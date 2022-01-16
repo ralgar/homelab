@@ -1,0 +1,36 @@
+---
+- name: Deploy Terraform Infrastructure
+  terraform:
+    project_path: "{{ playbook_dir }}/deploy"
+    force_init: "{{ force_init }}"
+    state: "{{ state }}"
+    variables:
+      dns_hostNums: "{{ dns.hostNums }}"
+      dns_secretKey: "{{ dns.secretKey }}"
+      dns_secretType: "{{ dns.secretType }}"
+      guest_ctImage: "{{ guest.ctImage }}"
+      guest_hostNums: "{{ hostNums }}"
+      guest_targetNode: "{{ guest.targetNode }}"
+      guest_storagePool: "{{ guest.storagePool }}"
+      guest_pubKeyFile: "{{ guest.pubKeyFile }}"
+      guest_vmTemplate: "{{ guest.vmTemplate }}"
+      net_domain: "{{ net.domain }}"
+      net_gateway: "{{ net.gateway }}"
+      net_prefix: "{{ net.prefix }}"
+      pve_host: proxmox.homelab.internal
+      pve_username: root
+      pve_password: "h2105%420swed*"
+      pve_tlsInsecure: "false"
+    targets: "{{ targets }}"
+  delegate_to: localhost
+
+- name: Refresh Inventory
+  meta: refresh_inventory
+  changed_when: no
+
+- name: If newly deployed nameservers, then add to inventory
+  add_host:
+    host: "{{ net.prefix | ansible.netcommon.nthhost(item) }}"
+    groups: new_nameservers
+  loop: "{{ dns.hostNums }}"
+  when: '"module.nameservers" in targets'
