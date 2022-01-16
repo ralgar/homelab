@@ -1,0 +1,8 @@
+---
+- name: Ensure the volume(s) are present
+  file:
+    path: "/srv/{{ service_name }}"
+    state: directory
+    owner: "10{{ service_uid }}"
+    group: "10{{ service_uid }}"
+    mode: 0700
