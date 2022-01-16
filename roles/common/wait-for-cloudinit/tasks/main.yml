@@ -1,0 +1,8 @@
+---
+- name: Wait for cloud-init to finish
+  community.general.cloud_init_data_facts:
+    filter: status
+  register: res
+  until: "res.cloud_init_data_facts.status.v1.stage is defined and not res.cloud_init_data_facts.status.v1.stage"
+  retries: 80
+  delay: 15

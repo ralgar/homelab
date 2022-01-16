@@ -1,0 +1,34 @@
+---
+- name: Check for existing swap file
+  stat:
+    path: /.swapfile
+  register: swapfile
+
+- name: Ensure swap file exists
+  file:
+    path: /.swapfile
+    owner: root
+    group: root
+    mode: 0600
+    seuser: system_u
+    serole: object_r
+    setype: swapfile_t
+    state: touch
+  when: not swapfile.stat.exists
+
+- name: Zero-fill the swap file
+  command: "dd if=/dev/zero of=/.swapfile bs=1M count={{ size }}"
+  when: not swapfile.stat.exists
+
+- name: Format the swap file
+  command: mkswap /.swapfile
+  when: not swapfile.stat.exists
+
+- name: Activate the swap file
+  command: swapon /.swapfile
+  when: not swapfile.stat.exists
+
+- name: Create the fstab entry
+  lineinfile:
+    path: /etc/fstab
+    line: /.swapfile    swap    swap    defaults    0 0

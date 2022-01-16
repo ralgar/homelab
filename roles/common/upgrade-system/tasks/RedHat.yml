@@ -1,0 +1,10 @@
+---
+- name: Upgrade the system
+  dnf:
+    name: "*"
+    state: latest
+    update_cache: yes
+
+- name: Remove any orphaned dependencies
+  dnf:
+    autoremove: yes
