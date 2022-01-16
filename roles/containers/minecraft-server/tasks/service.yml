@@ -1,0 +1,18 @@
+---
+- name: Install the service file
+  template:
+    src: container.service
+    dest: "/home/containers/.config/systemd/user/{{ service_name }}.service"
+    owner: containers
+    group: containers
+    mode: 0640
+
+- name: Enable and Start the service
+  systemd:
+    scope: user
+    name: "{{ service_name }}.service"
+    enabled: yes
+    state: started
+  environment:
+    XDG_RUNTIME_DIR: /run/user/9000
+  become_user: containers

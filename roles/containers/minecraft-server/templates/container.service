@@ -1,0 +1,54 @@
+[Unit]
+Description={{ service_name | capitalize }} container
+Documentation=man:podman-generate-systemd(1)
+Wants=network-online.target mariadb.service
+After=network-online.target mariadb.service
+RequiresMountsFor=%t/containers
+
+[Service]
+Environment=PODMAN_SYSTEMD_UNIT=%n
+Restart=no
+TimeoutStopSec=90
+
+# SPIGET_RESOURCES:
+#   19254 - ViaVersion - https://www.spigotmc.org/resources/19254
+
+ExecStartPre=/bin/rm -f %t/%n.ctr-id
+ExecStart=/usr/bin/podman run --cidfile=%t/%n.ctr-id --cgroups=no-conmon --rm --sdnotify=conmon --replace -d -it \
+    --name {{ service_name }} \
+    -e UID={{ service_uid }} \
+    -e GID={{ service_uid }} \
+    -v /srv/{{ service_name }}/data:/data:Z \
+    -v /srv/{{ service_name }}/config:/config:Z \
+    -p 25565:25565/tcp \
+    -p 19132:19132/udp \
+    -e EULA=TRUE \
+    -e TZ={{ timezone }} \
+    -e TYPE=PAPER \
+    -e SERVER_NAME="{{ mcserver.name }}" \
+    -e MOTD="{{ mcserver.motd }}" \
+    -e VERSION={{ mcserver.version }} \
+    -e MAX_PLAYERS={{ mcserver.max_players }} \
+    -e MODS_FILE=/config/mods.txt \
+    -e SPIGET_RESOURCES=19254 \
+    -e REMOVE_OLD_MODS=TRUE \
+    -e REMOVE_OLD_MODS_INCLUDE="*.jar" \
+    -e REMOVE_OLD_MODS_DEPTH=1 \
+    -e VIEW_DISTANCE=10 \
+    -e SEED=189354817 \
+    -e MEMORY={{ ansible_memtotal_mb - 1536 }}M \
+    -e TUNE_VIRTUALIZED=TRUE \
+    -e TUNE_NURSERY_SIZES=TRUE \
+    -e USE_AIKAR_FLAGS=true \
+    -e OPS={{ mcserver.ops }} \
+    -e OVERRIDE_OPS="true" \
+    itzg/minecraft-server:java17-openj9
+
+ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
+ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
+
+Type=notify
+NotifyAccess=all
+
+[Install]
+WantedBy=multi-user.target default.target

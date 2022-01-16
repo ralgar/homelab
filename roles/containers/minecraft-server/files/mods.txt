@@ -1,0 +1,8 @@
+###   GeyserMC (allow Bedrock clients)   ###
+https://ci.opencollab.dev/job/GeyserMC/job/Geyser/job/master/lastStableBuild/artifact/bootstrap/spigot/target/Geyser-Spigot.jar
+###   Floodgate (allow Bedrock without Java account)   ###
+https://ci.opencollab.dev/job/GeyserMC/job/Floodgate/job/master/lastStableBuild/artifact/spigot/target/floodgate-spigot.jar
+###   Holographic Displays   ###
+https://dev.bukkit.org/projects/holographic-displays/files/3402574/download
+###   CoreProtect   ###
+https://dev.bukkit.org/projects/coreprotect/files/3403438/download
