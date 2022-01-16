@@ -1,0 +1,19 @@
+# This playbook deploys and provisions one or more Debian LXC
+# containers for development purposes.
+---
+- name: Deploy Container with Terraform
+  hosts: localhost
+  vars_files:
+    - vars/global.yml
+  roles:
+    - role: terraform-deploy
+      targets: [ module.dev-containers ]
+      hostNums: [ 30, 31 ]
+
+- name: Provision Debian Dev Container
+  hosts: dev_servers
+  remote_user: root
+  gather_facts: no
+  roles:
+    - wait-for-connection
+    - common/upgrade-system
