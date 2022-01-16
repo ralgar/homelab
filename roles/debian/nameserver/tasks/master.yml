@@ -1,0 +1,16 @@
+---
+- name: Install DNS master configuration
+  template:
+    src: "{{ master_files.src }}"
+    dest: "{{ master_files.dest }}"
+    owner: root
+    group: bind
+    mode: 0640
+  loop:
+    - { src: named.conf.local.j2,   dest: /etc/bind/named.conf.local      }
+    - { src: named.conf.options.j2, dest: /etc/bind/named.conf.options    }
+    - { src: tsigkeys.conf,         dest: /etc/bind/tsigkeys.conf         }
+    - { src: zone.db.forward,       dest: /var/cache/bind/zone.db.forward }
+    - { src: zone.db.reverse,       dest: /var/cache/bind/zone.db.reverse }
+  loop_control:
+    loop_var: master_files

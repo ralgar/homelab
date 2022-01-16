@@ -1,0 +1,28 @@
+---
+- name: Install packages
+  apt:
+    name: bind9
+    update_cache: yes
+    policy_rc_d: 101
+
+- name: Install /etc/default/named
+  copy:
+    src: named
+    dest: /etc/default/named
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Include DNS master tasks
+  include_tasks: master.yml
+  when: ansible_hostname == 'ns1'
+
+- name: Include DNS slave tasks
+  include_tasks: slave.yml
+  when: ansible_hostname >= 'ns2'
+
+- name: Enable and start named service
+  systemd:
+    name: named
+    enabled: yes
+    state: started

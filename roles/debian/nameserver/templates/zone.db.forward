@@ -1,0 +1,19 @@
+$TTL 86400 ; 1 day
+@ IN SOA {{ ansible_hostname }}.{{ ansible_domain }}. admin.{{ ansible_domain }}. (
+				0          ; serial  (incr.)
+				86400      ; refresh (1 day)
+				3600       ; retry   (1 hour)
+				604800     ; expire  (1 week)
+				10800      ; minimum (3 hours)
+)
+
+; Hostname | Record Type | IP Address
+
+; NS Records
+						NS			ns1.{{ ansible_domain }}.
+						NS			ns2.{{ ansible_domain }}.
+
+; A Records
+ns1					A				{{ net.prefix | ansible.netcommon.nthhost(dns.hostNums[0]) }}
+ns2					A				{{ net.prefix | ansible.netcommon.nthhost(dns.hostNums[1]) }}
+proxmox			A				{{ net.prefix | ansible.netcommon.nthhost(proxmox.hostNum) }}
