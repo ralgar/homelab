@@ -1,8 +1,11 @@
 ############################################
 ###   ANSIBLE SECRET FILES / VARIABLES   ###
 ############################################
-# Root vars directory (contains sensitve data)
+# Root variables directory
 /vars/*
+
+# Proxmox dynamic inventory file
+*.proxmox.yml
 
 # Not fully implemented / sanitized yet
 **/media-server-v2/*
