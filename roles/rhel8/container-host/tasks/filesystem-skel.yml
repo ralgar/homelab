@@ -1,0 +1,20 @@
+# Configure the user home directory skeleton
+---
+- name: Add .config/systemd/user to /etc/skel
+  file:
+    path: /etc/skel/.config/systemd/user
+    state: directory
+    owner: root
+    group: root
+    seuser: system_u
+    serole: object_r
+    setype: etc_t
+    mode: 0755
+
+- name: Ensure .bashrc sets XDG_RUNTIME_DIR
+  blockinfile:
+    path: /etc/skel/.bashrc
+    block: |
+      if [[ -z "$XDG_RUNTIME_DIR" ]] ; then
+          export XDG_RUNTIME_DIR="/run/user/$(id -u)"
+      fi
