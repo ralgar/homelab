@@ -7,6 +7,9 @@
 # Proxmox dynamic inventory file
 *.proxmox.yml
 
+# Test playbook
+test-playbook.yml
+
 # Not fully implemented / sanitized yet
 **/media-server-v2/*
 
