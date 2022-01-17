@@ -8,7 +8,7 @@
   roles:
     - role: terraform-deploy
       targets: [ module.dev-containers ]
-      hostNums: [ 30, 31 ]
+      hostNums: [ 30 ]
 
 - name: Provision Debian Dev Container
   hosts: dev_servers
