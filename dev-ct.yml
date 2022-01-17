@@ -15,5 +15,5 @@
   remote_user: root
   gather_facts: no
   roles:
-    - wait-for-connection
+    - common/wait-for-connection
     - common/upgrade-system
