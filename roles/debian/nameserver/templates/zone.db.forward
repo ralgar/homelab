@@ -10,10 +10,15 @@ $TTL 86400 ; 1 day
 ; Hostname | Record Type | IP Address
 
 ; NS Records
-						NS			ns1.{{ ansible_domain }}.
-						NS			ns2.{{ ansible_domain }}.
+{% for dnsHostNum in dns.hostNums %}
+												NS			ns{{ loop.index }}.{{ ansible_domain }}.
+{% endfor %}
 
 ; A Records
-ns1					A				{{ net.prefix | ansible.netcommon.nthhost(dns.hostNums[0]) }}
-ns2					A				{{ net.prefix | ansible.netcommon.nthhost(dns.hostNums[1]) }}
-proxmox			A				{{ net.prefix | ansible.netcommon.nthhost(proxmox.hostNum) }}
+{% for dnsHostNum in dns.hostNums %}
+ns{{ loop.index }}			A				{{ net.prefix | ansible.netcommon.nthhost(dnsHostNum) }}
+{% endfor %}
+
+{% for pveHostNum in proxmox.hostNums %}
+pve{{ loop.index }}			A				{{ net.prefix | ansible.netcommon.nthhost(pveHostNum) }}
+{% endfor %}

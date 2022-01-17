@@ -10,10 +10,15 @@ $TTL 86400 ; 1 day
 ; IP Octets (rev. order) | Record Type | FQDN
 
 ; NS Records
-						NS			ns1.{{ ansible_domain }}.
-						NS			ns2.{{ ansible_domain }}.
+{% for dnsHostNum in dns.hostNums %}
+										NS			ns{{ loop.index }}.{{ ansible_domain }}.
+{% endfor %}
 
 ; PTR Records
-{{ dns.hostNums[0] }}			PTR	 ns1.{{ ansible_domain }}.
-{{ dns.hostNums[1] }}			PTR	 ns2.{{ ansible_domain }}.
-{{ proxmox.hostNum }}     PTR	 proxmox.{{ ansible_domain }}.
+{% for dnsHostNum in dns.hostNums %}
+{{ dnsHostNum }}		PTR			ns{{ loop.index }}.{{ ansible_domain }}.
+{% endfor %}
+
+{% for pveHostNum in proxmox.hostNums %}
+{{ pveHostNum }}		PTR			pve{{ loop.index }}.{{ ansible_domain }}.
+{% endfor %}
