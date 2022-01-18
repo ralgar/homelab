@@ -1,0 +1,10 @@
+---
+- name: Include base tasks
+  include_tasks: "{{ item }}"
+  loop:
+    - repo-config.yml
+    - subscription-nag.yml
+
+- name: Include dark theme
+  include_tasks: dark-theme.yml
+  when: dark_theme

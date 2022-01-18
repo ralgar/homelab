@@ -1,0 +1,12 @@
+---
+- name: Subscription Nag - Restart PVE web server
+  service:
+    name: pveproxy
+    state: restarted
+  listen: "restart pveproxy"
+
+- name: Repo Config - Perform a dist-upgrade
+  apt:
+    update_cache: true
+    upgrade: dist
+  listen: "new repo dist-upgrade"

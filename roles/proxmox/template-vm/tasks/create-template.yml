@@ -1,0 +1,20 @@
+# Create a template VM in Proxmox
+---
+- name: Copy create-template.sh script
+  copy:
+    src: create-template.sh
+    dest: /usr/local/bin/
+    owner: root
+    group: root
+    mode: 0700
+
+- name: Create a template using the script
+  command:
+    argv:
+      - create-template.sh
+      - "{{ template_vm_name }}"
+      - "/rpool/data/images/{{ image | basename }}"
+      - zfs
+  register: vm_template
+  changed_when: vm_template.rc == 0
+  failed_when: vm_template.rc == 2

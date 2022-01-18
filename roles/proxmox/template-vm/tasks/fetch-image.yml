@@ -1,0 +1,12 @@
+# Fetch a VM image from the web
+---
+- name: Ensure images directory exists
+  file:
+    path: /rpool/data/images
+    state: directory
+
+- name: Fetch guest image from web
+  get_url:
+    url: "{{ image }}"
+    checksum: "{{ checksum }}"
+    dest: "/rpool/data/images/{{ image | basename }}"

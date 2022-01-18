@@ -1,0 +1,10 @@
+# Initializes fresh Proxmox host(s) for homelab use
+# NOTE: the dark theme pulls a script from a third-party repo, if you
+#         prefer not to use it, simply toggle the boolean to `false`
+---
+- name: Initialize the Proxmox Host(s)
+  hosts: proxmox_nodes
+  remote_user: root
+  roles:
+    - { role: proxmox/base-init, dark_theme: true                             }
+    - { role: proxmox/template-vm                                             }
