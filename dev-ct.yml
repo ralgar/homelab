@@ -9,7 +9,7 @@
     - role: terraform-deploy
       targets: [ module.dev-containers ]
       hostNums: [ 30 ]
-      targetNode: proxmox
+      targetNode: pve1
       storagePool: local-zfs
 
 - name: Provision Debian Dev Container

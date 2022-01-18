@@ -9,7 +9,7 @@
     - role: terraform-deploy
       targets: [ module.nameservers ]
       hostNums: "{{ dns.hostNums }}"    # Needs to be set in ./vars/global.yml
-      targetNode: proxmox
+      targetNode: pve1
       storagePool: local-zfs
 
 - name: Provision Name Servers

@@ -8,7 +8,7 @@
     - role: terraform-deploy
       targets: [ module.minecraft-servers ]
       hostNums: [ 40 ]
-      targetNode: proxmox
+      targetNode: pve1
       storagePool: local-zfs
 
 - name: Provision the VM with Ansible

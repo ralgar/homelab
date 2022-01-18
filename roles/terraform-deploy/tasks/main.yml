@@ -17,7 +17,7 @@
       net_domain: "{{ net.domain }}"
       net_gateway: "{{ net.gateway }}"
       net_prefix: "{{ net.prefix }}"
-      pve_host: proxmox.homelab.internal
+      pve_host: pve1.homelab.internal
       pve_username: root
       pve_password: "h2105%420swed*"
       pve_tlsInsecure: "false"
