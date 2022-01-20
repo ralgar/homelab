@@ -1,0 +1,40 @@
+---
+- name: Install package(s)
+  apt:
+    pkg:
+      - postgresql-13
+      - python3-psycopg2
+      - sudo
+    update_cache: yes
+    policy_rc_d: 101
+
+- name: Install postgresql.conf
+  copy:
+    src: postgresql.conf
+    dest: /etc/postgresql/13/main/postgresql.conf
+    owner: postgres
+    group: postgres
+    mode: 0644
+
+- name: Install pg_hba.conf
+  template:
+    src: pg_hba.conf.j2
+    dest: /etc/postgresql/13/main/pg_hba.conf
+    owner: postgres
+    group: postgres
+    mode: 0640
+
+- name: Enable and start the service(s)
+  systemd:
+    name: postgresql@13-main
+    enabled: yes
+    state: started
+
+- name: Create a DB administrator
+  postgresql_user:
+    db: postgres
+    name: dbadmin
+    password: "{{ adminPassword }}"
+    role_attr_flags: "SUPERUSER"
+  become: yes
+  become_user: postgres
