@@ -1,0 +1,6 @@
+---
+- name: Restart PVE web server
+  service:
+    name: pveproxy
+    state: restarted
+  listen: "restart pveproxy"

@@ -6,5 +6,5 @@
   hosts: proxmox_nodes
   remote_user: root
   roles:
-    - { role: proxmox/base-init, dark_theme: true                             }
+    - { role: proxmox/host-upgrade, dark_theme: true                          }
     - { role: proxmox/template-vm                                             }

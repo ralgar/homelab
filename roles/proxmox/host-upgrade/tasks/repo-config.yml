@@ -1,10 +1,10 @@
 ---
-- name: Repo Config - Remove the enterprise repository
+- name: Remove the enterprise repository
   file:
     path: /etc/apt/sources.list.d/pve-enterprise.list
     state: absent
 
-- name: Repo Config - Add the no-subscription repository
+- name: Add the no-subscription repository
   template:
     src: pve-no-subscription.list
     dest: /etc/apt/sources.list.d/pve-no-subscription.list
@@ -13,5 +13,7 @@
     mode: 0644
   notify: "new repo dist-upgrade"
 
-- name: Flush handlers
-  meta: flush_handlers
+- name: Upgrade the system
+  apt:
+    update_cache: true
+    upgrade: dist

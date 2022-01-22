@@ -1,8 +1,0 @@
-# Upgrades the Proxmox host(s), and re-runs the base-init role
----
-- name: Upgrade the Proxmox Host(s)
-  hosts: proxmox_nodes
-  remote_user: root
-  roles:
-    - { role: common/upgrade-system                                           }
-    - { role: proxmox/base-init, dark_theme: true                             }
