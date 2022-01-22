@@ -1,4 +1,4 @@
-# Initializes fresh Proxmox host(s) for homelab use
+# Initializes or upgrades Proxmox host(s) for homelab use
 # NOTE: the dark theme pulls a script from a third-party repo, if you
 #         prefer not to use it, simply toggle the boolean to `false`
 ---
