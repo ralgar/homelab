@@ -19,6 +19,7 @@ Coming soon:
 Dependencies:
 - [Ansible](https://www.ansible.com/)
 - [Terraform](https://www.terraform.io/)
+- python-dnspython
 - python-netaddr
 - python-psycopg2
 
