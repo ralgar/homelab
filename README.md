@@ -5,7 +5,7 @@
 
 
 ## Overview
-A set of Ansible/Terraform deployments, to automate the provisioning of my homelab services. The services run on a combination of Debian LXC containers, and RHEL 8 virtual machines with rootless podman containers.
+A set of Ansible/Terraform deployments to automate the provisioning of my homelab services. The services run on a combination of Debian LXC containers, and Rocky Linux (RHEL) 8 virtual machines with rootless podman containers.
 
 ### Features
 - [x] Basic Proxmox host management
@@ -13,10 +13,11 @@ A set of Ansible/Terraform deployments, to automate the provisioning of my homel
 - [x] PostgreSQL database
 - [x] Basic development container
 - [x] Simple Minecraft server
-- [x] Automated PKI
+- [x] Automated PKI system
 - [ ] LDAP server (coming soon)
 - [ ] CI/CD pipeline (coming soon)
 - [ ] Media server (coming soon)
+- [ ] Improved Proxmox host management (coming soon)
 
 
 ## Requirements
