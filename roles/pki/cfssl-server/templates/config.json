@@ -1,0 +1,59 @@
+{
+  "auth_keys": {
+    "key1": {
+      "key": "{{ cfssl_auth_key }}",
+      "type": "standard"
+    }
+  },
+  "signing": {
+    "default": {
+      "auth_key": "key1",
+      "ocsp_url": "http://pki.{{ ansible_domain }}:8889",
+      "crl_url": "http://pki.{{ ansible_domain }}:8888/crl",
+      "expiry": "43830h"
+    },
+    "profiles": {
+      "intermediate": {
+        "auth_key": "key1",
+        "usages": [
+          "signing",
+          "key encipherment",
+          "cert sign",
+          "crl sign"
+        ],
+        "expiry": "43830h",
+        "ca_constraint": {
+          "is_ca": true,
+          "max_path_len": 1
+        }
+      },
+      "server": {
+        "auth_key": "key1",
+        "usages": [
+          "signing",
+          "key encipherment",
+          "server auth"
+        ],
+        "expiry": "43830h"
+      },
+      "client": {
+        "auth_key": "key1",
+        "usages": [
+          "signing",
+          "key encipherment",
+          "client auth",
+          "email protection"
+        ],
+        "expiry": "43830h"
+      },
+      "ocsp": {
+        "auth_key": "key1",
+        "usages": [
+          "digital signature",
+          "ocsp signing"
+        ],
+        "expiry": "43830h"
+      }
+    }
+  }
+}

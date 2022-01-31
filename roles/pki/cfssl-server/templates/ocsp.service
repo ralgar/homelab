@@ -1,0 +1,17 @@
+[Unit]
+Description=CFSSL OCSP Responder
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=exec
+User=cfssl
+Group=cfssl
+Restart=no
+ExecStart=cfssl ocspserve \
+    -address={{ ansible_default_ipv4.address|default(ansible_all_ipv4_addresses[0]) }} \
+    -port=8889 \
+    -db-config=/etc/cfssl/database.json
+
+[Install]
+WantedBy=multi-user.target

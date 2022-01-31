@@ -1,0 +1,12 @@
+---
+- name: Restart cfssl.service
+  systemd:
+    name: cfssl.service
+    daemon_reload: yes
+    state: restarted
+
+- name: Restart ocsp.service
+  systemd:
+    name: ocsp.service
+    daemon_reload: yes
+    state: restarted

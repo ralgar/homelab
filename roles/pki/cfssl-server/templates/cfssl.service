@@ -1,0 +1,21 @@
+[Unit]
+Description=CFSSL API Endpoint
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=exec
+User=cfssl
+Group=cfssl
+Restart=no
+ExecStart=cfssl serve \
+    -address={{ ansible_default_ipv4.address|default(ansible_all_ipv4_addresses[0]) }} \
+    -config=/etc/cfssl/config.json \
+    -db-config=/etc/cfssl/database.json \
+    -ca=/var/cfssl/int/ca.pem \
+    -ca-key=/var/cfssl/int/ca-key.pem \
+    -responder=/var/cfssl/ocsp/ocsp.pem \
+    -responder-key=/var/cfssl/ocsp/ocsp-key.pem
+
+[Install]
+WantedBy=multi-user.target

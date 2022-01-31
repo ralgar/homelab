@@ -1,0 +1,14 @@
+---
+# Semantic version number of cfssl to download
+cfssl_version: "1.6.1"
+
+# A 32 char hex key for remote signing
+cfssl_auth_key: "0123456789ABCDEF0123456789ABCDEF"
+
+cert_domain:
+  C: CA
+  ST: British Columbia
+  L: West Coast
+  O: My Organization
+
+uid: 1386
