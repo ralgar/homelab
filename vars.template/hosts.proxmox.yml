@@ -1,0 +1,22 @@
+##########################################################
+###   Proxmox Dynamic Inventory Plugin Configuration   ###
+##########################################################
+plugin: community.general.proxmox
+
+# Connection Settings
+url: https://pve1.homelab.internal:8006
+user: root@pam
+password: "somereallygoodpassword"
+validate_certs: true
+
+# Ansible Inventory Groups (from tags in Proxmox)
+want_facts: true
+groups:
+  databases: "'db' in (proxmox_tags_parsed|list)"
+  debian: "'debian' in (proxmox_tags_parsed|list)"
+  development: "'dev' in (proxmox_tags_parsed|list)"
+  minecraft: "'minecraft' in (proxmox_tags_parsed|list)"
+  nameservers: "'nameservers' in (proxmox_tags_parsed|list)"
+  pki_servers: "'pki' in (proxmox_tags_parsed|list)"
+  production: "'prod' in (proxmox_tags_parsed|list)"
+  rhel: "'rhel' in (proxmox_tags_parsed|list)"
