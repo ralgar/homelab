@@ -4,10 +4,11 @@
   hosts: localhost
   vars_files:
     - vars/global.yml
+    - vars/minecraft.yml
   roles:
     - role: terraform-deploy
       targets: [ module.minecraft-servers ]
-      hostNums: [ 40 ]
+      hostNums: "{{ mcserver.hostNums }}"
       targetNode: pve1
       storagePool: local-zfs
 
@@ -16,12 +17,19 @@
   become: true
   gather_facts: no
   vars_files:
+    - vars/pki.yml
     - vars/minecraft.yml
   roles:
-    - { role: common/wait-for-connection                                      }
-    - { role: common/swap-file,     size: "{{ swap_size }}"                   }
-    - { role: common/wait-for-cloudinit                                       }
-    - { role: rhel8/timesync-ntp                                              }
-    - { role: rhel8/container-host, prod: "{{ production }}"                  }
-    - { role: containers/mariadb                                              }
-    - { role: containers/minecraft-server                                     }
+    - role: common/wait-for-connection
+    - role: common/swap-file
+      size: "{{ swap_size }}"
+    - role: common/wait-for-cloudinit
+    - role: rhel8/timesync-ntp
+    - role: rhel8/container-host
+      prod: "{{ production }}"
+    - role: pki/cfssl-gencert
+      path: "{{ pki.path }}"
+      CN: "{{ pki.CN }}"
+      OU: "{{ pki.OU }}"
+    - role: containers/mariadb
+    - role: containers/minecraft-server
