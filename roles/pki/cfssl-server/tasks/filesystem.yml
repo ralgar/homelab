@@ -1,0 +1,36 @@
+---
+- name: Create directories
+  file:
+    path: "{{ dirs.path }}"
+    owner: root
+    group: "{{ dirs.group }}"
+    mode: "{{ dirs.mode }}"
+    state: directory
+  loop:
+    - { path: /etc/cfssl, group: cfssl, mode: "0750" }
+    - { path: /var/cfssl, group: cfssl, mode: "0770" }
+    - { path: /var/cfssl/root, group: cfssl, mode: "0770" }
+    - { path: /var/cfssl/int, group: cfssl, mode: "0770" }
+    - { path: /var/cfssl/ocsp, group: cfssl, mode: "0770" }
+    - { path: /usr/local/lib/systemd/system, group: root, mode: "0755" }
+  loop_control:
+    loop_var: dirs
+
+- name: Install config files
+  template:
+    src: "{{ file }}"
+    dest: "/etc/cfssl/{{ file }}"
+    owner: root
+    group: cfssl
+    mode: 0640
+  loop:
+    - config.json
+    - database.json
+    - ocsp.csr.json
+    - intermediate-ca.csr.json
+    - root-ca.csr.json
+  loop_control:
+    loop_var: file
+  notify:
+    - Restart cfssl.service
+    - Restart ocsp.service

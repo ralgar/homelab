@@ -1,0 +1,129 @@
+#!/usr/bin/env python
+'''
+Generates a new key and certificate using the CFSSL API, and
+bundle the certificate with the intermediate CA certificate.
+'''
+
+import json
+import os
+import shutil
+import requests
+
+from ansible.module_utils.basic import AnsibleModule
+
+
+def bundle_certs():
+    ''' Create a certificate chain with
+        the signer and endpoint certificates. '''
+
+    cfssl_host  = module.params['cfssl_host']
+    cfssl_port  = module.params['cfssl_port']
+    cert_path   = module.params['cert_path']
+    bundle_path = module.params['bundle_path']
+
+    base_url = 'http://' + cfssl_host + ':' + cfssl_port + '/api/v1/cfssl'
+
+    data = {
+        'label': 'default'
+    }
+
+    response = requests.post(base_url + '/info', data=json.dumps(data)).json()
+
+    try:
+        with open(bundle_path, 'w') as f_bundle:
+            f_bundle.write(response['result']['certificate'] + '\n')
+            with open(cert_path, 'r') as f_cert:
+                shutil.copyfileobj(f_cert, f_bundle)
+    except TypeError as fault:
+        module.fail_json(
+            msg='Unable to get signer certificate!',
+            exception=str(fault),
+            response_code=response['success']
+        )
+
+    changed = True
+    return changed
+
+
+def request_cert():
+    ''' Request a new certficiate '''
+
+    changed     = False
+    cfssl_host  = module.params['cfssl_host']
+    cfssl_port  = module.params['cfssl_port']
+    profile     = module.params['profile']
+    cert_path   = module.params['cert_path']
+    key_path    = module.params['key_path']
+    common_name = module.params['common_name']
+    names       = module.params['names']
+    hosts       = module.params['hosts']
+
+    url = 'http://' + cfssl_host + ':' + cfssl_port + '/api/v1/cfssl/newcert'
+
+    data = {
+        'profile': profile,
+        'request': {
+            'CN': common_name,
+            'names': names,
+            'hosts': hosts,
+        }
+    }
+
+    # Request a certificate from the API
+    response = requests.post(url, data=json.dumps(data)).json()
+
+    # Try to write out the response components.
+    try:
+        with open(cert_path, 'w') as fd:
+            fd.write(response['result']['certificate'])
+        with open(key_path, 'w') as fd:
+            fd.write(response['result']['private_key'])
+        os.chmod(key_path, 0o600)
+    except TypeError as fault:
+        module.fail_json(
+            msg='Unable to generate certificate!',
+            exception=str(fault),
+            response_code=response['success']
+        )
+
+    changed = True
+    return changed
+
+
+def main():
+    ''' Main function of the module '''
+
+    global module
+
+    result = dict(
+        changed=False,
+    )
+
+    module = AnsibleModule(
+        argument_spec=dict(
+            cfssl_host=dict(type='str',   required=False, default='localhost'),
+            cfssl_port=dict(type='str',   required=False, default='8888'),
+            profile=dict(type='str',      required=False),
+            cert_path=dict(type='path',   required=True),
+            key_path=dict(type='path',    required=True),
+            bundle_path=dict(type='path', required=True),
+            common_name=dict(type='str',  required=True),
+            names=dict(type='list',       required=True),
+            hosts=dict(type='list',       required=True)
+        ),
+        supports_check_mode=True
+    )
+
+    # Generate a new cert if needed
+    if not os.path.exists(module.params['cert_path']):
+        if not module.check_mode:
+            if request_cert():
+                result['changed']=True
+            if bundle_certs():
+                result['changed']=True
+
+    module.exit_json(**result)
+
+
+if __name__ == '__main__':
+    main()

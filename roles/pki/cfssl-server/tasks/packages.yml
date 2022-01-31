@@ -1,0 +1,27 @@
+---
+- name: Install package(s)
+  apt:
+    pkg:
+      - sudo
+    update_cache: yes
+    policy_rc_d: 101
+
+- name: Install cfssl binaries
+  get_url:
+    url: "https://github.com/cloudflare/cfssl/releases/download/v{{ cfssl_version }}/{{ binary }}_{{ cfssl_version }}_linux_amd64"
+    dest: "/usr/local/bin/{{ binary }}"
+    mode: 0755
+    owner: root
+    group: root
+    checksum: "sha256:https://github.com/cloudflare/cfssl/releases/download/v{{ cfssl_version }}/cfssl_{{ cfssl_version }}_checksums.txt"
+  loop:
+    - cfssl
+    - cfssl-bundle
+    - cfssl-certinfo
+    - cfssl-newkey
+    - cfssl-scan
+    - cfssljson
+    - mkbundle
+    - multirootca
+  loop_control:
+    loop_var: binary

@@ -1,0 +1,10 @@
+---
+- name: Include tasks
+  include_tasks: "{{ item }}"
+  loop:
+    - packages.yml
+    - users-and-groups.yml
+    - filesystem.yml
+    - database.yml
+    - generate-ca.yml
+    - services.yml

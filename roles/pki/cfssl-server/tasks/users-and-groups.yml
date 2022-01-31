@@ -1,0 +1,16 @@
+---
+- name: Ensure group exists
+  group:
+    name: cfssl
+    gid: "{{ uid }}"
+
+- name:
+  user:
+    name: cfssl
+    comment: PKI Services
+    uid: "{{ uid }}"
+    group: "{{ uid }}"
+    shell: /sbin/nologin
+    system: yes
+    home: /var/cfssl
+    create_home: no
