@@ -1,0 +1,20 @@
+- name: Generate CFSSL Certificate
+  cfssl_certificate:
+    cfssl_host: "pki.{{ ansible_domain }}"
+    cfssl_port: 8888
+    #api_token: "0123456789ABCDEF0123456789ABCDEF"
+    profile: server
+    cert_path: "{{ path }}/cert.pem"
+    key_path: "{{ path }}/key.pem"
+    chain_path: "{{ path }}/chain.pem"
+    common_name: "{{ CN }}"
+    hosts:
+      - "{{ ansible_hostname }}"
+      - "{{ ansible_hostname }}.{{ ansible_domain }}"
+      - "{{ ansible_default_ipv4.address }}"
+    names:
+      C: "{{ pki_common.subject.C }}"
+      ST: "{{ pki_common.subject.ST }}"
+      L: "{{ pki_common.subject.L }}"
+      O: "{{ pki_common.subject.O }}"
+      OU: "{{ OU }}"
