@@ -1,6 +1,6 @@
 # Deploys and provisions the infrastructure services
 ---
-- name: Deploy Name Servers
+- name: Deploy BIND9 Name Servers
   hosts: localhost
   vars_files:
     - vars/global.yml
@@ -11,7 +11,7 @@
       targetNode: pve1
       storagePool: local-zfs
 
-- name: Provision Name Servers
+- name: Provision BIND9 Name Servers
   hosts: new_nameservers
   remote_user: root
   gather_facts: no
@@ -22,7 +22,7 @@
     - common/upgrade-system
     - debian/nameserver
 
-- name: Deploy Database
+- name: Deploy PostgreSQL Database
   hosts: localhost
   vars_files:
     - vars/global.yml
@@ -33,7 +33,7 @@
       targetNode: pve1
       storagePool: local-zfs
 
-- name: Provision Database
+- name: Provision PostgreSQL Database
   hosts: postgres
   remote_user: root
   gather_facts: no
@@ -43,3 +43,25 @@
     - common/wait-for-connection
     - common/upgrade-system
     - debian/postgresql
+
+- name: Deploy PKI Server
+  hosts: localhost
+  vars_files:
+    - vars/global.yml
+  roles:
+    - role: terraform-deploy
+      targets: [ module.pki-server ]
+      hostNums: [ 24 ]
+      targetNode: pve1
+      storagePool: local-zfs
+
+- name: Provision PKI Server
+  hosts: pki_servers
+  remote_user: root
+  gather_facts: no
+  vars_files:
+    - vars/global.yml
+  roles:
+    - common/wait-for-connection
+    - common/upgrade-system
+    - pki/cfssl-server
