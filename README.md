@@ -1,27 +1,31 @@
 # Homelab Provisioning
+[![Latest Tag](https://img.shields.io/github/v/tag/ralgar/homelab-provisioning?style=for-the-badge&logo=semver&logoColor=white)](https://github.com/ralgar/homelab-provisioning/tags)
+[![Software License](https://img.shields.io/github/license/ralgar/homelab-provisioning?style=for-the-badge&logo=gnu&logoColor=white)](https://www.gnu.org/licenses/gpl-3.0.html)
+[![Github Stars](https://img.shields.io/github/stars/ralgar/homelab-provisioning?style=for-the-badge&logo=github&logoColor=white&color=gold)](https://github.com/ralgar/homelab-provisioning)
 
-## About the project
-A set of Ansible/Terraform deployments, to automate the provisioning of my homelab services. Everything runs on a combination of Debian LXC containers, and RHEL 8 virtual machines.
 
-Currently includes:
-- Proxmox host management
-- DNS nameservers
-- PostgreSQL database
-- Development container
-- Minecraft server
+## Overview
+A set of Ansible/Terraform deployments, to automate the provisioning of my homelab services. The services run on a combination of Debian LXC containers, and RHEL 8 virtual machines with rootless podman containers.
 
-Coming soon:
-- PKI server
-- LDAP server
-- Media server
+### Features
+- [x] Basic Proxmox host management
+- [x] Automated internal DNS
+- [x] PostgreSQL database
+- [x] Basic development container
+- [x] Simple Minecraft server
+- [x] Automated PKI
+- [ ] LDAP server (coming soon)
+- [ ] CI/CD pipeline (coming soon)
+- [ ] Media server (coming soon)
+
 
 ## Requirements
 Dependencies:
 - [Ansible](https://www.ansible.com/)
 - [Terraform](https://www.terraform.io/)
-- python-dnspython
-- python-netaddr
-- python-psycopg2
+- [dnspython](https://github.com/rthalley/dnspython/)
+- [netaddr](https://github.com/netaddr/netaddr)
+- [psycopg2](https://github.com/psycopg/psycopg2)
 
 Other requirements:
 - [Proxmox VE](https://www.proxmox.com/) host
@@ -37,20 +41,19 @@ Other requirements:
    ```
 3. Clone this repository and change directory into it.
    ```
-   $ git clone https://github.com/basschaser/homelab-provisioning.git
+   $ git clone --recurse-submodules https://github.com/basschaser/homelab-provisioning.git
    $ cd homelab-provisioning
    ```
 4. Copy the `vars.template` directory to `vars`.
    ```
    $ cp -r vars.template vars`
    ```
-5. Edit the variables in `vars/global.yml` as needed.
-6. Edit the parameters in `hosts.proxmox.yml` to point to a Proxmox host.
-7. Initialize the Terraform deployment.
+5. Edit the variables in `vars/global.yml` and `vars/hosts.proxmox.yml` as needed.
+6. Initialize the Terraform deployment.
    ```
-   $ cd ./deploy
+   $ cd deploy
    $ terraform init
-   $ cd ../
+   $ cd ..
    ```
 
 Now we are ready to start deploying the infrastructure.
@@ -61,7 +64,7 @@ The base infrastructure runs in Debian LXC containers, and is required to proper
    * Run the `proxmox-init.yml` playbook
 2. Deploy the base infrastructure services.
    * Run the `infrastructure.yml` playbook
-3. Change your router and/or device settings to use the new DNS servers.
+3. Change your router and/or device settings to use the new domain and DNS servers.
 
 ### Deploying the user-facing services
 The user-facing services can be deployed modularly, in any desired combination.
@@ -72,5 +75,14 @@ The user-facing services can be deployed modularly, in any desired combination.
 ### Destroying services
 To destroy any of the created services, simply append `-e state=absent` to the `ansible-playbook` command:
 ```
-$ ansible-playbook nameservers.yml -e state=absent
+$ ansible-playbook minecraft.yml -e state=absent
+$ ansible-playbook infrastructure.yml -e state=absent
 ```
+
+
+<!-- License -->
+## License
+
+Copyright: (c) 2022, Ryan Algar (https://github.com/ralgar/homelab-provisioning)
+
+GNU General Public License v3.0 (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
