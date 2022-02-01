@@ -13,9 +13,10 @@
       storagePool: local-zfs
 
 - name: Provision Debian Dev Container
-  hosts: dev_servers
+  hosts: development
   remote_user: root
   gather_facts: no
   roles:
     - common/wait-for-connection
     - common/upgrade-system
+    - debian/development

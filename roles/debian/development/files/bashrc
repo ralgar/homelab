@@ -1,0 +1,7 @@
+# ~/.bashrc
+
+export LS_OPTIONS="--color=auto --group-directories-first"
+eval "$(dircolors)"
+alias ls="ls $LS_OPTIONS -lh"
+alias ll="ls $LS_OPTIONS -lh"
+alias la="ls $LS_OPTIONS -lah"

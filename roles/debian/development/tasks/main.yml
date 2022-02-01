@@ -1,0 +1,15 @@
+---
+- name: Install package(s)
+  apt:
+    pkg:
+      - vim
+    update_cache: yes
+    policy_rc_d: 101
+
+- name: Install bashrc
+  copy:
+    src: bashrc
+    dest: /root/.bashrc
+    owner: root
+    group: root
+    mode: 0644
