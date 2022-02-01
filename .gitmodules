@@ -1,3 +1,3 @@
 [submodule "roles/pki/cfssl-gencert/library"]
-	path = roles/pki/cfssl-gencert/library
+	path = library
 	url = https://github.com/ralgar/ansible-cfssl-certificate
