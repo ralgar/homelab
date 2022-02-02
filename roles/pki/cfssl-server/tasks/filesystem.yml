@@ -12,6 +12,7 @@
     - { path: /var/cfssl/root, group: cfssl, mode: "0770" }
     - { path: /var/cfssl/int, group: cfssl, mode: "0770" }
     - { path: /var/cfssl/ocsp, group: cfssl, mode: "0770" }
+    - { path: /var/cfssl/ca-serve, group: cfssl, mode: "0770" }
     - { path: /usr/local/lib/systemd/system, group: root, mode: "0755" }
   loop_control:
     loop_var: dirs

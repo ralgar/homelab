@@ -10,6 +10,7 @@
   loop:
     - cfssl.service
     - ocsp.service
+    - root-ca-serve.service
   loop_control:
     loop_var: service_install
 
@@ -21,5 +22,6 @@
   loop:
     - cfssl.service
     - ocsp.service
+    - root-ca-serve.service
   loop_control:
     loop_var: service_start

@@ -10,3 +10,9 @@
     name: ocsp.service
     daemon_reload: yes
     state: restarted
+
+- name: Restart root-ca-serve.service
+  systemd:
+    name: root-ca-serve.service
+    daemon_reload: yes
+    state: restarted

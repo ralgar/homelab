@@ -10,6 +10,12 @@
   become: yes
   become_user: cfssl
 
+- name: Create hard link to Root CA
+  file:
+    src: /var/cfssl/root/ca.pem
+    dest: /var/cfssl/ca-serve/root-ca.pem
+    state: hard
+
 - name: Generate Intermediate CA
   shell:
     cmd: |
