@@ -27,6 +27,16 @@
           "max_path_len": 1
         }
       },
+      "server-client": {
+        "auth_key": "key1",
+        "usages": [
+          "signing",
+          "key encipherment",
+          "server auth",
+          "client auth"
+        ],
+        "expiry": "43830h"
+      },
       "server": {
         "auth_key": "key1",
         "usages": [
