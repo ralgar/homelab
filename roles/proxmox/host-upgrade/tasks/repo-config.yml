@@ -11,7 +11,6 @@
     owner: root
     group: root
     mode: 0644
-  notify: "new repo dist-upgrade"
 
 - name: Upgrade the system
   apt:
