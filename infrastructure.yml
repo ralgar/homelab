@@ -19,7 +19,6 @@
     - vars/global.yml
   roles:
     - common/wait-for-connection
-    - common/upgrade-system
     - debian/nameserver
 
 - name: Deploy PostgreSQL Database
@@ -41,7 +40,6 @@
     - vars/global.yml
   roles:
     - common/wait-for-connection
-    - common/upgrade-system
     - debian/postgresql
 
 - name: Deploy PKI Server
@@ -63,5 +61,4 @@
     - vars/global.yml
   roles:
     - common/wait-for-connection
-    - common/upgrade-system
     - pki/cfssl-server
