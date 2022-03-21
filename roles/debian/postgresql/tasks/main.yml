@@ -1,4 +1,8 @@
 ---
+- name: Ensure locale exists
+  locale_gen:
+    name: en_US.UTF-8
+
 - name: Install package(s)
   apt:
     pkg:

@@ -3,6 +3,7 @@
 - name: Deploy the VM with Terraform
   hosts: localhost
   vars_files:
+    - vars/hosts.proxmox.yml
     - vars/global.yml
     - vars/minecraft.yml
   roles:

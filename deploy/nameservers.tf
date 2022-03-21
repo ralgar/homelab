@@ -9,8 +9,8 @@ module "nameservers" {
   count       = length(var.guest_hostNums)
   countIndex  = count.index
   cores       = 1
-  memory      = 128
-  swap        = 128
+  memory      = 256
+  swap        = 256
   rootSize    = 8
   startOnBoot = true
   addToDns    = false

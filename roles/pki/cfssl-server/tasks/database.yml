@@ -1,5 +1,5 @@
 ---
-- name: Check if DB exists
+- name: Check if the DB exists
   postgresql_ping:
     db: cfssl
     login_host: 192.168.1.22
@@ -8,7 +8,21 @@
   register: cfssl_db
   delegate_to: localhost
 
-- name: Configure DB if not exists
+- name: Create the DB if it doesn't exist
+  postgresql_db:
+    login_host: 192.168.1.22
+    login_user: dbadmin
+    login_password: "p4$Sw0Rd"
+    name: cfssl
+    encoding: UTF-8
+    lc_collate: en_US.UTF-8
+    lc_ctype: en_US.UTF-8
+    template: template0
+    state: present
+  delegate_to: localhost
+  when: not cfssl_db.is_available
+
+- name: Seed the DB if newly created
   postgresql_db:
     login_host: 192.168.1.22
     login_user: dbadmin
