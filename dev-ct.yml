@@ -4,6 +4,7 @@
 - name: Deploy Container with Terraform
   hosts: localhost
   vars_files:
+    - vars/hosts.proxmox.yml
     - vars/global.yml
   roles:
     - role: terraform-deploy

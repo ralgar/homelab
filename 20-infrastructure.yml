@@ -3,6 +3,7 @@
 - name: Deploy PostgreSQL Database
   hosts: localhost
   vars_files:
+    - vars/hosts.proxmox.yml
     - vars/global.yml
   roles:
     - role: terraform-deploy
@@ -24,6 +25,7 @@
 - name: Deploy PKI Server
   hosts: localhost
   vars_files:
+    - vars/hosts.proxmox.yml
     - vars/global.yml
   roles:
     - role: terraform-deploy

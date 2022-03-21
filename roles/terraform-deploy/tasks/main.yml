@@ -17,10 +17,10 @@
       net_domain: "{{ net.domain }}"
       net_gateway: "{{ net.gateway }}"
       net_prefix: "{{ net.prefix }}"
-      pve_host: pve1.homelab.internal
-      pve_username: root
-      pve_password: "h2105%420swed*"
-      pve_tlsInsecure: "false"
+      pve_host: "{{ url }}"
+      pve_username: "{{ user }}"
+      pve_password: "{{ password }}"
+      pve_tlsInsecure: "{{ 'true' if not validate_certs else 'false' }}"
     targets: "{{ targets }}"
   delegate_to: localhost
 

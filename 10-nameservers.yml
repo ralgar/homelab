@@ -3,6 +3,7 @@
 - name: Deploy BIND9 Name Servers
   hosts: localhost
   vars_files:
+    - vars/hosts.proxmox.yml
     - vars/global.yml
   roles:
     - role: terraform-deploy
