@@ -62,9 +62,10 @@ Now we are ready to start deploying the infrastructure.
 ### Deploying the infrastructure
 The base infrastructure runs in Debian LXC containers, and is required to properly configure the user-facing services. You can deploy the base infrastructure as follows:
 1. **Optional:** Initialize the Proxmox host(s).
-   * Run the `proxmox-init.yml` playbook
+   * Run the `proxmox-host.yml` playbook
 2. Deploy the base infrastructure services.
-   * Run the `infrastructure.yml` playbook
+   * Run the `10-nameservers.yml` playbook
+   * Run the `20-infrastructure.yml` playbook
 3. Change your router and/or device settings to use the new domain and DNS servers.
 
 ### Deploying the user-facing services
@@ -77,7 +78,7 @@ The user-facing services can be deployed modularly, in any desired combination.
 To destroy any of the created services, simply append `-e state=absent` to the `ansible-playbook` command:
 ```
 $ ansible-playbook minecraft.yml -e state=absent
-$ ansible-playbook infrastructure.yml -e state=absent
+$ ansible-playbook 20-infrastructure.yml -e state=absent
 ```
 
 
