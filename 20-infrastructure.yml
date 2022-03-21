@@ -1,26 +1,5 @@
-# Deploys and provisions the infrastructure services
+# Deploys and provisions infrastructure services
 ---
-- name: Deploy BIND9 Name Servers
-  hosts: localhost
-  vars_files:
-    - vars/global.yml
-  roles:
-    - role: terraform-deploy
-      targets: [ module.nameservers ]
-      hostNums: "{{ dns.hostNums }}"
-      targetNode: pve1
-      storagePool: local-zfs
-
-- name: Provision BIND9 Name Servers
-  hosts: new_nameservers
-  remote_user: root
-  gather_facts: no
-  vars_files:
-    - vars/global.yml
-  roles:
-    - common/wait-for-connection
-    - debian/nameserver
-
 - name: Deploy PostgreSQL Database
   hosts: localhost
   vars_files:
