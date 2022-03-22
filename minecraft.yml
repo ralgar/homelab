@@ -28,9 +28,3 @@
     - role: rhel8/timesync-ntp
     - role: rhel8/container-host
       prod: "{{ production }}"
-    - role: pki/cfssl-gencert
-      path: "{{ pki.path }}"
-      CN: "{{ pki.CN }}"
-      OU: "{{ pki.OU }}"
-    - role: containers/mariadb
-    - role: containers/minecraft-server
