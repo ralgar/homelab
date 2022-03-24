@@ -3,8 +3,8 @@
   get_url:
     url: http://pki:8000/root-ca.pem
     dest: /usr/local/share/ca-certificates/homelab-root-ca.crt
-  register: root_ca_stat
+  register: certificate_status
 
 - name: Update CA trust store
   command: update-ca-certificates
-  when: root_ca_stat.changed
+  when: certificate_status.changed
