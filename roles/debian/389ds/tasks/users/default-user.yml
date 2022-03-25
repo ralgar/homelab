@@ -5,7 +5,7 @@
     bind_pw: "{{ dirsrv_root_pw }}"
     server_uri: "{% if dirsrv_cert_db.stat.exists %}ldaps://{% else %}ldap://{% endif %}"
     validate_certs: no
-    dn: "uid={{ default_user_uid }},ou=people,{{ dirsrv_domain }}"
+    dn: "cn={{ default_user_uid }},ou=people,{{ dirsrv_domain }}"
     objectClass:
       - top
       - nsPerson
@@ -22,11 +22,9 @@
     bind_pw: "{{ dirsrv_root_pw }}"
     server_uri: "{% if dirsrv_cert_db.stat.exists %}ldaps://{% else %}ldap://{% endif %}"
     validate_certs: no
-    dn: "uid={{ default_user_uid }},ou=people,{{ dirsrv_domain }}"
+    dn: "cn={{ default_user_uid }},ou=people,{{ dirsrv_domain }}"
     attributes:
-      uid: "{{ default_user_uid }}"
       cn: "{{ default_user_uid }}"
       displayName: "{{ default_user_displayname }}"
-      employeeType: developer
       mail: "{{ default_user_email }}"
     state: exact
