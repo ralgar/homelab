@@ -1,0 +1,10 @@
+---
+dirsrv_domain: "{{ dirsrv.suffix }}"
+dirsrv_root_pw: "{{ dirsrv.root_user_passwd }}"
+
+# Default User Configuration
+admin_user_passwd: "{{ dirsrv.admin_user_passwd }}"
+default_user_uid: "{{ dirsrv.default_user.uid }}"
+default_user_displayname: "{{ dirsrv.default_user.displayName }}"
+default_user_email: "{{ dirsrv.default_user.email }}"
+default_user_passwd: "{{ dirsrv.default_user.passwd }}"

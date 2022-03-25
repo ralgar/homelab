@@ -12,10 +12,10 @@
       - nsAccount
       - nsOrgPerson
     attributes:
-      cn: admin
+      cn: Admin
       uid: admin
       displayName: Admin
-      userPassword: "{{ admin_user_password }}"
+      userPassword: "{{ admin_user_passwd }}"
     state: present
 
 - name: Assert 'admin' user
@@ -26,8 +26,7 @@
     validate_certs: no
     dn: "uid=admin,ou=people,{{ dirsrv_domain }}"
     attributes:
-      cn: admin
+      cn: Admin
       uid: admin
       displayName: Admin
-      employeeType: developer
     state: exact

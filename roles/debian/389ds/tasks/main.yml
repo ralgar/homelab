@@ -32,6 +32,5 @@
     - permissions/user_read.yml
     - users/admin.yml
     - users/default-user.yml
-    - services/gitlab.yml
     - groups/administrators.yml
     - configure-tls.yml

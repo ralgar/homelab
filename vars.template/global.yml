@@ -25,3 +25,13 @@ proxmox:
 
 postgres:
   adminPassword: "somegoodpassword"
+
+dirsrv:
+  suffix: dc=homelab,dc=internal
+  root_user_passwd: password
+  admin_user_passwd: password
+  default_user:
+    uid: default_user
+    displayName: Default User
+    email: default_user@domain.tld
+    passwd: password

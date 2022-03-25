@@ -12,10 +12,10 @@
       - nsAccount
       - nsOrgPerson
     attributes:
-      cn: "{{ default_user_uid }}"
+      cn: "{{ default_user_displayname }}"
       uid: "{{ default_user_uid }}"
       displayName: "{{ default_user_displayname }}"
-      userPassword: "{{ default_user_password }}"
+      userPassword: "{{ default_user_passwd }}"
     state: present
 
 - name: Assert 'default' user
@@ -26,9 +26,8 @@
     validate_certs: no
     dn: "uid={{ default_user_uid }},ou=people,{{ dirsrv_domain }}"
     attributes:
-      cn: "{{ default_user_uid }}"
+      cn: "{{ default_user_displayname }}"
       uid: "{{ default_user_uid }}"
       displayName: "{{ default_user_displayname }}"
-      employeeType: developer
       mail: "{{ default_user_email }}"
     state: exact
