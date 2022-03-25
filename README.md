@@ -11,10 +11,9 @@ A set of Ansible/Terraform deployments to automate the provisioning of my homela
 - [x] Basic Proxmox host management
 - [x] Automated internal DNS
 - [x] PostgreSQL database
-- [x] Basic development container
-- [x] Simple Minecraft server
 - [x] Automated PKI system
-- [ ] LDAP server (coming soon)
+- [x] LDAP server
+- [x] Simple Minecraft server
 - [ ] CI/CD pipeline (coming soon)
 - [ ] Media server (coming soon)
 - [ ] Improved Proxmox host management (coming soon)
@@ -80,6 +79,8 @@ To destroy any of the created services, simply append `-e state=absent` to the `
 $ ansible-playbook minecraft.yml -e state=absent
 $ ansible-playbook 20-infrastructure.yml -e state=absent
 ```
+
+**Note:** The DNS nameservers must be destroyed last.
 
 
 <!-- License -->
