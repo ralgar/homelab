@@ -12,7 +12,7 @@
     attributes:
       cn: GitLab
       description: GitLab Service Account
-      userPassword: "{{ readonly_user_password }}"
+      userPassword: "{{ gitlab_service_password }}"
     state: present
 
 - name: Assert that 'gitlab' has 'user_read' permission
