@@ -122,7 +122,7 @@ aci:
     (groupdn="ldap:///cn=user_passwd_reset,ou=permissions,{{ dirsrv_domain }}");
   )
 aci:
-  (targetattr="objectClass || description || nsUniqueId || uid || displayName || loginShell || uidNumber || gidNumber || gecos || homeDirectory || cn || memberOf || mail || nsSshPublicKey || nsAccountLock || userCertificate")
+  (targetattr="objectClass || description || nsUniqueId || uid || displayName || loginShell || uidNumber || gidNumber || gecos || homeDirectory || cn || memberOf || mail || nsSshPublicKey || nsAccountLock || userCertificate || employeeType")
   (targetfilter="(objectClass=nsAccount)")
   (version 3.0;
     acl "Enable only user read";

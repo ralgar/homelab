@@ -3,7 +3,7 @@
   cfssl_certificate:
     cfssl_host: "pki.{{ ansible_domain }}"
     cfssl_port: 8888
-    profile: server-client
+    profile: server_client
     cert_path: "/var/local/{{ ansible_hostname }}.crt"
     key_path: "/var/local/{{ ansible_hostname }}.key"
     chain_path: "/var/local/{{ ansible_hostname }}-chain.crt"
