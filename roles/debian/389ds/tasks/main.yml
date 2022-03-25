@@ -34,4 +34,7 @@
     - users/default-user.yml
     - services/gitlab.yml
     - groups/administrators.yml
+    - plugins/attribute-uniqueness.yml
+    - plugins/dna.yml
+    - plugins/enable-plugins.yml
     - configure-tls.yml

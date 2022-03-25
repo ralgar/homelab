@@ -27,7 +27,7 @@
           "max_path_len": 1
         }
       },
-      "server-client": {
+      "server_client": {
         "auth_key": "key1",
         "usages": [
           "signing",
