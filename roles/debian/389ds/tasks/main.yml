@@ -25,12 +25,13 @@
 - name: Include tasks
   include_tasks: "{{ item }}"
   loop:
-    - access-control.yml
     - authentication.yml
     - plugins/attribute-uniqueness.yml
     - plugins/dna.yml
     - plugins/enable-plugins.yml
+    - permissions/user_read.yml
     - users/admin.yml
     - users/default-user.yml
+    - services/gitlab.yml
     - groups/administrators.yml
     - configure-tls.yml
