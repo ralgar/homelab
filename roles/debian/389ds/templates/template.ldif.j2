@@ -1,6 +1,6 @@
 version: 1
 
-# Domain Root Entry
+# entry-id: 1  |  Domain Root Entry
 dn: dc=homelab,dc=internal
 objectClass: top
 objectClass: domain
@@ -21,7 +21,7 @@ aci: (targetattr="ou || objectClass")
     (userdn="ldap:///anyone");
   )
 
-# entry-id: 2 ???
+# entry-id: 2  |  ???
 # TODO: Figure out what this does
 dn: cn=389_ds_system,dc=homelab,dc=internal
 objectClass: top
@@ -29,7 +29,7 @@ objectClass: nscontainer
 objectClass: ldapsubentry
 cn: 389_ds_system
 
-# Groups OU
+# entry-id: 3  |  Groups OU
 dn: ou=groups,dc=homelab,dc=internal
 objectClass: top
 objectClass: organizationalunit
@@ -46,7 +46,7 @@ aci: (targetattr="cn || member || gidNumber || description || objectClass")(ta
   to manage groups"; allow (write, add, delete)(groupdn="ldap:///cn=group_admi
  n,ou=permissions,dc=homelab,dc=internal");)
 
-# People OU
+# entry-id: 4  |  People OU
 dn: ou=people,dc=homelab,dc=internal
 objectClass: top
 objectClass: organizationalunit
@@ -84,13 +84,13 @@ aci: (targetattr="userPassword || nsAccountLock || userCertificate || nsSshPub
  r password reset"; allow (write, read)(groupdn="ldap:///cn=user_passwd_reset,
  ou=permissions,dc=homelab,dc=internal");)
 
-# Permissions OU
+# entry-id: 5  |  Permissions OU
 dn: ou=permissions,dc=homelab,dc=internal
 objectClass: top
 objectClass: organizationalunit
 ou: permissions
 
-# Services OU
+# entry-id: 6  |  Services OU
 dn: ou=services,dc=homelab,dc=internal
 objectClass: top
 objectClass: organizationalunit
@@ -104,42 +104,42 @@ aci: (
     (userdn="ldap:///anyone");
   )
 
-# Permission - Group Admin
+# entry-id: 7  |  Permission - Group Admin
 dn: cn=group_admin,ou=permissions,dc=homelab,dc=internal
 objectClass: top
 objectClass: groupOfNames
 objectClass: nsMemberOf
 cn: group_admin
 
-# Permission - Group Modify
+# entry-id: 8  |  Permission - Group Modify
 dn: cn=group_modify,ou=permissions,dc=homelab,dc=internal
 objectClass: top
 objectClass: groupOfNames
 objectClass: nsMemberOf
 cn: group_modify
 
-# Permission - User Admin
+# entry-id: 9  |  Permission - User Admin
 dn: cn=user_admin,ou=permissions,dc=homelab,dc=internal
 objectClass: top
 objectClass: groupOfNames
 objectClass: nsMemberOf
 cn: user_admin
 
-# Permission - User Modify
+# entry-id: 10  |  Permission - User Modify
 dn: cn=user_modify,ou=permissions,dc=homelab,dc=internal
 objectClass: top
 objectClass: groupOfNames
 objectClass: nsMemberOf
 cn: user_modify
 
-# Permission - User Password Reset
+# entry-id: 11  |  Permission - User Password Reset
 dn: cn=user_passwd_reset,ou=permissions,dc=homelab,dc=internal
 objectClass: top
 objectClass: groupOfNames
 objectClass: nsMemberOf
 cn: user_passwd_reset
 
-# Permission - User Private Read
+# entry-id: 12  |  Permission - User Private Read
 dn: cn=user_private_read,ou=permissions,dc=homelab,dc=internal
 objectClass: top
 objectClass: groupOfNames
