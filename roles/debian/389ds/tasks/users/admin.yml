@@ -10,7 +10,6 @@
       - top
       - nsPerson
       - nsAccount
-      - nsOrgPerson
     attributes:
       cn: admin
       displayName: Admin

@@ -10,7 +10,6 @@
       - top
       - nsPerson
       - nsAccount
-      - nsOrgPerson
     attributes:
       cn: "{{ default_user_uid }}"
       displayName: "{{ default_user_displayname }}"
