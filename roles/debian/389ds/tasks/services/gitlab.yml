@@ -1,0 +1,38 @@
+---
+- name: Create 'gitlab' service account
+  ldap_entry:
+    bind_dn: cn=manager
+    bind_pw: "{{ dirsrv_root_pw }}"
+    server_uri: "{% if dirsrv_cert_db.stat.exists %}ldaps://{% else %}ldap://{% endif %}"
+    validate_certs: no
+    dn: "cn=gitlab,ou=services,{{ dirsrv_domain }}"
+    objectClass:
+      - simpleSecurityObject
+      - organizationalRole
+    attributes:
+      cn: GitLab
+      description: GitLab Service Account
+      userPassword: "{{ readonly_user_password }}"
+    state: present
+
+- name: Assert that 'gitlab' has 'user_read' permission
+  ldap_attrs:
+    bind_dn: cn=manager
+    bind_pw: "{{ dirsrv_root_pw }}"
+    server_uri: "{% if dirsrv_cert_db.stat.exists %}ldaps://{% else %}ldap://{% endif %}"
+    validate_certs: no
+    dn: "cn=user_read,ou=permissions,{{ dirsrv_domain }}"
+    attributes:
+      member: "cn=gitlab,ou=services,{{ dirsrv_domain }}"
+    state: present
+
+- name: Assert that 'gitlab' has 'user_passwd_reset' permission
+  ldap_attrs:
+    bind_dn: cn=manager
+    bind_pw: "{{ dirsrv_root_pw }}"
+    server_uri: "{% if dirsrv_cert_db.stat.exists %}ldaps://{% else %}ldap://{% endif %}"
+    validate_certs: no
+    dn: "cn=user_passwd_reset,ou=permissions,{{ dirsrv_domain }}"
+    attributes:
+      member: "cn=gitlab,ou=services,{{ dirsrv_domain }}"
+    state: present
