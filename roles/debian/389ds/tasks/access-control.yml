@@ -1,0 +1,19 @@
+---
+- name: Set ACL - User self read only
+  ldap_attrs:
+    bind_dn: cn=manager
+    bind_pw: "{{ dirsrv_root_pw }}"
+    server_uri: "{% if dirsrv_cert_db.stat.exists %}ldaps://{% else %}ldap://{% endif %}"
+    validate_certs: no
+    dn: "ou=people,{{ dirsrv_domain }}"
+    attributes:
+      aci:
+        (targetattr="objectClass || description || nsUniqueId || uid || displayName || loginShell || uidNumber || gidNumber || gecos || homeDirectory || cn || memberOf || mail || nsSshPublicKey || nsAccountLock || userCertificate")
+        (targetfilter="(objectClass=posixaccount)")
+        (version 3.0;
+          acl "Enable only user self read";
+          allow (read, search, compare)
+          (userdn="ldap:///self");
+        )
+    state: exact
+  notify: restart_dirsrv

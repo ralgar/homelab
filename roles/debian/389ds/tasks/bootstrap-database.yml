@@ -1,0 +1,38 @@
+---
+- name: Create dirsrv.inf template
+  template:
+    src: dirsrv.inf.j2
+    dest: /tmp/dirsrv.inf
+    owner: dirsrv
+    group: dirsrv
+    mode: 0640
+
+- name: Install the Directory Server instance
+  command: dscreate from-file /tmp/dirsrv.inf
+
+- name: Create the database backend
+  command: |
+    dsconf {{ ansible_hostname }}
+    backend create
+    --suffix {{ dirsrv_domain }}
+    --be-name userRoot
+
+- name: Create the LDIF template
+  template:
+    src: template.ldif.j2
+    dest: "/var/lib/dirsrv/slapd-{{ ansible_hostname }}/ldif/template.ldif"
+    owner: dirsrv
+    group: dirsrv
+    mode: 0640
+
+- name: Import the LDIF template
+  command: |
+    dsconf {{ ansible_hostname }}
+    backend import
+    userRoot
+    template.ldif
+
+- name: Remove the LDIF template
+  file:
+    path: "/var/lib/dirsrv/slapd-{{ ansible_hostname }}/ldif/template.ldif"
+    state: absent

@@ -1,0 +1,65 @@
+---
+- name: Generate Certificate
+  cfssl_certificate:
+    cfssl_host: "pki.{{ ansible_domain }}"
+    cfssl_port: 8888
+    profile: server-client
+    cert_path: "/var/local/{{ ansible_hostname }}.crt"
+    key_path: "/var/local/{{ ansible_hostname }}.key"
+    chain_path: "/var/local/{{ ansible_hostname }}-chain.crt"
+    common_name: "{{ ansible_hostname | upper }}"
+    hosts:
+      - "{{ ansible_hostname }}"
+      - "{{ ansible_hostname }}.{{ ansible_domain }}"
+      - "{{ ansible_default_ipv4.address }}"
+    names:
+      C: "{{ pki_common.subject.C }}"
+      ST: "{{ pki_common.subject.ST }}"
+      L: "{{ pki_common.subject.L }}"
+      O: "{{ pki_common.subject.O }}"
+      OU: Authentication
+  notify: restart_dirsrv
+  register: dirsrv_tls_cert
+
+- name: Get Root CA Certificate
+  get_url:
+    url: http://pki:8000/root-ca.pem
+    dest: /var/local/ca.crt
+    owner: dirsrv
+    group: dirsrv
+    mode: 0600
+
+- name: Import Root CA Certificate
+  command:
+    argv:
+      - dsctl
+      - "{{ ansible_hostname }}"
+      - tls
+      - import-ca
+      - /var/local/ca.crt
+      - Root CA
+  when: dirsrv_tls_cert.changed
+
+- name: Import TLS Certificate
+  command:
+    argv:
+      - dsctl
+      - "{{ ansible_hostname }}"
+      - tls
+      - import-server-key-cert
+      - "/var/local/{{ ansible_hostname }}-chain.crt"
+      - "/var/local/{{ ansible_hostname }}.key"
+  when: dirsrv_tls_cert.changed
+
+- name: Enable and Require TLS Connections
+  ldap_attrs:
+    bind_dn: cn=manager
+    bind_pw: password
+    server_uri: "{% if dirsrv_cert_db.stat.exists %}ldaps://{% else %}ldap://{% endif %}"
+    validate_certs: no
+    dn: cn=config
+    attributes:
+      nsslapd-security: "on"
+      nsslapd-require-secure-binds: "on"
+    state: exact
+  notify: restart_dirsrv

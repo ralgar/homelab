@@ -1,0 +1,15 @@
+---
+- name: Import TLS Certificate
+  command:
+    argv:
+      - dsctl
+      - "{{ ansible_hostname }}"
+      - tls
+      - import-server-key-cert
+      - /var/local/chain.pem
+      - /var/local/key.pem
+  listen: import_cert
+
+- name: Restart the Directory Server
+  command: "dsctl {{ ansible_hostname }} restart"
+  listen: restart_dirsrv
