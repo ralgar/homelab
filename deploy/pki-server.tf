@@ -16,6 +16,7 @@ module "pki-server" {
   rootSize    = 8
   startOnBoot = true
   addToDns    = true
+  dnsWildcard = false
   tags        = [ "pki", "prod" ]
 
   // Global Variables

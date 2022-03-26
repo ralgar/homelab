@@ -14,6 +14,7 @@ module "ldap-server" {
   rootSize    = 8
   startOnBoot = true
   addToDns    = true
+  dnsWildcard = false
   tags        = [ "ldap" ]
 
   // Global Variables

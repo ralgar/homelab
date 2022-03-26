@@ -34,6 +34,11 @@ variable "dnsSecretType" {
   type        = string
 }
 
+variable "dnsWildcard" {
+  description = "Use a wildcard for the DNS entry."
+  type        = bool
+}
+
 variable "guestCtImage" {
   description = "Guest container image"
   type        = string

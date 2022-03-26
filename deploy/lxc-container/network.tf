@@ -9,6 +9,15 @@ resource "dns_a_record_set" "lxc-dns-a-record" {
   count = var.addToDns ? 1 : 0
 }
 
+// DNS CNAME Records (Forward Zone)
+resource "dns_cname_record" "lxc-dns-cname-record" {
+  zone  = "${var.netDomain}."
+  name  = "*.${var.hostname}"
+  cname = "${var.hostname}.${var.netDomain}."
+  ttl   = 3600
+  count = var.dnsWildcard ? 1 : 0
+}
+
 // DNS Pointer Records (Reverse Zone)
 resource "dns_ptr_record" "lxc-dns-ptr-record" {
   zone = "${join(".", reverse(slice(split(".", var.netPrefix), 0, 3)))}.in-addr.arpa."

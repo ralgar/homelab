@@ -14,6 +14,7 @@ module "minecraft-servers" {
   rootSize    = 20
   startOnBoot = false
   addToDns    = true
+  dnsWildcard = false
   tags        = [ "minecraft", "prod" ]
 
   // Global Variables

@@ -14,6 +14,7 @@ module "postgresql" {
   rootSize    = 20
   startOnBoot = true
   addToDns    = true
+  dnsWildcard = false
   tags        = [ "db", "prod" ]
 
   // Global Variables

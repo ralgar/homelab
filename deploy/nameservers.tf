@@ -14,6 +14,7 @@ module "nameservers" {
   rootSize    = 8
   startOnBoot = true
   addToDns    = false
+  dnsWildcard = false
   tags        = [ "nameservers", "prod" ]
 
   // Global Passthrough Variables
