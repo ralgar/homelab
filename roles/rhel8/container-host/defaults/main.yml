@@ -1,0 +1,3 @@
+---
+# Toggles hardening for production servers
+prod: true

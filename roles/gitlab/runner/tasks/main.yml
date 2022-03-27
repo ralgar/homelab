@@ -1,0 +1,7 @@
+---
+- name: Include tasks
+  include_tasks: "{{ item }}"
+  loop:
+    - install-docker.yml
+    - install-runner.yml
+    - register-runner.yml

@@ -1,0 +1,45 @@
+---
+- name: Get temporary bearer API token from GitLab
+  uri:
+    url: https://gitlab.homelab.internal/oauth/token
+    method: POST
+    body_format: json
+    body:
+      grant_type: password
+      username: root
+      password: temp_password
+  register: gitlab_api_token
+
+- name: Disable sign-up and standard auth
+  uri:
+    url: "https://{{ ansible_hostname }}.{{ ansible_domain }}/api/v4/{{ api_loop }}"
+    method: PUT
+    headers:
+      Authorization: "Bearer {{ gitlab_api_token.json.access_token }}"
+  loop:
+    - "application/settings?signup_enabled=false"
+    - "application/settings?password_authentication_enabled_for_web=false"
+  loop_control:
+    loop_var: api_loop
+  changed_when: true
+
+# Workaround for lack of LDAP group sync in GitLab CE and unlicensed EE
+# https://gitlab.com/gitlab-org/gitlab-foss/-/issues/43239
+- name: Create LDAP default user with admin privileges
+  uri:
+    url: "https://{{ ansible_hostname }}.{{ ansible_domain }}/api/v4/users"
+    method: POST
+    headers:
+      Authorization: "Bearer {{ gitlab_api_token.json.access_token }}"
+    body_format: json
+    body:
+      admin: "true"
+      email: "{{ dirsrv_default_user_uid }}@{{ ansible_domain }}"
+      extern_uid: "uid={{ dirsrv_default_user_uid }},ou=people,{{ dirsrv_suffix }}"
+      name: "{{ dirsrv_default_user_uid | capitalize }}"
+      force_random_password: "true"
+      provider: ldapmain
+      skip_confirmation: "true"
+      username: "{{ dirsrv_default_user_uid }}"
+    status_code: [ 201, 409 ]
+  changed_when: true

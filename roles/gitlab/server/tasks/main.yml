@@ -1,0 +1,16 @@
+---
+- name: Check if GitLab is already installed
+  stat:
+    path: /etc/gitlab/gitlab.rb
+  register: gitlab_status
+
+- name: Include prerequisite tasks
+  include_tasks: "{{ item }}"
+  loop:
+    - database.yml
+    - ssl.yml
+    - ldap.yml
+
+- name: Include GitLab install task
+  include_tasks: gitlab.yml
+  when: not gitlab_status.stat.exists

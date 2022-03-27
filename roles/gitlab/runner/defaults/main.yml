@@ -1,0 +1,17 @@
+---
+# GitLab Runner Registration Authentication
+#
+# 20 character, case-sensitive, alpha-numeric key
+# TODO: Randomize this in a persistent way
+runner_registration_token: 4B8FX5xb7MShDycF7jcZ
+#
+# URL of the GitLab instance to register runner with
+runner_registration_url: "https://gitlab.{{ ansible_domain }}"
+
+
+# Runner Attributes
+#
+runner_description: "{{ ansible_hostname }}.{{ ansible_domain }}"
+runner_executor: docker
+runner_default_docker_image: alpine:latest
+runner_tags: [ docker ]

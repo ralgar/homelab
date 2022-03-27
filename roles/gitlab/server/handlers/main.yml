@@ -1,0 +1,14 @@
+---
+- name: Reconfigure and restart GitLab
+  command: "{{ gitlab_restart_commands }}"
+  loop:
+    - gitlab-ctl reconfigure
+    - gitlab-ctl restart
+  loop_control:
+    loop_var: gitlab_restart_commands
+  when: gitlab_status.stat.exists
+  listen: restart_gitlab
+
+- name: Disable sign-up and standard auth
+  include_tasks: ldap.yml
+  listen: ldap_handler

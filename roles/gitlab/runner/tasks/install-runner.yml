@@ -1,0 +1,22 @@
+---
+- name: Configure GitLab GPG Key
+  rpm_key:
+    key: https://packages.gitlab.com/gpg.key
+
+- name: Configure GitLab Runner repository
+  yum_repository:
+    name: gitlab-runner
+    description: GitLab Runner Respository
+    baseurl: https://packages.gitlab.com/runner/gitlab-runner/el/8/$basearch
+    repo_gpgcheck: yes
+    gpgcheck: yes
+    gpgkey:
+      - https://packages.gitlab.com/runner/gitlab-runner/gpgkey
+      - https://packages.gitlab.com/runner/gitlab-runner/gpgkey/runner-gitlab-runner-4C80FB51394521E9.pub.gpg
+    metadata_expire: 300
+
+- name: Install packages
+  dnf:
+    name: gitlab-runner
+    state: present
+    update_cache: yes

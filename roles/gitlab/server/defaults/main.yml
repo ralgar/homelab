@@ -1,0 +1,19 @@
+---
+# GitLab edition to install (ee or ce)
+# Note: Do not change after first run
+edition: ce
+
+# 20 character, case-sensitive, alpha-numeric key
+# TODO: Randomize this in a persistent way
+runner_token: 4B8FX5xb7MShDycF7jcZ
+
+# Password for the GitLab root account
+gitlab_root_passwd: password
+
+# Password for the GitLab LDAP service account
+gitlab_dirsrv_account_passwd: password
+
+# LDAP Variables
+dirsrv_suffix: dc=homelab,dc=internal
+dirsrv_root_passwd: password
+dirsrv_default_user_uid: default_user

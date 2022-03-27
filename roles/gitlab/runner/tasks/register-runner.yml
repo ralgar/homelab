@@ -1,0 +1,16 @@
+---
+- name: List configured runners
+  command: gitlab-runner list
+  register: configured_runners
+  changed_when: false
+
+- name: Register runner with GitLab
+  command: gitlab-runner register >
+    --non-interactive
+    --url "{{ runner_registration_url }}"
+    --registration-token "{{ runner_registration_token }}"
+    --description "{{ runner_description }}"
+    --tag-list "{{ runner_tags | join(',') }}"
+    --executor "{{ runner_executor }}"
+    --docker-image "{{ runner_default_docker_image }}"
+  when: configured_runners.stderr.find(runner_description) == -1

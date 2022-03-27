@@ -1,0 +1,19 @@
+---
+# GitLab edition to install (ee or ce)
+# Note: Do not change after first run
+edition: "{{ gitlab.edition }}"
+
+# 20 character, case-sensitive, alpha-numeric key
+# TODO: Randomize this in a persistent way
+runner_token: "{{ gitlab.runner_registration_token }}"
+
+# Password for the GitLab root user
+gitlab_root_passwd: "{{ gitlab.root_passwd }}"
+
+  # Password for the GitLab LDAP service account
+gitlab_dirsrv_account_passwd: "{{ gitlab.dirsrv_account_passwd }}"
+
+# LDAP Variables
+dirsrv_suffix: "{{ dirsrv.suffix }}"
+dirsrv_root_passwd: "{{ dirsrv.root_user_passwd }}"
+dirsrv_default_user_uid: "{{ dirsrv.default_user.uid }}"

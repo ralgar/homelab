@@ -1,0 +1,73 @@
+---
+- name: Install 'python-ldap'
+  apt:
+    name: python3-ldap
+    update_cache: yes
+
+- name: Create LDAP 'gitlab_users' group
+  ldap_entry:
+    bind_dn: cn=manager
+    bind_pw: "{{ dirsrv_root_passwd }}"
+    server_uri: "ldaps://ldap.{{ ansible_domain }}"
+    validate_certs: no
+    dn: "cn=gitlab_users,ou=groups,{{ dirsrv_suffix }}"
+    objectClass:
+      - top
+      - groupOfNames
+      - nsMemberOf
+    attributes:
+      cn: gitlab_users
+    state: present
+
+- name: Assert 'gitlab_users' group members
+  ldap_attrs:
+    bind_dn: cn=manager
+    bind_pw: "{{ dirsrv_root_passwd }}"
+    server_uri: "ldaps://ldap.{{ ansible_domain }}"
+    validate_certs: no
+    dn: "cn=gitlab_users,ou=groups,{{ dirsrv_suffix }}"
+    attributes:
+      member: "{{ dirsrv_gitlab_users }},ou=people,{{ dirsrv_suffix }}"
+    state: present
+  loop:
+    - "uid={{ dirsrv_default_user_uid }}"
+  loop_control:
+    loop_var: dirsrv_gitlab_users
+
+- name: Create 'gitlab' service account
+  ldap_entry:
+    bind_dn: cn=manager
+    bind_pw: "{{ dirsrv_root_passwd }}"
+    server_uri: "ldaps://ldap.{{ ansible_domain }}"
+    validate_certs: no
+    dn: "cn=gitlab,ou=services,{{ dirsrv_suffix }}"
+    objectClass:
+      - simpleSecurityObject
+      - organizationalRole
+    attributes:
+      cn: GitLab
+      description: GitLab Service Account
+      userPassword: "{{ gitlab_dirsrv_account_passwd }}"
+    state: present
+
+- name: Assert that 'gitlab' account has 'user_read' permission
+  ldap_attrs:
+    bind_dn: cn=manager
+    bind_pw: "{{ dirsrv_root_passwd }}"
+    server_uri: "ldaps://ldap.{{ ansible_domain }}"
+    validate_certs: no
+    dn: "cn=user_read,ou=permissions,{{ dirsrv_suffix }}"
+    attributes:
+      member: "cn=gitlab,ou=services,{{ dirsrv_suffix }}"
+    state: present
+
+- name: Assert that 'gitlab' account has 'user_passwd_reset' permission
+  ldap_attrs:
+    bind_dn: cn=manager
+    bind_pw: "{{ dirsrv_root_passwd }}"
+    server_uri: "ldaps://ldap.{{ ansible_domain }}"
+    validate_certs: no
+    dn: "cn=user_passwd_reset,ou=permissions,{{ dirsrv_suffix }}"
+    attributes:
+      member: "cn=gitlab,ou=services,{{ dirsrv_suffix }}"
+    state: present
