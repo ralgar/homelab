@@ -13,6 +13,7 @@ module "gitlab" {
   swap        = 2048
   rootSize    = 20
   startOnBoot = true
+  startOrder  = "order=4,up=15"
   addToDns    = true
   dnsWildcard = true
   tags        = [ "gitlab-all", "gitlab-server", "prod" ]

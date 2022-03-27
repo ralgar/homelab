@@ -128,6 +128,11 @@ variable "startOnBoot" {
   type        = bool
 }
 
+variable "startOrder" {
+  description = "Startup order of guests when host boots"
+  type        = string
+}
+
 variable "rootSize" {
   description = "Allocate rootfs disk space in GB"
   type        = number

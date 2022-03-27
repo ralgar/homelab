@@ -13,6 +13,7 @@ module "nameservers" {
   swap        = 256
   rootSize    = 8
   startOnBoot = true
+  startOrder  = "order=any"
   addToDns    = false
   dnsWildcard = false
   tags        = [ "nameservers", "prod" ]

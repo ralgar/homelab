@@ -13,6 +13,7 @@ module "postgresql" {
   swap        = 256
   rootSize    = 20
   startOnBoot = true
+  startOrder  = "order=any"
   addToDns    = true
   dnsWildcard = false
   tags        = [ "db", "prod" ]

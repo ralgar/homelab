@@ -15,6 +15,7 @@ resource "proxmox_lxc" "lxc-compute" {
   unprivileged = true
   start        = true
   onboot       = var.startOnBoot
+  startup      = var.startOrder
   tags         = join(",", var.tags)
 
   // System Resources
