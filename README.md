@@ -13,8 +13,10 @@ A set of Ansible/Terraform deployments to automate the provisioning of my homela
 - [x] PostgreSQL database
 - [x] Automated PKI system
 - [x] LDAP server
+- [x] CI/CD using GitLab and GitLab Runner
 - [x] Simple Minecraft server
-- [ ] CI/CD pipeline (coming soon)
+- [ ] Automated backups (coming soon)
+- [ ] Kubernetes Cluster (coming soon)
 - [ ] Media server (coming soon)
 - [ ] Improved Proxmox host management (coming soon)
 
