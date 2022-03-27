@@ -30,7 +30,6 @@
     - plugins/dna.yml
     - plugins/enable-plugins.yml
     - permissions/user_read.yml
-    - users/admin.yml
     - users/default-user.yml
     - groups/administrators.yml
     - configure-tls.yml

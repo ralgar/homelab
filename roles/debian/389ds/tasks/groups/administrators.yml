@@ -14,7 +14,7 @@
       cn: administrators
     state: present
 
-- name: Assert 'administrators' group
+- name: Assert 'administrators' group members
   ldap_attrs:
     bind_dn: cn=manager
     bind_pw: "{{ dirsrv_root_pw }}"
@@ -22,5 +22,5 @@
     validate_certs: no
     dn: "cn=administrators,ou=groups,{{ dirsrv_domain }}"
     attributes:
-      member: "uid=admin,ou=people,{{ dirsrv_domain }}"
+      member: "uid={{ default_user_uid }},ou=people,{{ dirsrv_domain }}"
     state: exact
