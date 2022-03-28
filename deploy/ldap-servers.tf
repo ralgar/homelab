@@ -13,7 +13,7 @@ module "ldap-server" {
   swap        = 256
   rootSize    = 8
   startOnBoot = true
-  startOrder  = "order=any"
+  startOrder  = "order=2"
   addToDns    = true
   dnsWildcard = false
   tags        = [ "ldap" ]
