@@ -58,6 +58,8 @@ module "gitlab-runner" {
   sockets     = 1
   memory      = 4096
   rootSize    = 20
+  auxDisk     = true
+  auxDiskSize = 8
   startOnBoot = true
   addToDns    = true
   dnsWildcard = false

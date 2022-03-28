@@ -3,6 +3,16 @@ variable "addToDns" {
   type        = bool
 }
 
+variable "auxDisk" {
+  description = "Toggle creation of an auxiliary disk."
+  type        = bool
+}
+
+variable "auxDiskSize" {
+  description = "Allocate auxiliary disk space in GB"
+  type        = number
+}
+
 variable "countIndex" {
   description = "Passthrough index of count"
   type        = number

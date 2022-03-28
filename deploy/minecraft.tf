@@ -12,6 +12,8 @@ module "minecraft-servers" {
   sockets     = 1
   memory      = 4096
   rootSize    = 20
+  auxDisk     = false
+  auxDiskSize = null
   startOnBoot = false
   addToDns    = true
   dnsWildcard = false

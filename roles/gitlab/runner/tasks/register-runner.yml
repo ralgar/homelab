@@ -13,4 +13,6 @@
     --tag-list "{{ runner_tags | join(',') }}"
     --executor "{{ runner_executor }}"
     --docker-image "{{ runner_default_docker_image }}"
+    --docker-privileged "true"
+    --docker-devices "/dev/sdb"
   when: configured_runners.stderr.find(runner_description) == -1

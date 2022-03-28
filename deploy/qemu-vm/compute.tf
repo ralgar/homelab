@@ -30,6 +30,15 @@ resource "proxmox_vm_qemu" "vm-compute" {
     size    = "${var.rootSize}G"
   }
 
+  dynamic "disk" {
+    for_each = var.auxDisk ? [1] : []
+    content {
+      type    = "scsi"
+      storage = var.guestStoragePool
+      size    = "${var.auxDiskSize}G"
+    }
+  }
+
   network {
     model  = "virtio"
     bridge = "vmbr0"
