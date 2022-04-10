@@ -3,5 +3,6 @@
   include_tasks: "{{ item }}"
   loop:
     - install-docker.yml
+    - install-kernel.yml
     - install-runner.yml
     - register-runner.yml

@@ -26,6 +26,7 @@
     - gitlab/server
 
 - name: Deploy the GitLab Runner VM with Terraform
+  tags: runner
   hosts: localhost
   vars_files:
     - vars/hosts.proxmox.yml
@@ -38,6 +39,7 @@
       storagePool: local-zfs
 
 - name: Provision the GitLab Runner VM with Ansible
+  tags: runner
   hosts: gitlab-runner
   become: true
   gather_facts: no

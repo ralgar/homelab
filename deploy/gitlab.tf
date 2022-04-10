@@ -11,7 +11,7 @@ module "gitlab" {
   cores       = 2
   memory      = 4096
   swap        = 2048
-  rootSize    = 20
+  rootSize    = 40
   startOnBoot = true
   startOrder  = "order=4,up=60"
   addToDns    = true
@@ -57,9 +57,9 @@ module "gitlab-runner" {
   cores       = 2
   sockets     = 1
   memory      = 4096
-  rootSize    = 20
+  rootSize    = 40
   auxDisk     = true
-  auxDiskSize = 8
+  auxDiskSize = 10
   startOnBoot = true
   addToDns    = true
   dnsWildcard = false

@@ -14,5 +14,20 @@
     --executor "{{ runner_executor }}"
     --docker-image "{{ runner_default_docker_image }}"
     --docker-privileged "true"
-    --docker-devices "/dev/sdb"
   when: configured_runners.stderr.find(runner_description) == -1
+
+- name: Assert runner docker volumes
+  lineinfile:
+    path: /etc/gitlab-runner/config.toml
+    insertafter: "[runners.docker]"
+    search_string: "volumes ="
+    line: '    volumes = ["/cache", "/dev/disk:/dev/disk"]'
+  notify: restart_runner
+
+- name: Assert runner docker devices
+  lineinfile:
+    path: /etc/gitlab-runner/config.toml
+    insertafter: "[runners.docker]"
+    search_string: "devices ="
+    line: '    devices = ["/dev/sdb"]'
+  notify: restart_runner
