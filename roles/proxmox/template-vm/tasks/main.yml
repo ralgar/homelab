@@ -1,6 +1,8 @@
 ---
-- name: Include tasks
-  include_tasks: "{{ item }}"
-  loop:
-    - fetch-image.yml
-    - create-template.yml
+- name: Fetch images
+  include_tasks: fetch-image.yml
+  loop: "{{ templates }}"
+
+- name: Create templates
+  include_tasks: create-template.yml
+  loop: "{{ templates }}"

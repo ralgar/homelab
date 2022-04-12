@@ -7,6 +7,6 @@
 
 - name: Fetch guest image from web
   get_url:
-    url: "{{ image }}"
-    checksum: "{{ checksum }}"
-    dest: "/rpool/data/images/{{ image | basename }}"
+    url: "{{ item.image }}"
+    checksum: "{{ item.checksum }}"
+    dest: "/rpool/data/images/{{ item.image | basename }}"

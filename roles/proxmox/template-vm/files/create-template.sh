@@ -10,7 +10,7 @@ _create_template_vm() {
     # Create a new VM
     qm create \
         "$_vmid" \
-        --name "$_template_vm_name" \
+        --name "$_template_name" \
         --memory 1024 \
         --net0 virtio,bridge=vmbr0 || return 1
 
@@ -45,11 +45,11 @@ _find_free_vmid() {
 
 _filesystem="$3"
 _image_path="$2"
-_template_vm_name="$1"
+_template_name="$1"
 
 
 if [[ "$#" -eq 3 ]] ; then
-    if ! qm list | grep "$_template_vm_name" &> /dev/null ; then
+    if ! qm list | grep "$_template_name" &> /dev/null ; then
         _find_free_vmid
         if _create_template_vm "$_image_path" "$_filesystem" ; then
             printf "\nSUCCESS!\n\n"

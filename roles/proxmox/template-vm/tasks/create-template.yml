@@ -12,8 +12,8 @@
   command:
     argv:
       - create-template.sh
-      - "{{ template_vm_name }}"
-      - "/rpool/data/images/{{ image | basename }}"
+      - "{{ item.template_name }}"
+      - "/rpool/data/images/{{ item.image | basename }}"
       - zfs
   register: vm_template
   changed_when: vm_template.rc == 0
