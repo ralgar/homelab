@@ -6,7 +6,7 @@
     - vars/hosts.proxmox.yml
     - vars/global.yml
   roles:
-    - role: terraform-deploy
+    - role: proxmox/terraform-deploy
       targets: [ module.gitlab ]
       hostNums: [ 30 ]
       targetNode: pve1
@@ -32,7 +32,7 @@
     - vars/hosts.proxmox.yml
     - vars/global.yml
   roles:
-    - role: terraform-deploy
+    - role: proxmox/terraform-deploy
       targets: [ module.gitlab-runner ]
       hostNums: [ 31 ]
       targetNode: pve1

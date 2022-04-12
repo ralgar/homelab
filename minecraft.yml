@@ -7,7 +7,7 @@
     - vars/global.yml
     - vars/minecraft.yml
   roles:
-    - role: terraform-deploy
+    - role: proxmox/terraform-deploy
       targets: [ module.minecraft-servers ]
       hostNums: "{{ mcserver.hostNums }}"
       targetNode: pve1

@@ -6,7 +6,7 @@
     - vars/hosts.proxmox.yml
     - vars/global.yml
   roles:
-    - role: terraform-deploy
+    - role: proxmox/terraform-deploy
       targets: [ module.postgresql ]
       hostNums: [ 22 ]
       targetNode: pve1
@@ -28,7 +28,7 @@
     - vars/hosts.proxmox.yml
     - vars/global.yml
   roles:
-    - role: terraform-deploy
+    - role: proxmox/terraform-deploy
       targets: [ module.pki-server ]
       hostNums: [ 24 ]
       targetNode: pve1
@@ -50,7 +50,7 @@
     - vars/hosts.proxmox.yml
     - vars/global.yml
   roles:
-    - role: terraform-deploy
+    - role: proxmox/terraform-deploy
       targets: [ module.ldap-server ]
       hostNums: [ 25 ]
       targetNode: pve1

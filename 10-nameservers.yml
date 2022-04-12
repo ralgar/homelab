@@ -6,7 +6,7 @@
     - vars/hosts.proxmox.yml
     - vars/global.yml
   roles:
-    - role: terraform-deploy
+    - role: proxmox/terraform-deploy
       targets: [ module.nameservers ]
       hostNums: "{{ dns.hostNums }}"
       targetNode: pve1
