@@ -6,18 +6,19 @@ module "minecraft-servers" {
   description = <<-EOT
     A production-ready Minecraft server.
   EOT
-  count       = length(var.guest_hostNums)
-  countIndex  = count.index
-  cores       = 2
-  sockets     = 1
-  memory      = 4096
-  rootSize    = 20
-  auxDisk     = false
-  auxDiskSize = null
-  startOnBoot = false
-  addToDns    = true
-  dnsWildcard = false
-  tags        = [ "minecraft", "prod" ]
+  count           = length(var.guest_hostNums)
+  countIndex      = count.index
+  cores           = 2
+  sockets         = 1
+  memory          = 4096
+  enableQemuAgent = 1
+  rootSize        = 20
+  auxDisk         = false
+  auxDiskSize     = null
+  startOnBoot     = false
+  addToDns        = true
+  dnsWildcard     = false
+  tags            = [ "minecraft", "prod" ]
 
   // Global Variables
   dnsHostNums      = var.dns_hostNums

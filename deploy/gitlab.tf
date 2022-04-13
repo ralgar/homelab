@@ -52,18 +52,19 @@ module "gitlab-runner" {
   description = <<-EOT
     GitLab CI Pipeline Runner
   EOT
-  count       = 1
-  countIndex  = count.index
-  cores       = 2
-  sockets     = 1
-  memory      = 4096
-  rootSize    = 40
-  auxDisk     = true
-  auxDiskSize = 10
-  startOnBoot = true
-  addToDns    = true
-  dnsWildcard = false
-  tags        = [ "gitlab-all", "gitlab-runner" ]
+  count           = 1
+  countIndex      = count.index
+  cores           = 2
+  sockets         = 1
+  memory          = 4096
+  enableQemuAgent = 1
+  rootSize        = 40
+  auxDisk         = true
+  auxDiskSize     = 10
+  startOnBoot     = true
+  addToDns        = true
+  dnsWildcard     = false
+  tags            = [ "gitlab-all", "gitlab-runner" ]
 
   // Global Variables
   dnsHostNums      = var.dns_hostNums

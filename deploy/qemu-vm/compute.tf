@@ -15,7 +15,7 @@ resource "proxmox_vm_qemu" "vm-compute" {
   onboot   = var.startOnBoot
   clone    = var.guestVmTemplate
   os_type  = "cloud-init"
-  agent    = 1
+  agent    = var.enableQemuAgent
   tags     = join(",", var.tags)
 
   // System Resources

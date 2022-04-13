@@ -49,6 +49,11 @@ variable "dnsWildcard" {
   type        = bool
 }
 
+variable "enableQemuAgent" {
+  description = "Toggle use of the QEMU guest agent (0 or 1)."
+  type        = number
+}
+
 variable "guestCtImage" {
   description = "Guest container image"
   type        = string
