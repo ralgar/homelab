@@ -18,7 +18,7 @@
   become: true
   gather_facts: no
   vars_files:
-    - vars/pki.yml
+    - vars/global.yml
     - vars/minecraft.yml
   roles:
     - role: common/wait-for-connection
