@@ -11,7 +11,7 @@ net:
 guest:
   ctImage: "local:vztmpl/debian-11-standard_11.0-1_amd64.tar.gz"
   pubKeyFile: "~/.ssh/id_ed25519.pub"
-  vmTemplate: template-rocky85
+  vmTemplate: template-rocky8
 
 pki_common:
   subject:

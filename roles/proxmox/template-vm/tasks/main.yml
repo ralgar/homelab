@@ -1,8 +1,17 @@
 ---
-- name: Fetch images
-  include_tasks: fetch-image.yml
-  loop: "{{ templates }}"
+- name: Ensure images directory exists
+  file:
+    path: /rpool/data/images
+    state: directory
 
-- name: Create templates
+- name: Copy create-template.sh script
+  copy:
+    src: create-template.sh
+    dest: /usr/local/bin/
+    owner: root
+    group: root
+    mode: 0700
+
+- name: Loop through the templates
   include_tasks: create-template.yml
   loop: "{{ templates }}"
