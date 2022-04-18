@@ -1,10 +1,14 @@
 ---
 templates:
-  # Rocky Linux
-  - template_name: template-rocky85
-    image: "http://download.rockylinux.org/pub/rocky/8.5/images/Rocky-8-GenericCloud-8.5-20211114.2.x86_64.qcow2"
-    checksum: "sha256:c23f58f26f73fb9ae92bfb4cf881993c23fdce1bbcfd2881a5831f90373ce0c8"
   # Arch Linux
   - template_name: template-arch
     image: "https://gitlab.archlinux.org/archlinux/arch-boxes/-/jobs/52734/artifacts/raw/output/Arch-Linux-x86_64-cloudimg-20220412.52734.qcow2"
     checksum: "sha256:ef793478a5456bb37cf26fd2d052acf9d5c51f76907f70237baad041399d0b44"
+  # Fedora 35
+  - template_name: template-fedora35
+    image: "https://download.fedoraproject.org/pub/fedora/linux/releases/35/Cloud/x86_64/images/Fedora-Cloud-Base-35-1.2.x86_64.qcow2"
+    checksum: "sha256:fe84502779b3477284a8d4c86731f642ca10dd3984d2b5eccdf82630a9ca2de6"
+  # Rocky Linux 8
+  - template_name: template-rocky8
+    image: "http://download.rockylinux.org/pub/rocky/8.5/images/Rocky-8-GenericCloud-8.5-20211114.2.x86_64.qcow2"
+    checksum: "sha256:c23f58f26f73fb9ae92bfb4cf881993c23fdce1bbcfd2881a5831f90373ce0c8"
