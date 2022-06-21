@@ -13,10 +13,10 @@ A set of Ansible/Terraform deployments to automate the provisioning of my homela
 - [x] PostgreSQL database
 - [x] Automated PKI system
 - [x] LDAP server
-- [x] CI/CD using GitLab and GitLab Runner
+- [x] GitLab and a GitLab Runner for CI/CD jobs
+- [x] Kubernetes Cluster (using K3s)
 - [x] Simple Minecraft server
 - [ ] Automated backups (coming soon)
-- [ ] Kubernetes Cluster (coming soon)
 - [ ] Media server (coming soon)
 - [ ] Improved Proxmox host management (coming soon)
 
@@ -25,6 +25,7 @@ A set of Ansible/Terraform deployments to automate the provisioning of my homela
 Dependencies:
 - [Ansible](https://www.ansible.com/)
 - [Terraform](https://www.terraform.io/)
+- [kubectl](https://kubernetes.io/docs/reference/kubectl/)
 - [dnspython](https://github.com/rthalley/dnspython/)
 - [netaddr](https://github.com/netaddr/netaddr)
 - [psycopg2](https://github.com/psycopg/psycopg2)

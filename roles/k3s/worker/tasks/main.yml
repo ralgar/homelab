@@ -1,0 +1,40 @@
+---
+- name: Copy K3s service file
+  template:
+    src: k3s.service.j2
+    dest: /usr/local/lib/systemd/system/k3s.service
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart_k3s
+
+- name: Flush handlers
+  meta: flush_handlers
+
+- name: Enable and check K3s service
+  systemd:
+    name: k3s.service
+    state: started
+    enabled: yes
+
+- name: Wait until worker is registered with master
+  command: kubectl get nodes -o name
+  register: res
+  until: ansible_hostname in res.stdout
+  retries: 60
+  delay: 5
+  changed_when: false
+  delegate_to: "{{ master_hostname }}.{{ ansible_domain }}"
+
+- name: Ensure 'worker' label is set for node
+  k8s:
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    definition:
+      apiversion: v1
+      kind: Node
+      metadata:
+        name: "{{ ansible_hostname }}.{{ ansible_domain }}"
+        labels:
+          node-role.kubernetes.io/worker: "true"
+  delegate_to: "{{ master_hostname }}.{{ ansible_domain }}"
+  become: yes

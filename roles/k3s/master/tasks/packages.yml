@@ -1,0 +1,11 @@
+---
+- name: Install pip
+  dnf:
+    name: python3-pip
+    update_cache: yes
+    state: present
+
+- name: Install Python Kubernetes library
+  pip:
+    name: kubernetes
+    state: present

@@ -1,0 +1,42 @@
+# Deploys and provisions the K3s cluster
+---
+- name: Deploy K3s Cluster
+  hosts: localhost
+  vars_files:
+    - vars/hosts.proxmox.yml
+    - vars/global.yml
+  roles:
+    - role: proxmox/terraform-deploy
+      targets: [ module.k3s-master ]
+      hostNums: [ 80 ]
+      targetNode: pve1
+      storagePool: local-zfs
+    - role: proxmox/terraform-deploy
+      targets: [ module.k3s-worker ]
+      hostNums: [ 81 ]
+      targetNode: pve1
+      storagePool: local-zfs
+
+- name: Provision K3s Master Node
+  hosts: k3s_master
+  become: true
+  gather_facts: no
+  vars_files:
+    - vars/global.yml
+  roles:
+    - common/wait-for-connection
+    - common/wait-for-cloudinit
+    - k3s/common
+    - k3s/master
+
+- name: Provision K3s Worker Node(s)
+  hosts: k3s_workers
+  become: true
+  gather_facts: no
+  vars_files:
+    - vars/global.yml
+  roles:
+    - common/wait-for-connection
+    - common/wait-for-cloudinit
+    - k3s/common
+    - k3s/worker

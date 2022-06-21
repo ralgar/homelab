@@ -1,6 +1,7 @@
 ##########################################################
 ###   Proxmox Dynamic Inventory Plugin Configuration   ###
 ##########################################################
+---
 plugin: community.general.proxmox
 
 # Connection Settings
@@ -15,6 +16,9 @@ groups:
   databases: "'db' in (proxmox_tags_parsed|list)"
   debian: "'debian' in (proxmox_tags_parsed|list)"
   development: "'dev' in (proxmox_tags_parsed|list)"
+  k3s_cluster: "'k3s-cluster' in (proxmox_tags_parsed|list)"
+  k3s_master: "'k3s-master' in (proxmox_tags_parsed|list)"
+  k3s_workers: "'k3s-worker' in (proxmox_tags_parsed|list)"
   minecraft: "'minecraft' in (proxmox_tags_parsed|list)"
   nameservers: "'nameservers' in (proxmox_tags_parsed|list)"
   pki_servers: "'pki' in (proxmox_tags_parsed|list)"

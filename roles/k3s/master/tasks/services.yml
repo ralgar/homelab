@@ -1,0 +1,18 @@
+---
+- name: Copy K3s service file
+  template:
+    src: k3s.service.j2
+    dest: /usr/local/lib/systemd/system/k3s.service
+    owner: root
+    group: root
+    mode: 0644
+  notify: config_changed
+
+- name: Flush handlers
+  meta: flush_handlers
+
+- name: Enable and start K3s service
+  systemd:
+    name: k3s
+    state: started
+    enabled: yes
