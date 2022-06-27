@@ -1,0 +1,31 @@
+---
+- name: Include tasks
+  include_tasks: "{{ item }}"
+  loop:
+    - prerequisites.yml
+    - packages.yml
+    - token.yml
+    - services.yml
+
+- name: Wait until worker is registered with master
+  command: k3s kubectl get nodes -o name
+  register: res
+  until: ansible_hostname in res.stdout
+  retries: 60
+  delay: 5
+  changed_when: false
+  delegate_to: "{{ groups['k3s_masters'][0] }}"
+  when: "'k3s_workers' in group_names"
+
+- name: Ensure 'worker' label is set for worker nodes
+  k8s:
+    definition:
+      apiversion: v1
+      kind: Node
+      metadata:
+        name: "{{ ansible_hostname }}.{{ ansible_domain }}"
+        labels:
+          node-role.kubernetes.io/worker: "true"
+  delegate_to: localhost
+  become: no
+  when: "'k3s_workers' in group_names"

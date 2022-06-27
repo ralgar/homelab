@@ -17,26 +17,13 @@
       targetNode: pve1
       storagePool: local-zfs
 
-- name: Provision K3s Master Node
-  hosts: k3s_master
+- name: Provision K3s Cluster
+  hosts: k3s_cluster
   become: true
-  gather_facts: no
+  gather_facts: false
   vars_files:
     - vars/global.yml
   roles:
     - common/wait-for-connection
     - common/wait-for-cloudinit
-    - k3s/common
-    - k3s/master
-
-- name: Provision K3s Worker Node(s)
-  hosts: k3s_workers
-  become: true
-  gather_facts: no
-  vars_files:
-    - vars/global.yml
-  roles:
-    - common/wait-for-connection
-    - common/wait-for-cloudinit
-    - k3s/common
-    - k3s/worker
+    - kubernetes/k3s-cluster

@@ -43,7 +43,7 @@
 
 - name: Set bridge-nf-call-iptables (just to be sure)
   sysctl:
-    name: "{{ item }}"
+    name: "{{ bridge_nf_call_loop }}"
     value: "1"
     state: present
     reload: yes
@@ -51,6 +51,8 @@
   loop:
     - net.bridge.bridge-nf-call-iptables
     - net.bridge.bridge-nf-call-ip6tables
+  loop_control:
+    loop_var: bridge_nf_call_loop
 
 - name: Add /usr/local/bin to sudo secure_path
   lineinfile:
@@ -62,15 +64,17 @@
     validate: 'visudo -cf %s'
   when: ansible_distribution in ['CentOS', 'Red Hat Enterprise Linux']
 
-- name: Ensure 'local' systemd directory exists
+- name: Ensure required directories exist
   file:
-    path: "{{ systemd_dir }}"
+    path: "{{ local_dir }}"
     owner: root
     group: root
     mode: 0755
     state: directory
   loop:
+    - /etc/rancher/k3s
+    - /etc/rancher/node
     - /usr/local/lib/systemd
     - /usr/local/lib/systemd/system
   loop_control:
-    loop_var: systemd_dir
+    loop_var: local_dir

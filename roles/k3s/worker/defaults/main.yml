@@ -1,3 +1,0 @@
----
-master_hostname: k3s-master
-extra_worker_args: "--disable traefik --disable servicelb"

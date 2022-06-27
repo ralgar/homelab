@@ -1,0 +1,23 @@
+---
+- name: Copy K3s service file
+  template:
+    src: "{{ config_file.src }}"
+    dest: "{{ config_file.dest }}"
+    owner: root
+    group: root
+    mode: 0644
+  loop:
+    - { src: config.yaml.j2, dest: "{{ k3s_config_file }}" }
+    - { src: k3s.service.j2, dest: "{{ k3s_service_file }}" }
+  loop_control:
+    loop_var: config_file
+  notify: config_changed
+
+- name: Flush handlers
+  meta: flush_handlers
+
+- name: Enable and start K3s service
+  systemd:
+    name: k3s.service
+    state: started
+    enabled: yes

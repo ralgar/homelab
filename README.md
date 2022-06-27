@@ -26,6 +26,7 @@ Dependencies:
 - [Ansible](https://www.ansible.com/)
 - [Terraform](https://www.terraform.io/)
 - [kubectl](https://kubernetes.io/docs/reference/kubectl/)
+- [Kubernetes Python Client](https://github.com/kubernetes-client/python/)
 - [dnspython](https://github.com/rthalley/dnspython/)
 - [netaddr](https://github.com/netaddr/netaddr)
 - [psycopg2](https://github.com/psycopg/psycopg2)

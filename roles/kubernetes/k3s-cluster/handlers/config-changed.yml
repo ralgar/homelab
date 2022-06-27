@@ -13,18 +13,21 @@
     mode: 0700
   delegate_to: localhost
   become: no
+  when: inventory_hostname == groups['k3s_masters'][0]
 
-- name: Copy kubeconfig to local '~/.kube'
+- name: Fetch kubeconfig from first master node
   fetch:
     src: /etc/rancher/k3s/k3s.yaml
     dest: ~/.kube/config
     mode: 0600
     flat: yes
+  when: inventory_hostname == groups['k3s_masters'][0]
 
 - name: Ensure FQDN is set correctly for kubeconfig
-  ansible.builtin.lineinfile:
+  replace:
     path: ~/.kube/config
-    regexp: '^    server:'
-    line: "    server: https://{{ master_fqdn }}:6443"
+    regexp: '127.0.0.1'
+    replace: "{{ hostvars[groups['k3s_masters'][0]].ansible_hostname }}.{{ ansible_domain }}"
   delegate_to: localhost
   become: no
+  when: inventory_hostname == groups['k3s_masters'][0]
