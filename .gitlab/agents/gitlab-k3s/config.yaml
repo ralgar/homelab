@@ -1,0 +1,8 @@
+---
+gitops:
+  manifest_projects:
+    - id: infrastructure/homelab
+      default_namespace: homelab-default
+      paths:
+        - glob: '/apps/**/*.{yaml,yml,json}'
+      dry_run_strategy: none

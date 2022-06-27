@@ -1,0 +1,163 @@
+---
+- name: Assert the 'gitlab-kubernetes-agent' namespace
+  kubernetes.core.k8s:
+    state: "{{ state | default('present') }}"
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: gitlab-kubernetes-agent
+
+- name: Assert the 'gitlab-agent' service account
+  kubernetes.core.k8s:
+    state: "{{ state | default('present') }}"
+    definition:
+      apiVersion: v1
+      kind: ServiceAccount
+      metadata:
+        name: gitlab-agent
+        namespace: gitlab-kubernetes-agent
+        labels:
+          app.kubernetes.io/name: gitlab-agent
+          app: gitlab-agent
+          app.kubernetes.io/version: "{{ gitlab_agent_version }}"
+
+- name: Assert the 'gitlab-agent-token' secret
+  kubernetes.core.k8s:
+    state: "{{ state | default('present') }}"
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: gitlab-agent-token
+        namespace: gitlab-kubernetes-agent
+        labels:
+          app.kubernetes.io/name: gitlab-agent
+          app: gitlab-agent
+          app.kubernetes.io/version: "{{ gitlab_agent_version }}"
+      data:
+        token: "{{ gitlab_agent_token }}"
+      type: Opaque
+
+- name: Get the GitLab certificate fullchain
+  ansible.builtin.slurp:
+    src: /etc/gitlab/ssl/gitlab-fullchain.crt
+  register: gitlab_certificate_fullchain_base64
+  delegate_to: gitlab
+  remote_user: root
+
+- name: Assert the 'gitlab-agent' ConfigMap
+  kubernetes.core.k8s:
+    state: "{{ state | default('present') }}"
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: gitlab-agent
+        namespace: gitlab-kubernetes-agent
+        labels:
+          app.kubernetes.io/name: gitlab-agent
+          app: gitlab-agent
+          app.kubernetes.io/version: "{{ gitlab_agent_version }}"
+      binaryData:
+        gitlab.crt: "{{ gitlab_certificate_fullchain_base64.content }}"
+
+- name: Assert the RBAC binding
+  kubernetes.core.k8s:
+    state: "{{ state | default('present') }}"
+    definition:
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRoleBinding
+      metadata:
+        name: gitlab-kubernetes-agent:gitlab-agent-cluster-admin
+        labels:
+          app.kubernetes.io/name: gitlab-agent
+          app: gitlab-agent
+          app.kubernetes.io/version: "{{ gitlab_agent_version }}"
+      roleRef:
+        apiGroup: rbac.authorization.k8s.io
+        kind: ClusterRole
+        name: cluster-admin
+      subjects:
+        - kind: ServiceAccount
+          name: gitlab-agent
+          namespace: gitlab-kubernetes-agent
+
+- name: Assert the deployment
+  kubernetes.core.k8s:
+    state: "{{ state | default('present') }}"
+    definition:
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: gitlab-agent
+        namespace: gitlab-kubernetes-agent
+        labels:
+          app.kubernetes.io/name: gitlab-agent
+          app: gitlab-agent
+          app.kubernetes.io/version: "{{ gitlab_agent_version }}"
+      spec:
+        replicas: 1
+        strategy:
+          rollingUpdate:
+            maxSurge: 0
+            maxUnavailable: 1
+          type: RollingUpdate
+        selector:
+          matchLabels:
+            app.kubernetes.io/name: gitlab-agent
+            app: gitlab-agent
+        template:
+          metadata:
+            annotations:
+              prometheus.io/path: /metrics
+              prometheus.io/port: "8080"
+              prometheus.io/scrape: "true"
+            labels:
+              app.kubernetes.io/name: gitlab-agent
+              app: gitlab-agent
+          spec:
+            serviceAccountName: gitlab-agent
+            containers:
+              - name: gitlab-agent
+                image: registry.gitlab.com/gitlab-org/cluster-integration/gitlab-agent/agentk:{{ gitlab_agent_version }}
+                imagePullPolicy: IfNotPresent
+                args:
+                  - --token-file=/etc/agentk/secrets/token
+                  - --kas-address=wss://gitlab.{{ net.domain }}/-/kubernetes-agent/
+                  - --ca-cert-file=/etc/agentk/config/gitlab.crt
+                livenessProbe:
+                  httpGet:
+                    path: /liveness
+                    port: 8080
+                  initialDelaySeconds: 15
+                  periodSeconds: 20
+                readinessProbe:
+                  httpGet:
+                    path: /readiness
+                    port: 8080
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                resources:
+                  {}
+                env:
+                  - name: POD_NAMESPACE
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: metadata.namespace
+                  - name: POD_NAME
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: metadata.name
+                volumeMounts:
+                  - name: secret-volume
+                    mountPath: /etc/agentk/secrets
+                  - name: config-volume
+                    mountPath: /etc/agentk/config
+            volumes:
+              - name: secret-volume
+                secret:
+                  secretName: gitlab-agent-token
+              - name: config-volume
+                configMap:
+                  name: gitlab-agent

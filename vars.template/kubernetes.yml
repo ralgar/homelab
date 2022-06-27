@@ -1,0 +1,3 @@
+---
+# Base64 encoded token, provided by GitLab when connecting a new Agent
+gitlab_agent_token: 'insert-token-here'
