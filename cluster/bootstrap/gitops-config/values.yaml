@@ -1,0 +1,8 @@
+---
+gitOps:
+  repoUrl: https://github.com/ralgar/homelab-provisioning
+  revision: testing
+  stacksRoot: cluster
+stacks:
+  - name: bootstrap
+  - name: system

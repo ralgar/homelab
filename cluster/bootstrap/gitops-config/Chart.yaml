@@ -1,0 +1,4 @@
+---
+apiVersion: v2
+name: gitops-config
+version: 0.0.0

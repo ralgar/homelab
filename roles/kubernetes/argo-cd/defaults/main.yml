@@ -6,7 +6,7 @@ chart_version: v4.9.10
 repo_url: https://github.com/ralgar/homelab-provisioning.git
 
 # Target branch, tag, or commit, of the repository
-target_revision: feature/k8s-rework
+target_revision: testing
 
 # Repository path to the Argo CD bootstrap manifests
 bootstrap_path: kube/bootstrap

@@ -1,0 +1,16 @@
+---
+longhorn:
+  defaultSettings:
+    # Allow Kubernetes to delete downed pods and spin up replacements
+    nodeDownPodDeletionPolicy: delete-both-statefulset-and-deployment-pod
+  persistence:
+    # If 3 or more worker nodes, set '3', else set '2', or '1' for single node.
+    defaultClassReplicaCount: 1
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    host: longhorn.homelab.internal
+    tls: true
+    tlsSecret: longhorn-cert
+    annotations:
+      cert-manager.io/cluster-issuer: internal-issuer

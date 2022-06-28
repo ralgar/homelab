@@ -1,0 +1,10 @@
+---
+argo-cd:
+  server:
+    url: ''
+    extraArgs:
+      - --insecure
+    ingress:
+      enabled: true
+      ingressClassName: nginx
+      host: argocd.homelab.internal
