@@ -1,0 +1,14 @@
+---
+- name: Install open-iscsi
+  dnf:
+    name: iscsi-initiator-utils
+    update_cache: yes
+    state: present
+  when: "'k3s_workers' in group_names"
+
+- name: Enable and start the iscsid service
+  systemd:
+    name: iscsid.service
+    state: started
+    enabled: yes
+  when: "'k3s_workers' in group_names"
