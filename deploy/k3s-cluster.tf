@@ -4,7 +4,7 @@ module "k3s-master" {
   hostname    = "k3s-master"
   title       = "K3s Master Node"
   description = <<-EOT
-    K3S Master Node. The source of truth.
+    K3s Master Node. The source of truth.
   EOT
   count           = length(var.guest_hostNums)
   countIndex      = count.index
@@ -60,7 +60,7 @@ module "k3s-worker" {
   sockets         = 1
   memory          = 8192
   enableQemuAgent = 1
-  rootSize        = 64
+  rootSize        = 128
   auxDisk         = false
   auxDiskSize     = null
   startOnBoot     = true
