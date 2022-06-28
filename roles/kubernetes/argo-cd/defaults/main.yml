@@ -1,0 +1,12 @@
+---
+# Helm Chart version to deploy
+chart_version: v4.9.10
+
+# The repository from which to deploy charts/manifests
+repo_url: https://github.com/ralgar/homelab-provisioning.git
+
+# Target branch, tag, or commit, of the repository
+target_revision: feature/k8s-rework
+
+# Repository path to the Argo CD bootstrap manifests
+bootstrap_path: kube/bootstrap

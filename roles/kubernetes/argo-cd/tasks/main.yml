@@ -1,0 +1,27 @@
+---
+- name: Assert the Helm repository
+  kubernetes.core.helm_repository:
+    name: argo
+    repo_url: https://argoproj.github.io/argo-helm
+
+- name: Assert the Helm deployment
+  kubernetes.core.helm:
+    name: argo-cd
+    chart_ref: argo/argo-cd
+    chart_version: "{{ chart_version }}"
+    namespace: argo-cd
+    create_namespace: true
+    update_repo_cache: true
+    wait: true
+    values: "{{ lookup('template', 'values.yaml') | from_yaml }}"
+    state: "{{ state | default('present') }}"
+
+- name: Assert the namespace (for removal)
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: argo-cd
+    state: absent
+  when: state is defined and state == 'absent'

@@ -1,4 +1,5 @@
 # Deploys and provisions the K3s cluster
+# Usage: ansible-playbook <playbook> [-e state=absent]
 ---
 - name: Deploy K3s Cluster
   hosts: localhost
@@ -31,3 +32,13 @@
     - role: rhel8/automatic-upgrades
       when: "'k3s_workers' in group_names"
     - role: kubernetes/k3s-cluster
+
+- name: Deploy Kubernetes applications
+  hosts: localhost
+  gather_facts: no
+  vars_files:
+    - vars/global.yml
+    - vars/kubernetes.yml
+  roles:
+    - role: kubernetes/argo-cd
+      when: state is not defined or state == 'present'

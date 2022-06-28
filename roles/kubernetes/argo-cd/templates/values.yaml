@@ -1,0 +1,24 @@
+---
+server:
+  extraArgs:
+    - --insecure
+  ingress:
+    enabled: true
+    ingressClassName: traefik
+    host: argocd.{{ net.domain }}
+  additionalApplications:
+    - name: bootstrap
+      namespace: argo-cd
+      project: bootstrap
+      source:
+        repoURL: {{ repo_url }}
+        targetRevision: {{ target_revision }}
+        path: {{ bootstrap_path }}
+        directory:
+          recurse: true
+      destination:
+        server: https://kubernetes.default.svc
+      syncPolicy:
+        automated:
+          prune: false
+          selfHeal: false
