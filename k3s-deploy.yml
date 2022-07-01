@@ -15,7 +15,7 @@
       storagePool: local-zfs
     - role: proxmox/terraform-deploy
       targets: [ module.k3s-worker ]
-      hostNums: [ 81 ]
+      hostNums: [ 81, 82 ]
       targetNode: pve1
       storagePool: local-zfs
 

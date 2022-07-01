@@ -5,7 +5,7 @@ longhorn:
     nodeDownPodDeletionPolicy: delete-both-statefulset-and-deployment-pod
   persistence:
     # If 3 or more worker nodes, set '3', else set '2', or '1' for single node.
-    defaultClassReplicaCount: 1
+    defaultClassReplicaCount: 2
   ingress:
     enabled: true
     ingressClassName: nginx
