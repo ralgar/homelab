@@ -24,7 +24,10 @@
   gather_facts: false
   vars_files:
     - vars/global.yml
+    - vars/pushover.yml
   roles:
-    - common/wait-for-connection
-    - common/wait-for-cloudinit
-    - kubernetes/k3s-cluster
+    - role: common/wait-for-connection
+    - role: common/wait-for-cloudinit
+    - role: rhel8/automatic-upgrades
+      when: "'k3s_workers' in group_names"
+    - role: kubernetes/k3s-cluster
