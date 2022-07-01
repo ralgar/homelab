@@ -1,0 +1,5 @@
+---
+pushover:
+  user_token: "my_user_token"
+  app_tokens:
+    k8s_host_upgrades: "my_app_token"
