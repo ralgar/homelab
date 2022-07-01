@@ -1,3 +1,6 @@
+---
+timezone: America/Vancouver
+
 dns:
   hostNums: [ 20, 21 ]
   secretKey: "PFe9O/533Vp/RBLRRZeHACoQf0h4MWtY5ZVmniCilsM="

@@ -1,7 +1,7 @@
 # Deploys and provisions the K3s cluster
 # Usage: ansible-playbook <playbook> [-e state=absent]
 ---
-- name: Deploy K3s Cluster
+- name: Deploy the K3s Cluster
   hosts: localhost
   gather_facts: false
   vars_files:
@@ -19,7 +19,7 @@
       targetNode: pve1
       storagePool: local-zfs
 
-- name: Provision K3s Cluster
+- name: Provision the K3s Cluster
   hosts: k3s_cluster
   become: true
   gather_facts: false
@@ -29,16 +29,16 @@
   roles:
     - role: common/wait-for-connection
     - role: common/wait-for-cloudinit
+    - role: rhel8/timesync-ntp
     - role: rhel8/automatic-upgrades
       when: "'k3s_workers' in group_names"
     - role: kubernetes/k3s-cluster
 
-- name: Deploy Kubernetes applications
+- name: Provision Argo CD on the K3s Cluster
   hosts: localhost
   gather_facts: no
   vars_files:
     - vars/global.yml
-    - vars/kubernetes.yml
   roles:
     - role: kubernetes/argo-cd
       when: state is not defined or state == 'present'
