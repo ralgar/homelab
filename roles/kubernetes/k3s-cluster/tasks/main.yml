@@ -9,7 +9,7 @@
     - services.yml
 
 - name: Wait until worker is registered with master
-  command: k3s kubectl get nodes -o name
+  command: /usr/local/bin/k3s kubectl get nodes -o name
   register: res
   until: ansible_hostname in res.stdout
   retries: 60
