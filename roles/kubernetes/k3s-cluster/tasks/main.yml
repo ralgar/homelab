@@ -5,8 +5,8 @@
     - prerequisites.yml
     - packages.yml
     - token.yml
-    - services.yml
     - open-iscsi.yml
+    - services.yml
 
 - name: Wait until worker is registered with master
   command: k3s kubectl get nodes -o name
