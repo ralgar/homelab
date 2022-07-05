@@ -116,28 +116,6 @@ variable "netPrefix" {
   type        = string
 }
 
-variable "pveHost" {
-  description = "Proxmox host FQDN or IPv4 address"
-  type        = string
-}
-
-variable "pveUsername" {
-  description = "Proxmox VE username"
-  type        = string
-  sensitive   = true
-}
-
-variable "pvePassword" {
-  description = "Proxmox VE password"
-  type        = string
-  sensitive   = true
-}
-
-variable "pveTlsInsecure" {
-  description = "Toggle whether TLS must be validated"
-  type        = bool
-}
-
 variable "sockets" {
   description = "Assigned CPU sockets"
   type        = number

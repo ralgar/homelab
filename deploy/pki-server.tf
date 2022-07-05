@@ -24,10 +24,6 @@ module "pki-server" {
   dnsHostNums      = var.dns_hostNums
   dnsSecretKey     = var.dns_secretKey
   dnsSecretType    = var.dns_secretType
-  pveHost          = var.pve_host
-  pveUsername      = var.pve_username
-  pvePassword      = var.pve_password
-  pveTlsInsecure   = var.pve_tlsInsecure
   guestCtImage     = var.guest_ctImage
   guestPubKeyFile  = var.guest_pubKeyFile
   guestTargetNode  = var.guest_targetNode
