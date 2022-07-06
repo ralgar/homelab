@@ -9,6 +9,11 @@ server: https://{{ hostvars[groups['k3s_masters'][0]].ansible_hostname }}.{{ ans
 # Set path to token file
 token-file: {{ k3s_token_file }}
 
+{% if 'CentOS' or 'Rocky' or 'Red Hat Enterprise Linux' in ansible_distribution %}
+# Enable SELinux for containerd
+selinux: true
+{% endif %}
+
 {% if 'k3s_masters' in group_names %}
 # Set options for K3s controller nodes
 disable:

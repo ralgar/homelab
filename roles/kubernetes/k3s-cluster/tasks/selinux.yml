@@ -1,0 +1,27 @@
+---
+- name: "SELinux : Assert the Rancher RPM key"
+  ansible.builtin.rpm_key:
+    key: https://rpm.rancher.io/public.key
+    fingerprint: C8CF F216 4551 26E9 B9C9  18BE 925E A29A E257 814A
+
+- name: "SELinux : Assert the 'K3s Common' YUM repository"
+  ansible.builtin.yum_repository:
+    name: rancher-k3s-common
+    description: Rancher K3s Common (SELinux policy)
+    baseurl: https://rpm.rancher.io/k3s/stable/common/centos/$releasever/noarch
+    gpgcheck: true
+
+- name: "SELinux : Assert the packages"
+  ansible.builtin.dnf:
+    name:
+      - container-selinux
+      - grubby
+      - k3s-selinux
+    update_cache: yes
+    state: present
+
+- name: "SELinux : Assert operational mode 'enforcing'"
+  ansible.posix.selinux:
+    policy: targeted
+    state: enforcing
+    update_kernel_param: true
