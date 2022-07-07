@@ -6,3 +6,14 @@
   until: "res.cloud_init_data_facts.status.v1.stage is defined and not res.cloud_init_data_facts.status.v1.stage"
   retries: 80
   delay: 15
+
+- name: Check if system needs rebooting (Red Hat systems)
+  ansible.builtin.command: needs-restarting --reboothint
+  register: needs_restarting
+  changed_when: needs_restarting.rc == 1
+  failed_when: false
+  notify: reboot_system
+  when: ansible_os_family == "RedHat"
+
+- name: Flush handlers
+  meta: flush_handlers
