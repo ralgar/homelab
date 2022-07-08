@@ -1,0 +1,15 @@
+---
+apiVersion: trust.cert-manager.io/v1alpha1
+kind: Bundle
+metadata:
+  name: homelab.internal
+spec:
+  sources:
+  - secret:
+      name: root-ca-keys
+      key: ca.crt
+  target:
+    # Data synced to the ConfigMap `homelab.internal` at the key `root-cert.pem` in
+    # every namespace.
+    configMap:
+      key: root-cert.pem
