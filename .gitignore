@@ -7,6 +7,9 @@ test-playbook.yml
 # Python SSL testing file
 ssl-test.py
 
+# Cluster testing directory
+cluster/testing/
+
 
 ############################################
 ###   ANSIBLE SECRET FILES / VARIABLES   ###
