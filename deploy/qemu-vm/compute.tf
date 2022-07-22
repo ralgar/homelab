@@ -11,6 +11,7 @@ resource "proxmox_vm_qemu" "vm-compute" {
   EOT
   target_node = var.guestTargetNode
 
+  tablet   = false
   oncreate = true
   onboot   = var.startOnBoot
   clone    = var.guestVmTemplate
