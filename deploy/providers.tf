@@ -25,4 +25,5 @@ provider "proxmox" {
   pm_user         = "${var.pve_username}"
   pm_password     = var.pve_password
   pm_tls_insecure = var.pve_tlsInsecure
+  pm_timeout      = 600
 }
