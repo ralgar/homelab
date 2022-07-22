@@ -1,4 +1,0 @@
-{
-  "driver": "postgres",
-  "data_source": "postgres://cfssl:p4$Sw0Rd@postgres.{{ ansible_domain }}/cfssl?sslmode=disable"
-}

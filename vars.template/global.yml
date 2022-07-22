@@ -16,13 +16,6 @@ guest:
   pubKeyFile: "~/.ssh/id_ed25519.pub"
   vmTemplate: template-rocky8
 
-pki_common:
-  subject:
-    C: US
-    ST: California
-    L: San Francisco
-    O: My Homelab
-
 proxmox:
   hostNums: [ 100 ]
 
