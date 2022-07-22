@@ -1,0 +1,16 @@
+---
+- name: Install the Directory Server
+  include_tasks: bootstrap-database.yml
+  # when: not dirsrv_instance.stat.exists
+
+- name: Include tasks
+  include_tasks: "{{ item }}"
+  loop:
+    - authentication.yml
+    - plugins/attribute-uniqueness.yml
+    - plugins/dna.yml
+    - plugins/enable-plugins.yml
+    - permissions/user_read.yml
+    - users/default-user.yml
+    - groups/administrators.yml
+    - gitlab.yml

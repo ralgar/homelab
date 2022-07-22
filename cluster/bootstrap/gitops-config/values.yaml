@@ -6,3 +6,4 @@ gitOps:
 stacks:
   - name: bootstrap
   - name: system
+  - name: platform

@@ -1,9 +1,9 @@
 ---
 - name: Enable MemberOf Plugin
   ldap_attrs:
-    bind_dn: cn=manager
-    bind_pw: "{{ dirsrv_root_pw }}"
-    server_uri: "{% if dirsrv_cert_db.stat.exists %}ldaps://{% else %}ldap://{% endif %}"
+    bind_dn: cn=Directory Manager
+    bind_pw: password
+    server_uri: ldaps://ldap.homelab.internal
     validate_certs: no
     dn: cn=MemberOf Plugin,cn=plugins,cn=config
     attributes:
@@ -13,9 +13,9 @@
 
 - name: Enable Referential Integrity Plugin
   ldap_attrs:
-    bind_dn: cn=manager
-    bind_pw: "{{ dirsrv_root_pw }}"
-    server_uri: "{% if dirsrv_cert_db.stat.exists %}ldaps://{% else %}ldap://{% endif %}"
+    bind_dn: cn=Directory Manager
+    bind_pw: password
+    server_uri: ldaps://ldap.homelab.internal
     validate_certs: no
     dn: cn=referential integrity postoperation,cn=plugins,cn=config
     attributes:

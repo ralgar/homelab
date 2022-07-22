@@ -1,0 +1,68 @@
+---
+- name: Create LDAP 'gitlab_users' group
+  ldap_entry:
+    bind_dn: cn=Directory Manager
+    bind_pw: password
+    server_uri: ldaps://ldap.homelab.internal
+    validate_certs: yes
+    dn: "cn=gitlab_users,ou=groups,{{ dirsrv_domain }}"
+    objectClass:
+      - top
+      - groupOfNames
+      - nsMemberOf
+    attributes:
+      cn: gitlab_users
+    state: present
+
+- name: Assert 'gitlab_users' group members
+  ldap_attrs:
+    bind_dn: cn=Directory Manager
+    bind_pw: password
+    server_uri: ldaps://ldap.homelab.internal
+    validate_certs: yes
+    dn: "cn=gitlab_users,ou=groups,{{ dirsrv_domain }}"
+    attributes:
+      member: "{{ dirsrv_gitlab_users }},ou=people,{{ dirsrv_domain }}"
+    state: present
+  loop:
+    - "uid={{ default_user_uid }}"
+  loop_control:
+    loop_var: dirsrv_gitlab_users
+
+- name: Create 'gitlab' service account
+  ldap_entry:
+    bind_dn: cn=Directory Manager
+    bind_pw: password
+    server_uri: ldaps://ldap.homelab.internal
+    validate_certs: yes
+    dn: "cn=gitlab,ou=services,{{ dirsrv_domain }}"
+    objectClass:
+      - simpleSecurityObject
+      - organizationalRole
+    attributes:
+      cn: GitLab
+      description: GitLab Service Account
+      userPassword: password
+    state: present
+
+- name: Assert that 'gitlab' account has 'user_read' permission
+  ldap_attrs:
+    bind_dn: cn=Directory Manager
+    bind_pw: password
+    server_uri: ldaps://ldap.homelab.internal
+    validate_certs: yes
+    dn: "cn=user_read,ou=permissions,{{ dirsrv_domain }}"
+    attributes:
+      member: "cn=gitlab,ou=services,{{ dirsrv_domain }}"
+    state: present
+
+- name: Assert that 'gitlab' account has 'user_passwd_reset' permission
+  ldap_attrs:
+    bind_dn: cn=Directory Manager
+    bind_pw: password
+    server_uri: ldaps://ldap.homelab.internal
+    validate_certs: yes
+    dn: "cn=user_passwd_reset,ou=permissions,{{ dirsrv_domain }}"
+    attributes:
+      member: "cn=gitlab,ou=services,{{ dirsrv_domain }}"
+    state: present

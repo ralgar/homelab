@@ -1,0 +1,12 @@
+---
+- name: Disable anonymous bind
+  ldap_attrs:
+    bind_dn: cn=Directory Manager
+    bind_pw: password
+    server_uri: ldaps://ldap.homelab.internal
+    validate_certs: yes
+    dn: cn=config
+    attributes:
+      nsslapd-allow-anonymous-access: "off"
+    state: exact
+  notify: restart_dirsrv

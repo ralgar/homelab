@@ -1,9 +1,9 @@
 ---
 - name: Create 'user_read' permission
   ldap_entry:
-    bind_dn: cn=manager
-    bind_pw: "{{ dirsrv_root_pw }}"
-    server_uri: "{% if dirsrv_cert_db.stat.exists %}ldaps://{% else %}ldap://{% endif %}"
+    bind_dn: cn=Directory Manager
+    bind_pw: password
+    server_uri: ldaps://ldap.homelab.internal
     validate_certs: no
     dn: "cn=user_read,ou=permissions,{{ dirsrv_domain }}"
     objectClass:

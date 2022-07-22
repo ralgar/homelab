@@ -1,0 +1,8 @@
+---
+- name: Test Stuff
+  hosts: localhost
+  vars_files:
+    - vars/global.yml
+  roles:
+    # TODO: Get cluster CA certificate here
+    - 389ds-bootstrap

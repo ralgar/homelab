@@ -1,0 +1,92 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: 389ds
+  namespace: 389ds
+  labels:
+    app.kubernetes.io/name: 389ds
+    app.kubernetes.io/instance: 389ds
+    app.kubernetes.io/version: "2.1"
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: 389ds
+      app.kubernetes.io/instance: 389ds
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: 389ds
+        app.kubernetes.io/instance: 389ds
+    spec:
+      serviceAccountName: 389ds
+      securityContext:
+        {}
+      containers:
+        - name: 389ds
+          securityContext:
+            {}
+          image: "389ds/dirsrv:2.1"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: DS_DM_PASSWORD
+              value: '{{ .Values.rootPassword }}'
+          ports:
+            - name: ldap-tcp
+              containerPort: 3389
+              protocol: TCP
+            - name: ldap-udp
+              containerPort: 3389
+              protocol: UDP
+            - name: ldaps-tcp
+              containerPort: 3636
+              protocol: TCP
+            - name: ldaps-udp
+              containerPort: 3636
+              protocol: UDP
+          volumeMounts:
+            - name: 389ds-data
+              mountPath: '/data/'
+            - name: 389ds-certs
+              mountPath: '/data/tls/'
+              readOnly: true
+          livenessProbe:
+            exec:
+              command:
+                - "/usr/lib/dirsrv/dscontainer"
+                - "-H"
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          readinessProbe:
+            exec:
+              command:
+                - "/usr/lib/dirsrv/dscontainer"
+                - "-H"
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          startupProbe:
+            exec:
+              command:
+                - "/usr/lib/dirsrv/dscontainer"
+                - "-H"
+            failureThreshold: 30
+            periodSeconds: 15
+          resources:
+            {}
+      volumes:
+        - name: 389ds-data
+          persistentVolumeClaim:
+            claimName: 389ds-data
+        - name: 389ds-certs
+          secret:
+            secretName: 389ds-cert
+            items:
+              - key: tls.key
+                path: server.key
+              - key: tls.crt
+                path: server.crt
+              - key: ca.crt
+                path: ca/ca.crt

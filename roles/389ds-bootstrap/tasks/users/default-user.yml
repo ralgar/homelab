@@ -1,9 +1,9 @@
 ---
 - name: Create 'default' user
   ldap_entry:
-    bind_dn: cn=manager
-    bind_pw: "{{ dirsrv_root_pw }}"
-    server_uri: "{% if dirsrv_cert_db.stat.exists %}ldaps://{% else %}ldap://{% endif %}"
+    bind_dn: cn=Directory Manager
+    bind_pw: password
+    server_uri: ldaps://ldap.homelab.internal
     validate_certs: no
     dn: "uid={{ default_user_uid }},ou=people,{{ dirsrv_domain }}"
     objectClass:
@@ -20,9 +20,9 @@
 
 - name: Assert 'default' user
   ldap_attrs:
-    bind_dn: cn=manager
-    bind_pw: "{{ dirsrv_root_pw }}"
-    server_uri: "{% if dirsrv_cert_db.stat.exists %}ldaps://{% else %}ldap://{% endif %}"
+    bind_dn: cn=Directory Manager
+    bind_pw: password
+    server_uri: ldaps://ldap.homelab.internal
     validate_certs: no
     dn: "uid={{ default_user_uid }},ou=people,{{ dirsrv_domain }}"
     attributes:
