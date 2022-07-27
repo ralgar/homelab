@@ -1,6 +1,6 @@
 ---
 - name: Restart the directory server
-  command: kubectl -n 389server rollout restart deployment 389server
+  command: kubectl -n 389ds rollout restart deployment 389ds
 
 - name: Wait for directory server to be ready
-  command: kubectl -n 389server rollout status deployment 389server
+  command: kubectl -n 389ds rollout status deployment 389ds
