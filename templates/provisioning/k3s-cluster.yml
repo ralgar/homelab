@@ -1,0 +1,20 @@
+---
+- name: Provision the K3s Cluster
+  hosts: k3s_cluster
+  become: true
+  vars_files:
+    - ../../vars/global.yml
+    - ../../vars/kubernetes.yml
+    - ../../vars/pushover.yml
+  roles:
+    - role: rhel8/timesync-ntp
+    - role: rhel8/automatic-upgrades
+      when: packer_build_name == 'k3s-worker'
+    - role: kubernetes/k3s-cluster
+
+- name: Deploy Argo CD on the K3s Cluster
+  hosts: localhost
+  gather_facts: false
+  roles:
+    - role: kubernetes/argo-cd
+      when: "'k3s_masters' in group_names"

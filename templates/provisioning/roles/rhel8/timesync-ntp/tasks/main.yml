@@ -1,0 +1,27 @@
+---
+- name: Set the timezone
+  timezone:
+    name: "{{ timezone }}"
+
+- name: Ensure the chrony package is installed
+  dnf:
+    name: chrony
+    state: present
+
+- name: Copy the chrony configuration file
+  copy:
+    src: chrony.conf
+    dest: /etc/chrony.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: "restart chronyd"
+
+- name: Enable/Start the chronyd service
+  service:
+    name: chronyd
+    enabled: yes
+    state: started
+
+- name: Flush handlers
+  meta: flush_handlers

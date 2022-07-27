@@ -1,0 +1,26 @@
+---
+{% if packer_build_name == "k3s-master" %}
+# Insert database options here
+{% else %}
+# Set master FQDN
+server: https://k3s-master.{{ net.domain }}:6443
+{% endif %}
+
+# Set path to token file
+token-file: {{ k3s_token_file }}
+
+{% if "CentOS" or "Rocky" or "Red Hat Enterprise Linux" in ansible_distribution %}
+# Enable SELinux for containerd
+selinux: true
+{% endif %}
+
+{% if packer_build_name == "k3s-master" %}
+# Set options for K3s controller nodes
+disable:
+  - local-storage
+  - servicelb
+  - traefik
+disable-cloud-controller: true
+secret-encryption: true
+node-taint: "CriticalAddonsOnly=true:NoExecute"
+{% endif %}

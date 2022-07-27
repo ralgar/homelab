@@ -1,0 +1,30 @@
+---
+- name: Restart K3s service
+  systemd:
+    name: k3s.service
+    daemon_reload: yes
+    state: restarted
+    enabled: yes
+
+- name: Create directory '~/.kube'
+  file:
+    path: ~/.kube
+    state: directory
+    mode: 0700
+  delegate_to: localhost
+  become: no
+
+- name: Fetch kubeconfig from first master node
+  fetch:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: ~/.kube/config
+    mode: 0600
+    flat: yes
+
+- name: Ensure FQDN is set correctly for kubeconfig
+  replace:
+    path: ~/.kube/config
+    regexp: '127.0.0.1'
+    replace: "k3s-master.{{ net.domain }}"
+  delegate_to: localhost
+  become: no

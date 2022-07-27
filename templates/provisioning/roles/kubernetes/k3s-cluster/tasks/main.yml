@@ -1,0 +1,12 @@
+---
+- name: "SELinux : Include tasks"
+  include_tasks: selinux.yml
+  when: k3s_enable_selinux and ansible_os_family == "RedHat"
+
+- name: Include common tasks
+  include_tasks: "{{ item }}"
+  loop:
+    - prerequisites.yml
+    - token.yml
+    - open-iscsi.yml
+    - services.yml

@@ -1,0 +1,8 @@
+---
+- name: Create token file
+  copy:
+    content: "{{ k3s_token }}"
+    dest: "{{ k3s_token_file }}"
+    owner: root
+    group: root
+    mode: 0600
