@@ -1,7 +1,0 @@
----
-- name: Include tasks
-  include_tasks: "{{ item }}"
-  loop:
-    - packages.yml
-    - filesystem-skel.yml
-    - rootless-user.yml

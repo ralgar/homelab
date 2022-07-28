@@ -1,5 +1,0 @@
----
-k3s_version: "v1.24.1+k3s1"
-k3s_token_file: /etc/rancher/node/password
-k3s_service_file: /usr/local/lib/systemd/system/k3s.service
-k3s_enable_selinux: true

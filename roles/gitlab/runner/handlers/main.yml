@@ -1,8 +1,0 @@
----
-- name: Reboot host after kernel installation
-  reboot:
-  listen: reboot_host
-
-- name: Restart GitLab runner
-  command: gitlab-runner restart
-  listen: restart_runner

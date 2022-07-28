@@ -1,6 +1,0 @@
----
-- name: Restart chronyd
-  service:
-    name: chronyd
-    state: restarted
-  listen: "restart chronyd"

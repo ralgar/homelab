@@ -1,4 +1,0 @@
----
-- name: Include 'config-changed' handler tasks
-  include_tasks: config-changed.yml
-  listen: config_changed

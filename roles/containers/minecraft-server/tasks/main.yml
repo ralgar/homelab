@@ -1,7 +1,0 @@
----
-- name: Include tasks
-  include_tasks: "{{ item }}"
-  loop:
-    - database.yml
-    - volumes.yml
-    - service.yml
