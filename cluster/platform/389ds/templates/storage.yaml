@@ -5,6 +5,7 @@ metadata:
   name: 389ds-data
   namespace: 389ds
 spec:
+  storageClassName: longhorn
   accessModes:
     - ReadWriteOnce
   resources:
