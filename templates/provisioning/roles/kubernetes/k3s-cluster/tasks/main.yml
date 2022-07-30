@@ -9,4 +9,5 @@
     - prerequisites.yml
     - token.yml
     - open-iscsi.yml
+    - kube-vip.yml
     - services.yml

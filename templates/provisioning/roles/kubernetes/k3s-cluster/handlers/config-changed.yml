@@ -21,10 +21,10 @@
     mode: 0600
     flat: yes
 
-- name: Ensure FQDN is set correctly for kubeconfig
+- name: Ensure IP address is set correctly for kubeconfig
   replace:
     path: ~/.kube/config
     regexp: '127.0.0.1'
-    replace: "k3s-master.{{ net.domain }}"
+    replace: "{{ k3s_kubevip_address }}"
   delegate_to: localhost
   become: no

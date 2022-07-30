@@ -1,9 +1,10 @@
 ---
 {% if packer_build_name == "k3s-master" %}
-# Insert database options here
+# Set SAN for kube-vip address
+tls-san: {{ k3s_kubevip_address }}
 {% else %}
-# Set master FQDN
-server: https://k3s-master.{{ net.domain }}:6443
+# Set control-plane IP address
+server: https://{{ k3s_kubevip_address }}:6443
 {% endif %}
 
 # Set path to token file
@@ -15,7 +16,7 @@ selinux: true
 {% endif %}
 
 {% if packer_build_name == "k3s-master" %}
-# Set options for K3s controller nodes
+# Set additonal cluster options
 disable:
   - local-storage
   - servicelb

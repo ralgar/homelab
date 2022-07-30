@@ -1,0 +1,33 @@
+---
+- name: "kube-vip : Assert the required directory structure"
+  file:
+    path: "/var/lib/{{ kubevip_dir.path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "{{ kubevip_dir.mode }}"
+    seuser: system_u
+    serole: object_r
+    setype: "{{ kubevip_dir.setype }}"
+    selevel: s0
+  loop:
+    - { path: rancher, mode: '0755', setype: var_lib_t }
+    - { path: rancher/k3s, mode: '0755', setype: container_var_lib_t }
+    - { path: rancher/k3s/server, mode: '0700', setype: container_var_lib_t }
+    - { path: rancher/k3s/server/manifests, mode: '0700', setype: container_var_lib_t }
+  loop_control:
+    loop_var: kubevip_dir
+  when: packer_build_name == 'k3s-master'
+
+- name: "kube-vip : Assert the manifest template"
+  template:
+    src: kube-vip.yaml.j2
+    dest: /var/lib/rancher/k3s/server/manifests/kube-vip.yaml
+    owner: root
+    group: root
+    mode: 0600
+    seuser: system_u
+    serole: object_r
+    setype: container_var_lib_t
+    selevel: s0
+  when: packer_build_name == 'k3s-master'
