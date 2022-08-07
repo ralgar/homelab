@@ -1,12 +1,12 @@
 ---
 - name: Install packages
-  apt:
+  ansible.builtin.apt:
     name: bind9
-    update_cache: yes
+    update_cache: true
     policy_rc_d: 101
 
 - name: Install /etc/default/named
-  copy:
+  ansible.builtin.copy:
     src: named
     dest: /etc/default/named
     owner: root
@@ -22,7 +22,7 @@
   when: ansible_hostname >= 'ns2'
 
 - name: Enable and start named service
-  systemd:
+  ansible.builtin.systemd:
     name: named
-    enabled: yes
+    enabled: true
     state: started

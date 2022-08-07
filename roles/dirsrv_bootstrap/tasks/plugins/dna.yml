@@ -7,7 +7,7 @@
     bind_dn: cn=Directory Manager
     bind_pw: password
     server_uri: ldaps://ldap.homelab.internal
-    validate_certs: no
+    validate_certs: false
     dn: cn=Distributed Numeric Assignment Plugin,cn=plugins,cn=config
     attributes:
       nsslapd-pluginEnabled: "on"
@@ -20,7 +20,7 @@
     bind_dn: cn=Directory Manager
     bind_pw: password
     server_uri: ldaps://ldap.homelab.internal
-    validate_certs: no
+    validate_certs: false
     dn: "ou=Ranges,{{ dirsrv_domain }}"
     objectClass:
       - top
@@ -35,7 +35,7 @@
     bind_dn: cn=Directory Manager
     bind_pw: password
     server_uri: ldaps://ldap.homelab.internal
-    validate_certs: no
+    validate_certs: false
     dn: "cn={{ dna_loop1 }},ou=Ranges,{{ dirsrv_domain }}"
     objectClass:
       - top
@@ -54,7 +54,7 @@
     bind_dn: cn=Directory Manager
     bind_pw: password
     server_uri: ldaps://ldap.homelab.internal
-    validate_certs: no
+    validate_certs: false
     dn: "dnaHostname=ldap.homelab.internal+dnaPortNum=389,cn=Account {{ dna_loop2 }}s,ou=Ranges,{{ dirsrv_domain }}"
     objectClass:
       - top
@@ -77,7 +77,7 @@
     bind_dn: cn=Directory Manager
     bind_pw: password
     server_uri: ldaps://ldap.homelab.internal
-    validate_certs: no
+    validate_certs: false
     dn: cn=Account {{ dna_loop3 }}s,cn=Distributed Numeric Assignment Plugin,cn=plugins,cn=config
     objectClass:
       - top
@@ -104,7 +104,7 @@
     bind_dn: cn=Directory Manager
     bind_pw: password
     server_uri: ldaps://ldap.homelab.internal
-    validate_certs: no
+    validate_certs: false
     dn: cn=Account {{ dna_loop4 }}s,cn=Distributed Numeric Assignment Plugin,cn=plugins,cn=config
     attributes:
       dnatype: "{{ dna_loop4 | lower }}Number"

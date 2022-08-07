@@ -4,7 +4,7 @@
     bind_dn: cn=Directory Manager
     bind_pw: password
     server_uri: ldaps://ldap.homelab.internal
-    validate_certs: no
+    validate_certs: false
     dn: "cn={{ attr_uniq }} Attribute Uniqueness,cn=plugins,cn=config"
     objectClass:
       - top
@@ -38,7 +38,7 @@
     bind_dn: cn=Directory Manager
     bind_pw: password
     server_uri: ldaps://ldap.homelab.internal
-    validate_certs: no
+    validate_certs: false
     dn: "cn={{ attr_uniq }} Attribute Uniqueness,cn=plugins,cn=config"
     attributes:
       nsslapd-pluginEnabled: "on"

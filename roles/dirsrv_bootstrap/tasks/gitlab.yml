@@ -4,7 +4,7 @@
     bind_dn: cn=Directory Manager
     bind_pw: password
     server_uri: ldaps://ldap.homelab.internal
-    validate_certs: yes
+    validate_certs: true
     dn: "cn=gitlab_users,ou=groups,{{ dirsrv_domain }}"
     objectClass:
       - top
@@ -19,7 +19,7 @@
     bind_dn: cn=Directory Manager
     bind_pw: password
     server_uri: ldaps://ldap.homelab.internal
-    validate_certs: yes
+    validate_certs: true
     dn: "cn=gitlab_users,ou=groups,{{ dirsrv_domain }}"
     attributes:
       member: "{{ dirsrv_gitlab_users }},ou=people,{{ dirsrv_domain }}"
@@ -34,7 +34,7 @@
     bind_dn: cn=Directory Manager
     bind_pw: password
     server_uri: ldaps://ldap.homelab.internal
-    validate_certs: yes
+    validate_certs: true
     dn: "cn=gitlab,ou=services,{{ dirsrv_domain }}"
     objectClass:
       - simpleSecurityObject
@@ -50,7 +50,7 @@
     bind_dn: cn=Directory Manager
     bind_pw: password
     server_uri: ldaps://ldap.homelab.internal
-    validate_certs: yes
+    validate_certs: true
     dn: "cn=user_read,ou=permissions,{{ dirsrv_domain }}"
     attributes:
       member: "cn=gitlab,ou=services,{{ dirsrv_domain }}"
@@ -61,7 +61,7 @@
     bind_dn: cn=Directory Manager
     bind_pw: password
     server_uri: ldaps://ldap.homelab.internal
-    validate_certs: yes
+    validate_certs: true
     dn: "cn=user_passwd_reset,ou=permissions,{{ dirsrv_domain }}"
     attributes:
       member: "cn=gitlab,ou=services,{{ dirsrv_domain }}"

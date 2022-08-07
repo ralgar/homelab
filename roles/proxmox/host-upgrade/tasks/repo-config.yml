@@ -1,11 +1,11 @@
 ---
 - name: Remove the enterprise repository
-  file:
+  ansible.builtin.file:
     path: /etc/apt/sources.list.d/pve-enterprise.list
     state: absent
 
 - name: Add the no-subscription repository
-  template:
+  ansible.builtin.template:
     src: pve-no-subscription.list
     dest: /etc/apt/sources.list.d/pve-no-subscription.list
     owner: root
@@ -13,6 +13,6 @@
     mode: 0644
 
 - name: Upgrade the system
-  apt:
+  ansible.builtin.apt:
     update_cache: true
     upgrade: dist

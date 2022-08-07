@@ -1,17 +1,17 @@
 ---
 - name: Ensure '{{ locale }}' localisation is available
-  locale_gen:
+  community.general.locale_gen:
     name: en_US.UTF-8
 
 - name: Get current locale
-  command: localectl status
+  ansible.builtin.command: localectl status
   register: locale_status
   changed_when: false
 
 - name: Parse 'LANG' from current locale
-  set_fact:
+  ansible.builtin.set_fact:
     current_locale: "{{ locale_status.stdout | regex_search('LANG=([^\n]+)', '\\1') | first }}"
 
 - name: Ensure locale is set to '{{ locale }}'
-  command: localectl set-locale {{ locale }}
+  ansible.builtin.command: localectl set-locale {{ locale }}
   changed_when: current_locale != locale

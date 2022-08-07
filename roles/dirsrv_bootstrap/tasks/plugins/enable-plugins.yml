@@ -4,7 +4,7 @@
     bind_dn: cn=Directory Manager
     bind_pw: password
     server_uri: ldaps://ldap.homelab.internal
-    validate_certs: no
+    validate_certs: false
     dn: cn=MemberOf Plugin,cn=plugins,cn=config
     attributes:
       nsslapd-pluginEnabled: "on"
@@ -16,7 +16,7 @@
     bind_dn: cn=Directory Manager
     bind_pw: password
     server_uri: ldaps://ldap.homelab.internal
-    validate_certs: no
+    validate_certs: false
     dn: cn=referential integrity postoperation,cn=plugins,cn=config
     attributes:
       nsslapd-pluginEnabled: "on"
@@ -24,4 +24,4 @@
   notify: restart_dirsrv
 
 - name: Flush handlers
-  meta: flush_handlers
+  ansible.builtin.meta: flush_handlers

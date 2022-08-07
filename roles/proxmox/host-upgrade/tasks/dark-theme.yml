@@ -2,21 +2,21 @@
 #   https://github.com/Weilbyte/PVEDiscordDark
 ---
 - name: Dark Theme - Check theme status
-  command: /root/PVEDiscordDark.sh status
+  ansible.builtin.command: /root/PVEDiscordDark.sh status
   changed_when: false
   failed_when: false
   register: pve_theme
 
 - name: Dark Theme - Download the installer
-  get_url:
+  ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/Weilbyte/PVEDiscordDark/master/PVEDiscordDark.sh
     dest: /root/PVEDiscordDark.sh
-    force: yes
+    force: true
     owner: root
     group: root
     mode: 0700
   when: pve_theme.rc != 0
 
 - name: Dark Theme - Run the installer
-  command: "/root/PVEDiscordDark.sh install"
+  ansible.builtin.command: "/root/PVEDiscordDark.sh install"
   when: pve_theme.rc != 0

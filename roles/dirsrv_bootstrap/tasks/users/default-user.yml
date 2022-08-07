@@ -4,7 +4,7 @@
     bind_dn: cn=Directory Manager
     bind_pw: password
     server_uri: ldaps://ldap.homelab.internal
-    validate_certs: no
+    validate_certs: false
     dn: "uid={{ default_user_uid }},ou=people,{{ dirsrv_domain }}"
     objectClass:
       - top
@@ -23,7 +23,7 @@
     bind_dn: cn=Directory Manager
     bind_pw: password
     server_uri: ldaps://ldap.homelab.internal
-    validate_certs: no
+    validate_certs: false
     dn: "uid={{ default_user_uid }},ou=people,{{ dirsrv_domain }}"
     attributes:
       cn: "{{ default_user_displayname }}"

@@ -4,7 +4,7 @@
     bind_dn: cn=Directory Manager
     bind_pw: password
     server_uri: ldaps://ldap.homelab.internal
-    validate_certs: yes
+    validate_certs: true
     dn: cn=config
     attributes:
       nsslapd-allow-anonymous-access: "off"

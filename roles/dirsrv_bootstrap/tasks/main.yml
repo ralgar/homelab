@@ -1,7 +1,8 @@
 ---
-- name: Install the Directory Server
-  include_tasks: bootstrap-database.yml
-  # when: not dirsrv_instance.stat.exists
+# TODO: Fix the database bootstrap
+# - name: Install the Directory Server
+#   include_tasks: bootstrap-database.yml
+#   # when: not dirsrv_instance.stat.exists
 
 - name: Include tasks
   include_tasks: "{{ item }}"

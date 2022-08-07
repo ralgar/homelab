@@ -1,10 +1,12 @@
 ---
 - name: Upgrade the system
-  dnf:
+  ansible.builtin.dnf:
     name: "*"
     state: latest
-    update_cache: yes
+    update_cache: true
+  tags:
+    - skip_ansible_lint
 
 - name: Remove any orphaned dependencies
-  dnf:
-    autoremove: yes
+  ansible.builtin.dnf:
+    autoremove: true

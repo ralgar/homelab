@@ -1,6 +1,6 @@
 ---
 - name: Subscription Nag - Remove the notification
-  replace:
+  ansible.builtin.replace:
     path: /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
     regexp: 'Ext.Msg.show'
     before: 'No valid subscription'
