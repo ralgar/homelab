@@ -1,87 +1,54 @@
-module "k3s-master" {
-  // Guest Settings
-  source      = "./qemu-vm"
-  hostname    = "k3s-master"
-  title       = "K3s Master Node"
-  description = <<-EOT
-    K3s Master Node. The source of truth.
-  EOT
-  count           = length(var.guest_hostNums)
-  countIndex      = count.index
-  cores           = 2
-  sockets         = 1
-  memory          = 2048
-  enableQemuAgent = 1
-  rootSize        = 8
-  auxDisk         = false
-  auxDiskSize     = null
-  startOnBoot     = true
-  addToDns        = true
-  dnsWildcard     = false
-  tags            = [ "k3s-cluster", "k3s-master" ]
+module "k3s-controllers" {
+  // Module Settings
+  source           = "./k3s-controller"
+  count            = 1
+  countIndex       = count.index
+  guestTargetNode  = "pve1"
+  guestStoragePool = "local-zfs"
 
-  // Global Passthrough Variables
-  dnsHostNums      = var.dns_hostNums
-  dnsSecretKey     = var.dns_secretKey
-  dnsSecretType    = var.dns_secretType
-  guestCtImage     = var.guest_ctImage
-  guestPubKeyFile  = var.guest_pubKeyFile
-  guestTargetNode  = var.guest_targetNode
-  guestStoragePool = var.guest_storagePool
-  guestVmTemplate  = var.guest_vmTemplate
-  netDnsHosts      = [
-    "${cidrhost(var.net_prefix, var.dns_hostNums[0])}",
-    "${cidrhost(var.net_prefix, var.dns_hostNums[1])}",
-    "1.1.1.1",
-  ]
-  netDomain        = var.net_domain
-  netGateway       = var.net_gateway
-  netPrefix        = var.net_prefix
-
-  // Module Variables
-  netHostNums      = var.guest_hostNums
+  // Global Variables
+  guestPubKeyFile = var.guest_pubKeyFile
+  netDnsHosts     = var.net_dnsServers
+  netDomain       = var.net_domain
 }
 
-module "k3s-worker" {
-  // Guest Settings
-  source      = "./qemu-vm"
-  hostname    = "k3s-worker-${count.index + 1}"
-  title       = "K3s Worker Node #${count.index + 1 }"
-  description = <<-EOT
-    A K3s worker node. Runs services.
-  EOT
-  count           = length(var.guest_hostNums)
-  countIndex      = count.index
-  cores           = 4
-  sockets         = 1
-  memory          = 8192
-  enableQemuAgent = 1
-  rootSize        = 128
-  auxDisk         = false
-  auxDiskSize     = null
-  startOnBoot     = true
-  addToDns        = true
-  dnsWildcard     = false
-  tags            = [ "k3s-cluster", "k3s-worker" ]
+module "k3s-workers" {
+  // Module Settings
+  source           = "./k3s-worker"
+  count            = 2
+  countIndex       = count.index
+  guestTargetNode  = "pve1"
+  guestStoragePool = "local-zfs"
 
-  // Global Passthrough Variables
-  dnsHostNums      = var.dns_hostNums
-  dnsSecretKey     = var.dns_secretKey
-  dnsSecretType    = var.dns_secretType
-  guestCtImage     = var.guest_ctImage
-  guestPubKeyFile  = var.guest_pubKeyFile
-  guestTargetNode  = var.guest_targetNode
-  guestStoragePool = var.guest_storagePool
-  guestVmTemplate  = var.guest_vmTemplate
-  netDnsHosts      = [
-    "${cidrhost(var.net_prefix, var.dns_hostNums[0])}",
-    "${cidrhost(var.net_prefix, var.dns_hostNums[1])}",
-    "1.1.1.1",
-  ]
-  netDomain        = var.net_domain
-  netGateway       = var.net_gateway
-  netPrefix        = var.net_prefix
+  // Global Variables
+  guestPubKeyFile = var.guest_pubKeyFile
+  netDnsHosts     = var.net_dnsServers
+  netDomain       = var.net_domain
+}
 
-  // Module Variables
-  netHostNums      = var.guest_hostNums
+resource "time_sleep" "wait_for_controlplane" {
+  create_duration = "60s"
+  depends_on      = [ module.k3s-controllers ]
+}
+
+resource "helm_release" "argo-cd" {
+  name             = "argocd"
+  repository       = "https://argoproj.github.io/argo-helm"
+  chart            = "argo-cd"
+  version          = "4.9.10"
+  namespace        = "argocd"
+  create_namespace = true
+  wait             = true
+  values           = [ "${file("../cluster/bootstrap/argocd/values.yaml")}" ]
+
+  depends_on       = [ time_sleep.wait_for_controlplane ]
+}
+
+resource "helm_release" "gitops-config" {
+  name       = "gitops-config"
+  chart      = "../cluster/bootstrap/gitops-config"
+  namespace  = "argocd"
+  values     = [ "${file("../cluster/bootstrap/gitops-config/values.yaml")}" ]
+
+  depends_on = [ helm_release.argo-cd ]
 }

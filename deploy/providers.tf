@@ -1,8 +1,9 @@
 terraform {
+  required_version = ">= 1.0.0"
   required_providers {
-    dns = {
-      source  = "hashicorp/dns"
-      version = "3.2.1"
+    helm = {
+      source  = "hashicorp/helm"
+      version = "2.6.0"
     }
     proxmox = {
       source  = "telmate/proxmox"
@@ -11,19 +12,16 @@ terraform {
   }
 }
 
-provider "dns" {
-  update {
-    server        = cidrhost(var.net_prefix, var.dns_hostNums[0])
-    key_name      = "${var.net_domain}."
-    key_algorithm = var.dns_secretType
-    key_secret    = var.dns_secretKey
+provider "helm" {
+  kubernetes {
+    config_path = "~/.kube/config"
   }
 }
 
 provider "proxmox" {
-  pm_api_url      = "${var.pve_host}/api2/json"
-  pm_user         = "${var.pve_username}"
-  pm_password     = var.pve_password
-  pm_tls_insecure = var.pve_tlsInsecure
-  pm_timeout      = 600
+  pm_api_url          = "https://${var.pve_host}:8006/api2/json"
+  pm_api_token_id     = var.pve_api_token_id
+  pm_api_token_secret = var.pve_api_token_secret
+  pm_tls_insecure     = var.pve_tlsInsecure
+  pm_timeout          = 600
 }
