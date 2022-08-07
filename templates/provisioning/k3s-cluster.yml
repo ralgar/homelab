@@ -4,8 +4,6 @@
   become: true
   vars_files:
     - ../../vars/global.yml
-    - ../../vars/kubernetes.yml
-    - ../../vars/pushover.yml
   roles:
     - role: rhel8/timesync-ntp
     - role: rhel8/automatic-upgrades

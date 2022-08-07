@@ -1,5 +1,0 @@
----
-gitlab:
-  edition: ce
-  dirsrv_account_passwd: password
-  runner_registration_token: 4B8FX5xb7MShDycF7jcZ
