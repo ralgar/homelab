@@ -1,0 +1,90 @@
+---
+default:
+  image: alpine:latest
+  tags:
+    - docker
+  interruptible: true
+  before_script:
+    - if [[ ! -d $CI_PROJECT_DIR/.pkg_cache ]] ; then mkdir "$CI_PROJECT_DIR/.pkg_cache" ; fi
+    - ln -s "$CI_PROJECT_DIR/.pkg_cache" /etc/apk/cache
+    - apk update
+
+stages:
+  - linting
+  - testing
+  - deployment
+
+cache:
+  paths:
+    - .pkg_cache/
+    - .packer/
+    - deploy/.terraform/
+
+# markdownlint:
+#   stage: linting
+#   image: registry.gitlab.com/pipeline-components/markdownlint:latest
+#   script:
+#     - mdl --style all --warnings .
+
+# markdown-spellcheck:
+#   stage: linting
+#   image: registry.gitlab.com/pipeline-components/markdown-spellcheck:latest
+#   script:
+#     - mdspell --report '**/*.md'
+
+# tflint:
+#   stage: linting
+#   image: ghcr.io/terraform-linters/tflint:latest
+#   script:
+#     - cd deploy
+#     - tflint --module .
+
+ansible-lint:
+  stage: linting
+  image: registry.gitlab.com/pipeline-components/ansible-lint:latest
+  script:
+    - ansible-lint -P production
+
+packer-validate:
+  stage: testing
+  image:
+    name: docker.io/hashicorp/packer:1.8.3
+    entrypoint: [""]
+  variables:
+    PACKER_PLUGIN_PATH: "$CI_PROJECT_DIR/.packer/plugins"
+  script:
+    - packer init -upgrade templates
+    - packer validate -var-file templates/secret.pkrvars.hcl templates
+
+terraform-validate:
+  stage: testing
+  image:
+    name: docker.io/hashicorp/terraform:1.2.6
+    entrypoint: [""]
+  script:
+    - cd deploy
+    - terraform init -upgrade
+    - terraform validate
+
+build-templates:
+  stage: deployment
+  image: docker.io/hashicorp/packer:1.8.3
+  rules:
+    - if: $CI_COMMIT_TAG
+  variables:
+    PACKER_PLUGIN_PATH: "$CI_PROJECT_DIR/.packer/plugins"
+  script:
+    - cd templates
+    - packer build -var-file secret.pkrvars.hcl -only proxmox-iso.rocky8-base .
+    - >
+      packer build -var-file secret.pkrvars.hcl
+      -only proxmox-clone.k3s-master,proxmox-clone.k3s-worker .
+
+deploy-infrastructure:
+  stage: deployment
+  image: docker.io/hashicorp/terraform:1.2.6
+  rules:
+    - if: $CI_COMMIT_TAG
+  script:
+    - cd deploy
+    - terraform apply -auto-approve
