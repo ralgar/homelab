@@ -9,7 +9,7 @@ net:
   domain: homelab.internal
 
 guest:
-  ctImage: "local:vztmpl/debian-11-standard_11.0-1_amd64.tar.gz"
+  ctImage: "local:vztmpl/debian-11-standard_11.3-1_amd64.tar.zst"
   pubKeyFile: "~/.ssh/id_ed25519.pub"
   vmTemplate: template-rocky8
 

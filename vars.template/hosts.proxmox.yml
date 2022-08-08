@@ -15,6 +15,7 @@ groups:
   databases: "'db' in (proxmox_tags_parsed|list)"
   debian: "'debian' in (proxmox_tags_parsed|list)"
   development: "'dev' in (proxmox_tags_parsed|list)"
+  ldap_servers: "'ldap' in (proxmox_tags_parsed|list)"
   minecraft: "'minecraft' in (proxmox_tags_parsed|list)"
   nameservers: "'nameservers' in (proxmox_tags_parsed|list)"
   pki_servers: "'pki' in (proxmox_tags_parsed|list)"
