@@ -1,27 +1,23 @@
 variable "pve_host" {
   description = "Proxmox host FQDN or IPv4 address"
   type        = string
+  sensitive   = true
 }
 
-variable "pve_username" {
-  description = "Proxmox VE username"
+variable "pve_api_token_id" {
+  description = "Required: Proxmox API token ID (format: user@realm!token_name)."
   type        = string
   sensitive   = true
 }
 
-variable "pve_password" {
-  description = "Proxmox VE password"
+variable "pve_api_token_secret" {
+  description = "Required: Proxmox API token secret (format is a UUID string)."
   type        = string
   sensitive   = true
 }
 
 variable "pve_tlsInsecure" {
-  description = "Toggle whether TLS must be valid"
+  description = "Optional: Toggles TLS certificate validation."
   type        = bool
-}
-
-variable "pve_token" {
-  description = "Proxmox VE authentication token (if used)"
-  type        = string
-  sensitive   = true
+  default     = false
 }

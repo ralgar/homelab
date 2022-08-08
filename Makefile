@@ -1,5 +1,5 @@
 PKR_DIR  := ./templates
-PKR_VARS := $(PKR_DIR)/secret.pkrvars.hcl
+PKR_VARS := ./vars/secret.hcl
 
 
 # Build the entire system

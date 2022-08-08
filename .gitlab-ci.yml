@@ -7,57 +7,55 @@ default:
   before_script:
     - if [[ ! -d $CI_PROJECT_DIR/.pkg_cache ]] ; then mkdir "$CI_PROJECT_DIR/.pkg_cache" ; fi
     - ln -s "$CI_PROJECT_DIR/.pkg_cache" /etc/apk/cache
-    - apk update
 
 stages:
-  - linting
-  - testing
-  - deployment
+  - lint
+  - test
+  - deploy
 
 cache:
   paths:
     - .pkg_cache/
     - .packer/
     - deploy/.terraform/
+    - deploy/.terraform.lock.hcl
 
-# markdownlint:
-#   stage: linting
-#   image: registry.gitlab.com/pipeline-components/markdownlint:latest
-#   script:
-#     - mdl --style all --warnings .
+.markdownlint:
+  stage: lint
+  image: registry.gitlab.com/pipeline-components/markdownlint:latest
+  script:
+    - mdl --style all --warnings .
 
-# markdown-spellcheck:
-#   stage: linting
-#   image: registry.gitlab.com/pipeline-components/markdown-spellcheck:latest
-#   script:
-#     - mdspell --report '**/*.md'
+.markdown-spellcheck:
+  stage: lint
+  image: registry.gitlab.com/pipeline-components/markdown-spellcheck:latest
+  script:
+    - mdspell --report '**/*.md'
 
-# tflint:
-#   stage: linting
-#   image: ghcr.io/terraform-linters/tflint:latest
-#   script:
-#     - cd deploy
-#     - tflint --module .
+.tflint:
+  stage: lint
+  image: ghcr.io/terraform-linters/tflint:latest
+  script:
+    - cd deploy
+    - tflint --module .
 
 ansible-lint:
-  stage: linting
+  stage: lint
   image: registry.gitlab.com/pipeline-components/ansible-lint:latest
   script:
     - ansible-lint -P production
 
-packer-validate:
-  stage: testing
-  image:
-    name: docker.io/hashicorp/packer:1.8.3
-    entrypoint: [""]
+.packer-validate:
+  stage: test
   variables:
     PACKER_PLUGIN_PATH: "$CI_PROJECT_DIR/.packer/plugins"
   script:
+    - apk add ansible~=5.8.0 packer~=1.8.1
     - packer init -upgrade templates
-    - packer validate -var-file templates/secret.pkrvars.hcl templates
+    - packer validate -var-file vars.template/secret.hcl templates
 
 terraform-validate:
-  stage: testing
+  stage: test
   image:
     name: docker.io/hashicorp/terraform:1.2.6
     entrypoint: [""]
@@ -67,24 +65,45 @@ terraform-validate:
     - terraform validate
 
 build-templates:
-  stage: deployment
-  image: docker.io/hashicorp/packer:1.8.3
+  stage: deploy
   rules:
     - if: $CI_COMMIT_TAG
   variables:
     PACKER_PLUGIN_PATH: "$CI_PROJECT_DIR/.packer/plugins"
   script:
+    - apk add ansible~=5.8.0 packer~=1.8.1
     - cd templates
-    - packer build -var-file secret.pkrvars.hcl -only proxmox-iso.rocky8-base .
+    - packer build -var-file ../vars.template/secret.hcl -only proxmox-iso.rocky8-base .
     - >
       packer build -var-file secret.pkrvars.hcl
       -only proxmox-clone.k3s-master,proxmox-clone.k3s-worker .
 
-deploy-infrastructure:
-  stage: deployment
-  image: docker.io/hashicorp/terraform:1.2.6
+apply-infrastructure:
+  stage: deploy
+  environment:
+    name: production
+    url: https://homelab.internal
+    on_stop: destroy-infrastructure
+  image:
+    name: docker.io/hashicorp/terraform:1.2.6
+    entrypoint: [""]
   rules:
-    - if: $CI_COMMIT_TAG
+    # - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH == 'testing'
+      when: manual
   script:
     - cd deploy
-    - terraform apply -auto-approve
+    - terraform apply -auto-approve -var-file $PVE_AUTH -var guest_pubKeyFile=$SSH_PUBKEY
+
+destroy-infrastructure:
+  stage: deploy
+  environment:
+    name: production
+    action: stop
+  image:
+    name: docker.io/hashicorp/terraform:1.2.6
+    entrypoint: [""]
+  when: manual
+  script:
+    - cd deploy
+    - terraform destroy -auto-approve -var-file $PVE_AUTH -var guest_pubKeyFile=$SSH_PUBKEY

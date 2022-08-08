@@ -1,9 +1,8 @@
 source "proxmox-iso" "rocky8-base" {
   // Proxmox Builder Settings
   proxmox_url              = "${var.pve_host}"
-  username                 = "${var.pve_username}"
-  password                 = "${var.pve_password}"
-  token                    = "${var.pve_token}"
+  username                 = "${var.pve_api_token_id}"
+  token                    = "${var.pve_api_token_secret}"
   node                     = "pve1"
   insecure_skip_tls_verify = var.pve_tlsInsecure
   task_timeout             = "10m"

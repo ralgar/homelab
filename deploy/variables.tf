@@ -20,6 +20,7 @@ variable "net_domain" {
 variable "pve_host" {
   description = "Required: IP address or FQDN of a Proxmox host in your cluster."
   type        = string
+  sensitive   = true
 }
 
 variable "pve_api_token_id" {
