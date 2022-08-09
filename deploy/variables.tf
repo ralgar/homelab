@@ -13,7 +13,7 @@ variable "net_dnsServers" {
 variable "net_domain" {
   description = "Optional: DNS root domain"
   type        = string
-  default     = ""
+  default     = "homelab.internal"
   sensitive   = true
 }
 
