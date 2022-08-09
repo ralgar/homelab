@@ -1,5 +1,5 @@
 ---
-{% if packer_build_name == "k3s-master" %}
+{% if packer_build_name == "k3s-controller" %}
 # Set SAN for kube-vip address
 tls-san: {{ k3s_kubevip_address }}
 {% else %}
@@ -15,7 +15,7 @@ token-file: {{ k3s_token_file }}
 selinux: true
 {% endif %}
 
-{% if packer_build_name == "k3s-master" %}
+{% if packer_build_name == "k3s-controller" %}
 # Set additonal cluster options
 disable:
   - local-storage

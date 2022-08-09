@@ -7,5 +7,4 @@
   roles:
     - role: rhel8/timesync-ntp
     - role: rhel8/automatic-upgrades
-      when: packer_build_name == 'k3s-worker'
     - role: kubernetes/k3s-cluster

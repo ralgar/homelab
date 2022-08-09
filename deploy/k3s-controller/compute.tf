@@ -14,7 +14,7 @@ resource "proxmox_vm_qemu" "vm-compute" {
   tablet   = false
   oncreate = true
   onboot   = true
-  clone    = "template-rocky8-k3s-master"
+  clone    = "template-k3s-controller"
   os_type  = "cloud-init"
   agent    = 1
   tags     = "k3s-cluster,k3s-controller"

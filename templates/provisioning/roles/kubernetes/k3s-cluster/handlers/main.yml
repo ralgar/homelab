@@ -2,4 +2,4 @@
 - name: Include 'config-changed' handler tasks
   include_tasks: config-changed.yml
   listen: config_changed
-  when: packer_build_name == 'k3s-master'
+  when: packer_build_name == 'k3s-controller'

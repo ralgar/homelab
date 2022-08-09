@@ -17,7 +17,7 @@
     - { path: rancher/k3s/server/manifests, mode: '0700', setype: container_var_lib_t }
   loop_control:
     loop_var: kubevip_dir
-  when: packer_build_name == 'k3s-master'
+  when: packer_build_name == 'k3s-controller'
 
 - name: "kube-vip : Assert the manifest template"
   template:
@@ -30,4 +30,4 @@
     serole: object_r
     setype: container_var_lib_t
     selevel: s0
-  when: packer_build_name == 'k3s-master'
+  when: packer_build_name == 'k3s-controller'

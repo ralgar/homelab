@@ -1,6 +1,6 @@
-source "proxmox-iso" "rocky8-base" {
+source "proxmox-iso" "rocky8" {
   // Proxmox Builder Settings
-  proxmox_url              = "${var.pve_host}"
+  proxmox_url              = "https://${var.pve_host}:8006/api2/json"
   username                 = "${var.pve_api_token_id}"
   token                    = "${var.pve_api_token_secret}"
   node                     = "pve1"
@@ -26,8 +26,9 @@ source "proxmox-iso" "rocky8-base" {
   ssh_timeout  = "60m"
 
   // VM Settings
-  vm_name              = "packer-rocky8-base"
-  template_name        = "template-rocky8-base"
+  vm_name              = "packer-rocky8"
+  vm_id                = 9998
+  template_name        = "template-rocky8"
   template_description = <<-EOT
     Rocky Linux 8 base template.
 
@@ -58,7 +59,7 @@ source "proxmox-iso" "rocky8-base" {
 }
 
 build {
-  sources = ["source.proxmox-iso.rocky8-base"]
+  sources = ["source.proxmox-iso.rocky8"]
   provisioner "shell" {
     inline = [
       "sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config",
