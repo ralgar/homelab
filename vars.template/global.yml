@@ -1,6 +1,9 @@
 ---
 timezone: UTC
 
+net:
+  domain: homelab.internal
+
 dirsrv:
   suffix: dc=homelab,dc=internal
   root_user_passwd: "p4$Sw0Rd"
