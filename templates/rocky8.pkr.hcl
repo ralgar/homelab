@@ -41,8 +41,9 @@ source "proxmox-iso" "rocky8" {
   os         = "l26"
   qemu_agent = true
 
+  scsi_controller     = "virtio-scsi-pci"
   disks {
-    type              = "virtio"
+    type              = "scsi"
     disk_size         = "8G"
     storage_pool      = "local-zfs"
     storage_pool_type = "zfspool"

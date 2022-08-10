@@ -29,6 +29,8 @@ source "proxmox-clone" "k3s-master" {
   os         = "l26"
   qemu_agent = true
 
+  scsi_controller     = "virtio-scsi-pci"
+
   network_adapters {
     bridge   = "vmbr0"
     model    = "virtio"
@@ -67,6 +69,8 @@ source "proxmox-clone" "k3s-controller" {
   os         = "l26"
   qemu_agent = true
 
+  scsi_controller     = "virtio-scsi-pci"
+
   network_adapters {
     bridge   = "vmbr0"
     model    = "virtio"
@@ -104,6 +108,8 @@ source "proxmox-clone" "k3s-worker" {
   sockets    = 1
   os         = "l26"
   qemu_agent = true
+
+  scsi_controller     = "virtio-scsi-pci"
 
   network_adapters {
     bridge   = "vmbr0"
