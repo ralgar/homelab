@@ -1,22 +1,23 @@
 ---
-{% if packer_build_name == "k3s-controller" %}
-# Set SAN for kube-vip address
+# Set initialization/connection parameters
+{% if packer_build_name == "k3s-master" %}
+cluster-init: true
 tls-san: {{ k3s_kubevip_address }}
-{% else %}
-# Set control-plane IP address
+{% elif packer_build_name == "k3s-controller" %}
+cluster-init: true
+tls-san: {{ k3s_kubevip_address }}
+server: https://{{ k3s_kubevip_address }}:6443
+{% elif packer_build_name == "k3s-worker" %}
 server: https://{{ k3s_kubevip_address }}:6443
 {% endif %}
-
-# Set path to token file
-token-file: {{ k3s_token_file }}
 
 {% if "CentOS" or "Rocky" or "Red Hat Enterprise Linux" in ansible_distribution %}
 # Enable SELinux for containerd
 selinux: true
 {% endif %}
 
-{% if packer_build_name == "k3s-controller" %}
-# Set additonal cluster options
+{% if packer_build_name == "k3s-master" or packer_build_name == "k3s-controller" %}
+# Set additional control-plane options
 disable:
   - local-storage
   - servicelb
@@ -25,3 +26,6 @@ disable-cloud-controller: true
 secret-encryption: true
 node-taint: "CriticalAddonsOnly=true:NoExecute"
 {% endif %}
+
+# Set path to token file
+token-file: {{ k3s_token_file }}

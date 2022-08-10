@@ -1,41 +1,43 @@
 resource "proxmox_vm_qemu" "vm-compute" {
-  name    = "k3s-controller-${var.countIndex}"
-  desc        = <<-EOT
-    ## K3s Controller #${var.countIndex}
+  count = var.replicas
+  name  = "k3s-worker-${count.index}"
+  desc  = <<-EOT
+    ## K3s Worker #${count.index}
     ---
 
-    A K3s control-plane node.
+    A K3s worker node.
 
     **Type:** QEMU Virtual Machine <br>
-    **Tags:** k3s-cluster,k3s-controller
+    **Tags:** k3s-cluster,k3s-worker
   EOT
   target_node = var.guestTargetNode
 
+  full_clone = false
   tablet   = false
   oncreate = true
   onboot   = true
-  clone    = "template-k3s-controller"
+  clone    = "template-k3s-worker"
   os_type  = "cloud-init"
   agent    = 1
-  tags     = "k3s-cluster,k3s-controller"
+  tags     = "k3s-cluster,k3s-worker"
 
   // System Resources
   #pool    = "pool0"
-  cores   = 2
+  cores   = 4
   sockets = 1
-  memory  = 2048
+  memory  = 8192
 
   disk {
     type    = "scsi"
     storage = var.guestStoragePool
-    size    = "8G"
+    size    = "128G"
   }
 
-  disk {
+  /*disk {
     type    = "scsi"
     storage = var.guestStoragePool
-    size    = "16G"
-  }
+    size    = "128G"
+  }*/
 
   network {
     model  = "virtio"

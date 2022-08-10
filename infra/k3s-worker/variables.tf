@@ -1,8 +1,3 @@
-variable "countIndex" {
-  description = "Passthrough index of module count."
-  type        = number
-}
-
 variable "guestPubKeyFile" {
   description = "Path to the SSH public key file"
   type        = string
@@ -28,4 +23,9 @@ variable "netDomain" {
   description = "Local domain name (used for DNS)"
   type        = string
   sensitive   = true
+}
+
+variable "replicas" {
+  description = "Number of control-plane node replicas."
+  type        = number
 }

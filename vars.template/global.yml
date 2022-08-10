@@ -13,8 +13,12 @@ dirsrv:
     email: myemail@domain.tld
     passwd: "p4$Sw0Rd"
 
-# 32 char string
-k3s_token: 'Tx0HcpfyMZb8oVJ6NNTwLcSjba5jMQHR'
+k3s:
+  controller:
+    # Desired static IP of the control-plane load balancer
+    load_balancer_ip: 192.168.1.11
+    # 32 character alpha-numeric string
+    node_token: 'Tx0HcpfyMZb8oVJ6NNTwLcSjba5jMQHR'
 
 pushover:
   enabled: true

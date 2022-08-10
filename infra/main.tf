@@ -1,8 +1,19 @@
+module "k3s-master" {
+  // Module Settings
+  source           = "./k3s-master"
+  guestTargetNode  = "pve1"
+  guestStoragePool = "local-zfs"
+
+  // Global Variables
+  guestPubKeyFile = var.guest_pubKeyFile
+  netDnsHosts     = var.net_dnsServers
+  netDomain       = var.net_domain
+}
+
 module "k3s-controllers" {
   // Module Settings
   source           = "./k3s-controller"
-  count            = 1
-  countIndex       = count.index
+  replicas         = 2
   guestTargetNode  = "pve1"
   guestStoragePool = "local-zfs"
 
@@ -15,8 +26,7 @@ module "k3s-controllers" {
 module "k3s-workers" {
   // Module Settings
   source           = "./k3s-worker"
-  count            = 2
-  countIndex       = count.index
+  replicas         = 2
   guestTargetNode  = "pve1"
   guestStoragePool = "local-zfs"
 
@@ -24,10 +34,7 @@ module "k3s-workers" {
   guestPubKeyFile = var.guest_pubKeyFile
   netDnsHosts     = var.net_dnsServers
   netDomain       = var.net_domain
-}
 
-resource "time_sleep" "wait_for_controlplane" {
-  create_duration = "60s"
   depends_on      = [ module.k3s-controllers ]
 }
 
@@ -41,7 +48,7 @@ resource "helm_release" "argo-cd" {
   wait             = true
   values           = [ "${file("../cluster/bootstrap/argocd/values.yaml")}" ]
 
-  depends_on       = [ time_sleep.wait_for_controlplane ]
+  depends_on       = [ module.k3s-workers ]
 }
 
 resource "helm_release" "gitops-config" {

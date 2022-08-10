@@ -7,7 +7,11 @@ After=network-online.target
 Type=notify
 ExecStartPre=-/sbin/modprobe br_netfilter
 ExecStartPre=-/sbin/modprobe overlay
-ExecStart=/usr/local/bin/k3s {{ "server" if packer_build_name == "k3s-controller" else "agent" }}
+{% if packer_build_name == "k3s-master" or packer_build_name == "k3s-controller" %}
+ExecStart=/usr/local/bin/k3s server
+{% else %}
+ExecStart=/usr/local/bin/k3s agent
+{% endif %}
 KillMode=process
 Delegate=yes
 # Having non-zero Limit*s causes performance problems due to accounting overhead

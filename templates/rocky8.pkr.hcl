@@ -8,7 +8,7 @@ source "proxmox-iso" "rocky8" {
   task_timeout             = "10m"
 
   // ISO / Kickstart / Cloud-Init Settings
-  iso_url          = "https://download.rockylinux.org/pub/rocky/8/isos/x86_64/Rocky-8.6-x86_64-boot.iso"
+  iso_url          = "https://download.rockylinux.org/pub/rocky/8/isos/x86_64/Rocky-x86_64-boot.iso"
   iso_checksum     = "fe77cc293a2f2fe6ddbf5d4bc2b5c820024869bc7ea274c9e55416d215db0cc5"
   iso_storage_pool = "local"
   unmount_iso      = true
@@ -26,8 +26,8 @@ source "proxmox-iso" "rocky8" {
   ssh_timeout  = "60m"
 
   // VM Settings
-  vm_name              = "packer-rocky8"
-  vm_id                = 9998
+  vm_name              = "template-rocky8"
+  vm_id                = 9999
   template_name        = "template-rocky8"
   template_description = <<-EOT
     Rocky Linux 8 base template.

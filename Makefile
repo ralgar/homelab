@@ -11,7 +11,8 @@ templates: template-k3s-cluster
 # Build VM templates with Packer
 template-rocky8: $(PKR_DIR)/rocky8.pkr.hcl
 	packer build -var-file $(PKR_VARS) -only proxmox-iso.rocky8 $(PKR_DIR)
-	sleep 5
+	sleep 15
 template-k3s-cluster: $(PKR_DIR)/k3s-cluster.pkr.hcl
 	packer build -var-file $(PKR_VARS) \
-		-only proxmox-clone.k3s-controller,proxmox-clone.k3s-worker $(PKR_DIR)
+		-only proxmox-clone.k3s-master,proxmox-clone.k3s-controller,proxmox-clone.k3s-worker \
+		$(PKR_DIR)
