@@ -4,7 +4,7 @@ HCL_VARS := ./vars/secret.hcl
 
 
 # Build the entire system
-all: template-rocky8 template-k3s-cluster create-infrastructure
+all: template-rocky8 template-k3s-cluster apply-infrastructure
 
 # Intermediary targets
 templates: template-k3s-cluster
