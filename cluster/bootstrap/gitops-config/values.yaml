@@ -1,7 +1,7 @@
 ---
 gitOps:
-  repoUrl: https://github.com/ralgar/homelab-provisioning
-  revision: testing
+  repoUrl: https://github.com/ralgar/homelab
+  revision: feature/k8s-rework
   stacksRoot: cluster
 stacks:
   - name: bootstrap
