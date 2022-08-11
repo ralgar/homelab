@@ -1,0 +1,9 @@
+# NOTE: The dark theme pulls a script from a third-party repo, if you
+#         prefer not to use it, simply comment out the role.
+---
+- name: Upgrade the Proxmox host(s)
+  hosts: all
+  remote_user: root
+  roles:
+    - host-upgrade
+    - dark-theme
