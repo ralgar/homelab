@@ -3,22 +3,32 @@ default:
   image: alpine:latest
   tags:
     - docker
+    - shared
   interruptible: true
   before_script:
     - if [[ ! -d $CI_PROJECT_DIR/.pkg_cache ]] ; then mkdir "$CI_PROJECT_DIR/.pkg_cache" ; fi
     - ln -s "$CI_PROJECT_DIR/.pkg_cache" /etc/apk/cache
 
 stages:
+  - prepare
   - lint
-  - test
+  - build
   - deploy
+  - cleanup
 
 cache:
+  key: "$CI_COMMIT_REF_NAME"
   paths:
     - .pkg_cache/
     - .packer/
-    - deploy/.terraform/
-    - deploy/.terraform.lock.hcl
+    - infra/.terraform/
+    - infra/.terraform.lock.hcl
+    - vars/
+
+variables-template:
+  stage: prepare
+  script:
+    - cp -a vars.template vars
 
 .markdownlint:
   stage: lint
@@ -32,40 +42,35 @@ cache:
   script:
     - mdspell --report '**/*.md'
 
-.tflint:
-  stage: lint
-  image: ghcr.io/terraform-linters/tflint:latest
-  script:
-    - cd deploy
-    - tflint --module .
-
 ansible-lint:
   stage: lint
   image: registry.gitlab.com/pipeline-components/ansible-lint:latest
   script:
     - ansible-lint -P production
 
-.packer-validate:
-  stage: test
+packer-validate:
+  stage: lint
   variables:
     PACKER_PLUGIN_PATH: "$CI_PROJECT_DIR/.packer/plugins"
   script:
     - apk add ansible~=5.8.0 packer~=1.8.1
     - packer init -upgrade templates
-    - packer validate -var-file vars.template/secret.hcl templates
+    - packer validate templates
 
 terraform-validate:
-  stage: test
+  stage: lint
   image:
     name: docker.io/hashicorp/terraform:1.2.6
     entrypoint: [""]
   script:
-    - cd deploy
+    - cd infra
     - terraform init -upgrade
     - terraform validate
 
-build-templates:
-  stage: deploy
+.build-templates:
+  stage: build
+  tags:
+    - private-cluster
   rules:
     - if: $CI_COMMIT_TAG
   variables:
@@ -73,37 +78,56 @@ build-templates:
   script:
     - apk add ansible~=5.8.0 packer~=1.8.1
     - cd templates
-    - packer build -var-file ../vars.template/secret.hcl -only proxmox-iso.rocky8-base .
+    - packer build -only proxmox-iso.rocky8-base .
     - >
-      packer build -var-file secret.pkrvars.hcl
-      -only proxmox-clone.k3s-master,proxmox-clone.k3s-worker .
+      packer build
+      -only proxmox-clone.k3s-master,proxmox-clone.k3s-controller,proxmox-clone.k3s-worker .
+
+plan-infrastructure:
+  stage: build
+  tags:
+    - private-cluster
+  image:
+    name: docker.io/hashicorp/terraform:1.2.6
+    entrypoint: [""]
+  script:
+    - cd infra
+    - terraform plan
+  artifacts:
+    paths:
+      - ${CI_PROJECT_DIR}/infra/plan.cache
+    reports:
+      terraform: ${CI_PROJECT_DIR}/infra/plan.json
 
 apply-infrastructure:
   stage: deploy
+  tags:
+    - private-cluster
   environment:
-    name: production
+    name: testing
     url: https://homelab.internal
     on_stop: destroy-infrastructure
   image:
     name: docker.io/hashicorp/terraform:1.2.6
     entrypoint: [""]
   rules:
-    # - if: $CI_COMMIT_TAG
-    - if: $CI_COMMIT_BRANCH == 'testing'
+    - if: $CI_COMMIT_BRANCH == 'feature/k8s-rework'
       when: manual
   script:
-    - cd deploy
-    - terraform apply -auto-approve -var-file $PVE_AUTH -var guest_pubKeyFile=$SSH_PUBKEY
+    - cd infra
+    - terraform apply -auto-approve
 
 destroy-infrastructure:
-  stage: deploy
+  stage: cleanup
+  tags:
+    - private-cluster
   environment:
-    name: production
+    name: testing
     action: stop
   image:
     name: docker.io/hashicorp/terraform:1.2.6
     entrypoint: [""]
   when: manual
   script:
-    - cd deploy
-    - terraform destroy -auto-approve -var-file $PVE_AUTH -var guest_pubKeyFile=$SSH_PUBKEY
+    - cd infra
+    - terraform destroy -auto-approve

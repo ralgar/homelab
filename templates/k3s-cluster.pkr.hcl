@@ -1,10 +1,10 @@
 source "proxmox-clone" "k3s-master" {
   // Proxmox Builder Settings
-  proxmox_url              = "https://${var.pve_host}:8006/api2/json"
-  username                 = "${var.pve_api_token_id}"
-  token                    = "${var.pve_api_token_secret}"
+  proxmox_url              = "https://${local.pve_host}:8006/api2/json"
+  username                 = "${local.pve_api_token_id}"
+  token                    = "${local.pve_api_token_secret}"
   node                     = "pve1"
-  insecure_skip_tls_verify = var.pve_tlsInsecure
+  insecure_skip_tls_verify = local.pve_tlsInsecure
   task_timeout             = "10m"
 
   // SSH Communicator Settings
@@ -40,11 +40,11 @@ source "proxmox-clone" "k3s-master" {
 
 source "proxmox-clone" "k3s-controller" {
   // Proxmox Builder Settings
-  proxmox_url              = "https://${var.pve_host}:8006/api2/json"
-  username                 = "${var.pve_api_token_id}"
-  token                    = "${var.pve_api_token_secret}"
+  proxmox_url              = "https://${local.pve_host}:8006/api2/json"
+  username                 = "${local.pve_api_token_id}"
+  token                    = "${local.pve_api_token_secret}"
   node                     = "pve1"
-  insecure_skip_tls_verify = var.pve_tlsInsecure
+  insecure_skip_tls_verify = local.pve_tlsInsecure
   task_timeout             = "10m"
 
   // SSH Communicator Settings
@@ -80,11 +80,11 @@ source "proxmox-clone" "k3s-controller" {
 
 source "proxmox-clone" "k3s-worker" {
   // Proxmox Builder Settings
-  proxmox_url              = "https://${var.pve_host}:8006/api2/json"
-  username                 = "${var.pve_api_token_id}"
-  token                    = "${var.pve_api_token_secret}"
+  proxmox_url              = "https://${local.pve_host}:8006/api2/json"
+  username                 = "${local.pve_api_token_id}"
+  token                    = "${local.pve_api_token_secret}"
   node                     = "pve1"
-  insecure_skip_tls_verify = var.pve_tlsInsecure
+  insecure_skip_tls_verify = local.pve_tlsInsecure
   task_timeout             = "10m"
 
   // SSH Communicator Settings

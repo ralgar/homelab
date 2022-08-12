@@ -19,9 +19,9 @@ provider "helm" {
 }
 
 provider "proxmox" {
-  pm_api_url          = "https://${var.pve_host}:8006/api2/json"
-  pm_api_token_id     = var.pve_api_token_id
-  pm_api_token_secret = var.pve_api_token_secret
-  pm_tls_insecure     = var.pve_tlsInsecure
+  pm_api_url          = "https://${local.pve_host}:8006/api2/json"
+  pm_api_token_id     = local.pve_api_token_id
+  pm_api_token_secret = local.pve_api_token_secret
+  pm_tls_insecure     = local.pve_tlsInsecure
   pm_timeout          = 600
 }

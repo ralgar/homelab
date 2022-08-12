@@ -5,22 +5,22 @@ module "k3s-master" {
   guestStoragePool = "local-zfs"
 
   // Global Variables
-  guestPubKeyFile = var.guest_pubKeyFile
-  netDnsHosts     = var.net_dnsServers
-  netDomain       = var.net_domain
+  guestPubKeyFile = local.guest_pubKeyFile
+  netDnsHosts     = local.net_dnsServers
+  netDomain       = local.net_domain
 }
 
 module "k3s-controllers" {
   // Module Settings
   source           = "./k3s-controller"
-  replicas         = 2
+  replicas         = 0
   guestTargetNode  = "pve1"
   guestStoragePool = "local-zfs"
 
   // Global Variables
-  guestPubKeyFile = var.guest_pubKeyFile
-  netDnsHosts     = var.net_dnsServers
-  netDomain       = var.net_domain
+  guestPubKeyFile = local.guest_pubKeyFile
+  netDnsHosts     = local.net_dnsServers
+  netDomain       = local.net_domain
 }
 
 module "k3s-workers" {
@@ -31,9 +31,9 @@ module "k3s-workers" {
   guestStoragePool = "local-zfs"
 
   // Global Variables
-  guestPubKeyFile = var.guest_pubKeyFile
-  netDnsHosts     = var.net_dnsServers
-  netDomain       = var.net_domain
+  guestPubKeyFile = local.guest_pubKeyFile
+  netDnsHosts     = local.net_dnsServers
+  netDomain       = local.net_domain
 
   depends_on      = [ module.k3s-controllers ]
 }

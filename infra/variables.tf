@@ -1,42 +1,14 @@
-variable "guest_pubKeyFile" {
-  description = "Required: Path to the SSH public key file"
-  type        = string
-  sensitive   = true
-}
+locals {
+  root = yamldecode(file("../vars/secret.yml"))
 
-variable "net_dnsServers" {
-  description = "Optional: List of DNS server IP addresses."
-  type        = list(string)
-  default     = [ "" ]
-}
+  // Proxmox Authentication
+  pve_host             = sensitive(local.root.proxmox.host)
+  pve_api_token_id     = sensitive(local.root.proxmox.apiTokenID)
+  pve_api_token_secret = sensitive(local.root.proxmox.apiTokenSecret)
+  pve_tlsInsecure      = local.root.proxmox.tlsInsecure
 
-variable "net_domain" {
-  description = "Optional: DNS root domain"
-  type        = string
-  default     = "homelab.internal"
-  sensitive   = true
-}
-
-variable "pve_host" {
-  description = "Required: IP address or FQDN of a Proxmox host in your cluster."
-  type        = string
-  sensitive   = true
-}
-
-variable "pve_api_token_id" {
-  description = "Required: Proxmox API token ID (format: user@realm!token_name)."
-  type        = string
-  sensitive   = true
-}
-
-variable "pve_api_token_secret" {
-  description = "Required: Proxmox API token secret (format is a UUID string)."
-  type        = string
-  sensitive   = true
-}
-
-variable "pve_tlsInsecure" {
-  description = "Optional: Toggles TLS certificate validation."
-  type        = bool
-  default     = false
+  // Global Guest Settings
+  guest_pubKeyFile = sensitive(local.root.globalVars.ssh.pubKeyFile)
+  net_dnsServers   = sensitive(local.root.globalVars.net.dnsServers)
+  net_domain       = sensitive(local.root.globalVars.net.domainRoot)
 }

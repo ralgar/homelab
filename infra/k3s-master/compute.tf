@@ -58,7 +58,7 @@ resource "proxmox_vm_qemu" "vm-compute" {
     interpreter = [
       "ansible-playbook",
       "-i", "${self.default_ipv4_address},",
-      "-e", "@../vars/global.yml"
+      "-e", "@../vars/secret.yml"
     ]
     command = "ansible/get-kubeconfig.yml"
   }
