@@ -1,0 +1,15 @@
+---
+- name: Include tasks
+  include_tasks: "{{ dirsrv_tasks }}"
+  loop:
+    - bootstrap-database.yml
+    - authentication.yml
+    - plugins/attribute-uniqueness.yml
+    - plugins/dna.yml
+    - plugins/enable-plugins.yml
+    - permissions/user_read.yml
+    - users/default-user.yml
+    - groups/administrators.yml
+    - gitlab.yml
+  loop_control:
+    loop_var: dirsrv_tasks

@@ -1,0 +1,30 @@
+---
+- name: Get backend status
+  ansible.builtin.stat:
+    path: /data/db/userRoot
+  register: dirsrv_existing_backend
+
+- name: Create the database backend
+  ansible.builtin.command: |
+    dsconf localhost
+    backend create
+    --suffix {{ dirsrv_domain }}
+    --be-name userRoot
+  when: not dirsrv_existing_backend.stat.exists
+
+- name: Create LDIF database template
+  ansible.builtin.template:
+    src: template.ldif.j2
+    dest: /data/ldif/template.ldif
+    owner: dirsrv
+    group: dirsrv
+    mode: 0640
+  when: not dirsrv_existing_backend.stat.exists
+
+- name: Import the base LDIF template
+  ansible.builtin.command: |
+    dsconf localhost
+    backend import
+    userRoot
+    template.ldif
+  when: not dirsrv_existing_backend.stat.exists

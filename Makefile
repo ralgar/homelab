@@ -1,5 +1,6 @@
 PKR_DIR  := ./templates
 TF_DIR   := ./infra
+POST_DIR := ./post-deploy
 HCL_VARS := ./vars/secret.hcl
 
 
@@ -26,3 +27,7 @@ apply-infrastructure: $(TF_DIR)/main.tf
 destroy-infrastructure: $(TF_DIR)/main.tf
 	cd $(TF_DIR) && terraform init -upgrade
 	cd $(TF_DIR) && terraform destroy -var-file ../$(HCL_VARS) -auto-approve
+
+post-bootstrap: $(POST_DIR)/inventory/k8s.yml
+	cd $(POST_DIR) && ansible-playbook -i inventory/k8s.yml -K trust-internal-ca.yml
+	cd $(POST_DIR) && ansible-playbook -i inventory/k8s.yml dirsrv-bootstrap.yml

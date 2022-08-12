@@ -1,0 +1,12 @@
+---
+- name: Create 'user_read' permission
+  ldap_entry:
+    server_uri: "ldapi://%2fdata%2frun%2fslapd-localhost.socket"
+    dn: "cn=user_read,ou=permissions,{{ dirsrv_domain }}"
+    objectClass:
+      - top
+      - groupOfNames
+      - nsMemberOf
+    attributes:
+      cn: user_read
+    state: present

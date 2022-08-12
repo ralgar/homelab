@@ -1,6 +1,0 @@
----
-- name: Upgrade the system
-  community.general.pacman:
-    update_cache: true
-    upgrade: true
-    force: true

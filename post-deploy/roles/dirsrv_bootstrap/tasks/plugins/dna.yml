@@ -1,0 +1,105 @@
+# Distributed Numeric Assignment Plugin
+#   - Automatically manages POSIX UID and GID numbers
+#   - Works with multi-master replication
+---
+- name: Enable DNA Plugin
+  ldap_attrs:
+    server_uri: "ldapi://%2fdata%2frun%2fslapd-localhost.socket"
+    dn: cn=Distributed Numeric Assignment Plugin,cn=plugins,cn=config
+    attributes:
+      nsslapd-pluginEnabled: "on"
+    state: exact
+  notify: restart_dirsrv
+
+# Create the shared OU
+- name: Create the DNA Shared Ranges OU
+  ldap_entry:
+    server_uri: "ldapi://%2fdata%2frun%2fslapd-localhost.socket"
+    dn: "ou=Ranges,{{ dirsrv_domain }}"
+    objectClass:
+      - top
+      - extensibleObject
+      - organizationalUnit
+    state: present
+  notify: restart_dirsrv
+
+# Create the shared objects
+- name: Create the DNA Shared Account and Group Objects
+  ldap_entry:
+    server_uri: "ldapi://%2fdata%2frun%2fslapd-localhost.socket"
+    dn: "cn={{ dna_loop1 }},ou=Ranges,{{ dirsrv_domain }}"
+    objectClass:
+      - top
+      - extensibleObject
+    state: present
+  notify: restart_dirsrv
+  loop:
+    - Account UIDs
+    - Account GIDs
+  loop_control:
+    loop_var: dna_loop1
+
+# Set host-specific replication parameters
+- name: Configure DNA replication parameters
+  ldap_entry:
+    server_uri: "ldapi://%2fdata%2frun%2fslapd-localhost.socket"
+    dn: "dnaHostname=ldap.homelab.internal+dnaPortNum=389,cn=Account {{ dna_loop2 }}s,ou=Ranges,{{ dirsrv_domain }}"
+    objectClass:
+      - top
+      - dnaSharedConfig
+    attributes:
+      dnaHostname: ldap.homelab.internal
+      dnaPortNum: 389
+      dnaSecurePortNum: 636
+    state: present
+  notify: restart_dirsrv
+  loop:
+    - UID
+    - GID
+  loop_control:
+    loop_var: dna_loop2
+
+# Ensure that the DNA configuration entries exist
+- name: Create DNA plugin configuration entries
+  ldap_entry:
+    server_uri: "ldapi://%2fdata%2frun%2fslapd-localhost.socket"
+    dn: cn=Account {{ dna_loop3 }}s,cn=Distributed Numeric Assignment Plugin,cn=plugins,cn=config
+    objectClass:
+      - top
+      - extensibleObject
+    attributes:
+      dnatype: "{{ dna_loop3 | lower }}Number"
+      dnamagicregen: 0
+      dnafilter: (objectclass=posixAccount)
+      dnascope: "{{ dirsrv_domain }}"
+      dnanextvalue: 1001
+      dnamaxvalue: 99997
+      dnasharedcfgdn: "cn=Account {{ dna_loop3 }}s,ou=Ranges,{{ dirsrv_domain }}"
+    state: present
+  notify: restart_dirsrv
+  loop:
+    - UID
+    - GID
+  loop_control:
+    loop_var: dna_loop3
+
+# Assert that the actual DNA plugin parameters are correct
+- name: Configure DNA plugin
+  ldap_attrs:
+    server_uri: "ldapi://%2fdata%2frun%2fslapd-localhost.socket"
+    dn: cn=Account {{ dna_loop4 }}s,cn=Distributed Numeric Assignment Plugin,cn=plugins,cn=config
+    attributes:
+      dnatype: "{{ dna_loop4 | lower }}Number"
+      dnamagicregen: 0
+      dnafilter: (objectclass=posixAccount)
+      dnascope: "{{ dirsrv_domain }}"
+      dnanextvalue: 1001
+      dnamaxvalue: 99997
+      dnasharedcfgdn: "cn=Account {{ dna_loop4 }}s,ou=Ranges,{{ dirsrv_domain }}"
+    state: exact
+  notify: restart_dirsrv
+  loop:
+    - UID
+    - GID
+  loop_control:
+    loop_var: dna_loop4

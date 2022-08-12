@@ -1,0 +1,12 @@
+---
+- name: Restart the directory server
+  ansible.builtin.command: kubectl -n 389ds rollout restart deployment 389ds
+  delegate_to: localhost
+
+- name: Wait for directory server to be ready
+  ansible.builtin.command: kubectl -n 389ds rollout status deployment 389ds
+  delegate_to: localhost
+
+- name: Pause for 15 seconds to ensure directory server is ready
+  ansible.builtin.pause:
+    seconds: 15

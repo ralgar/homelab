@@ -1,0 +1,21 @@
+---
+- name: Enable MemberOf Plugin
+  ldap_attrs:
+    server_uri: "ldapi://%2fdata%2frun%2fslapd-localhost.socket"
+    dn: cn=MemberOf Plugin,cn=plugins,cn=config
+    attributes:
+      nsslapd-pluginEnabled: "on"
+    state: exact
+  notify: restart_dirsrv
+
+- name: Enable Referential Integrity Plugin
+  ldap_attrs:
+    server_uri: "ldapi://%2fdata%2frun%2fslapd-localhost.socket"
+    dn: cn=referential integrity postoperation,cn=plugins,cn=config
+    attributes:
+      nsslapd-pluginEnabled: "on"
+    state: exact
+  notify: restart_dirsrv
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers

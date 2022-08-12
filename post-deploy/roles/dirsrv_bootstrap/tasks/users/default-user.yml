@@ -1,0 +1,27 @@
+---
+- name: Create 'default' user
+  ldap_entry:
+    server_uri: "ldapi://%2fdata%2frun%2fslapd-localhost.socket"
+    dn: "uid={{ default_user_uid }},ou=people,{{ dirsrv_domain }}"
+    objectClass:
+      - top
+      - nsPerson
+      - nsAccount
+      - nsOrgPerson
+    attributes:
+      cn: "{{ default_user_displayname }}"
+      uid: "{{ default_user_uid }}"
+      displayName: "{{ default_user_displayname }}"
+      userPassword: "{{ default_user_passwd }}"
+    state: present
+
+- name: Assert 'default' user
+  ldap_attrs:
+    server_uri: "ldapi://%2fdata%2frun%2fslapd-localhost.socket"
+    dn: "uid={{ default_user_uid }},ou=people,{{ dirsrv_domain }}"
+    attributes:
+      cn: "{{ default_user_displayname }}"
+      uid: "{{ default_user_uid }}"
+      displayName: "{{ default_user_displayname }}"
+      mail: "{{ default_user_email }}"
+    state: exact

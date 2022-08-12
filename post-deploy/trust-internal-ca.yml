@@ -1,0 +1,7 @@
+---
+- name: Trust Internal CA
+  hosts: localhost
+  vars_files:
+    - ../vars/global.yml
+  roles:
+    - ca_trust
