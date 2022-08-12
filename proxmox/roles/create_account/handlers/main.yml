@@ -1,0 +1,4 @@
+---
+- name: Set filesystem access and role for 'automation' account
+  ansible.builtin.command: pveum aclmod / -user automation@pve -role Automation
+  listen: set_account_access_and_role
