@@ -21,11 +21,11 @@ template-k3s-cluster: $(PKR_DIR)/k3s-cluster.pkr.hcl
 	sleep 15
 
 # Apply and destroy Terraform infrastructure
-apply-infrastructure: $(TF_DIR)/main.tf
+terraform-init: $(TF_DIR)/main.tf
 	cd $(TF_DIR) && terraform init -upgrade
+apply-infrastructure: terraform-init
 	cd $(TF_DIR) && terraform apply -auto-approve
-destroy-infrastructure: $(TF_DIR)/main.tf
-	cd $(TF_DIR) && terraform init -upgrade
+destroy-infrastructure: terraform-init
 	cd $(TF_DIR) && terraform destroy -auto-approve
 
 post-bootstrap: $(POST_DIR)/inventory/k8s.yml

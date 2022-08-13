@@ -2,8 +2,7 @@
 default:
   image: alpine:latest
   tags:
-    - docker
-    - shared
+    - private-cluster
   interruptible: true
   before_script:
     - if [[ ! -d $CI_PROJECT_DIR/.pkg_cache ]] ; then mkdir "$CI_PROJECT_DIR/.pkg_cache" ; fi
@@ -16,6 +15,7 @@ stages:
   - deploy
   - cleanup
 
+# TODO: Set up cache for Kubernetes runner
 cache:
   key: "$CI_COMMIT_REF_NAME"
   paths:
@@ -23,18 +23,32 @@ cache:
     - .packer/
     - infra/.terraform/
     - infra/.terraform.lock.hcl
-    - vars/
 
-variables-template:
+variables:
+  PKR_ROOT: ${CI_PROJECT_DIR}/templates
+  TF_ROOT: ${CI_PROJECT_DIR}/infra
+  TF_STATE_NAME: staging
+
+terraform:init:
   stage: prepare
+  image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:1.2.6
   script:
-    - cp -a vars.template vars
+    - cd ${TF_ROOT}
+    - gitlab-terraform init
 
-.markdownlint:
+packer:init:
+  stage: prepare
+  variables:
+    PACKER_PLUGIN_PATH: "$CI_PROJECT_DIR/.packer/plugins"
+  script:
+    - apk add ansible~=5.8.0 packer~=1.8.1
+    - packer init -upgrade ${PKR_ROOT}
+
+markdownlint:
   stage: lint
   image: registry.gitlab.com/pipeline-components/markdownlint:latest
   script:
-    - mdl --style all --warnings .
+    - mdl --style all .
 
 .markdown-spellcheck:
   stage: lint
@@ -46,7 +60,7 @@ ansible-lint:
   stage: lint
   image: registry.gitlab.com/pipeline-components/ansible-lint:latest
   script:
-    - ansible-lint -P production
+    - ansible-lint -P production --exclude cluster
 
 packer-validate:
   stage: lint
@@ -54,45 +68,41 @@ packer-validate:
     PACKER_PLUGIN_PATH: "$CI_PROJECT_DIR/.packer/plugins"
   script:
     - apk add ansible~=5.8.0 packer~=1.8.1
-    - packer init -upgrade templates
-    - packer validate templates
+    - packer init ${PKR_ROOT}
+    - packer validate -var varsFile=${VARS_FILE} ${PKR_ROOT}
 
 terraform-validate:
   stage: lint
-  image:
-    name: docker.io/hashicorp/terraform:1.2.6
-    entrypoint: [""]
+  image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:1.2.6
   script:
-    - cd infra
-    - terraform init -upgrade
-    - terraform validate
+    - cd ${TF_ROOT}
+    - gitlab-terraform validate
 
-.build-templates:
+build-templates:
   stage: build
-  tags:
-    - private-cluster
   rules:
     - if: $CI_COMMIT_TAG
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - templates/
+      when: manual
   variables:
     PACKER_PLUGIN_PATH: "$CI_PROJECT_DIR/.packer/plugins"
   script:
     - apk add ansible~=5.8.0 packer~=1.8.1
-    - cd templates
-    - packer build -only proxmox-iso.rocky8-base .
     - >
-      packer build
-      -only proxmox-clone.k3s-master,proxmox-clone.k3s-controller,proxmox-clone.k3s-worker .
+      packer build -var varsFile=${VARS_FILE}
+      -only proxmox-clone.k3s-master,proxmox-clone.k3s-controller,proxmox-clone.k3s-worker
+      ${PKR_ROOT}
 
 plan-infrastructure:
   stage: build
-  tags:
-    - private-cluster
-  image:
-    name: docker.io/hashicorp/terraform:1.2.6
-    entrypoint: [""]
+  image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:1.2.6
   script:
-    - cd infra
-    - terraform plan
+    - cat ${SSH_PUBKEY_FILE} > ${CI_PROJECT_DIR}/ssh_key.pub
+    - cd ${TF_ROOT}
+    - gitlab-terraform plan -var varsFile=${VARS_FILE}
+    - gitlab-terraform plan-json
   artifacts:
     paths:
       - ${CI_PROJECT_DIR}/infra/plan.cache
@@ -101,33 +111,29 @@ plan-infrastructure:
 
 apply-infrastructure:
   stage: deploy
-  tags:
-    - private-cluster
   environment:
     name: testing
     url: https://homelab.internal
     on_stop: destroy-infrastructure
-  image:
-    name: docker.io/hashicorp/terraform:1.2.6
-    entrypoint: [""]
+  image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:1.2.6
   rules:
     - if: $CI_COMMIT_BRANCH == 'feature/k8s-rework'
       when: manual
   script:
-    - cd infra
-    - terraform apply -auto-approve
+    - cat ${SSH_PUBKEY_FILE} > ${CI_PROJECT_DIR}/ssh_key.pub
+    - cd ${TF_ROOT}
+    - gitlab-terraform apply
 
 destroy-infrastructure:
   stage: cleanup
-  tags:
-    - private-cluster
   environment:
     name: testing
     action: stop
-  image:
-    name: docker.io/hashicorp/terraform:1.2.6
-    entrypoint: [""]
-  when: manual
+  image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:1.2.6
+  rules:
+    - if: $CI_COMMIT_BRANCH == 'feature/k8s-rework'
+      when: manual
   script:
-    - cd infra
-    - terraform destroy -auto-approve
+    - cat ${SSH_PUBKEY_FILE} > ${CI_PROJECT_DIR}/ssh_key.pub
+    - cd ${TF_ROOT}
+    - gitlab-terraform destroy

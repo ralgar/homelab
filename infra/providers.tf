@@ -1,5 +1,6 @@
 terraform {
   required_version = ">= 1.0.0"
+  backend "http" {}
   required_providers {
     helm = {
       source  = "hashicorp/helm"

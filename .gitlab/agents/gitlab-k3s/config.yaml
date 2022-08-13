@@ -1,8 +1,8 @@
 ---
 gitops:
   manifest_projects:
-    - id: infrastructure/homelab
-      default_namespace: homelab-default
+    - id: ralgar/homelab
+      default_namespace: default
       paths:
-        - glob: '/apps/**/*.{yaml,yml,json}'
+        - glob: '/cluster/gitlab-managed/**/*.{yaml,yml,json}'
       dry_run_strategy: none

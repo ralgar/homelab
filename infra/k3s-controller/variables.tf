@@ -1,7 +1,6 @@
 variable "guestPubKeyFile" {
   description = "Path to the SSH public key file"
   type        = string
-  sensitive   = true
 }
 
 variable "guestStoragePool" {

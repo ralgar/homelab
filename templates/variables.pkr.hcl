@@ -1,5 +1,11 @@
+variable "varsFile" {
+  description = "Path to the YAML variables file"
+  type        = string
+  default     = "../vars/secret.yml"
+}
+
 local "root" {
-  expression = yamldecode(file("../vars/secret.yml"))
+  expression = yamldecode(file(var.varsFile))
 }
 
 local "pve_host" {
