@@ -1,14 +1,14 @@
 ---
-- name: "kube-vip : Assert the required directory structure"
+- name: "Auto-deploy : Assert the required directory structure"
   file:
-    path: "/var/lib/{{ kubevip_dir.path }}"
+    path: "/var/lib/{{ manifest_dir.path }}"
     state: directory
     owner: root
     group: root
-    mode: "{{ kubevip_dir.mode }}"
+    mode: "{{ manifest_dir.mode }}"
     seuser: system_u
     serole: object_r
-    setype: "{{ kubevip_dir.setype }}"
+    setype: "{{ manifest_dir.setype }}"
     selevel: s0
   loop:
     - { path: rancher, mode: '0755', setype: var_lib_t }
@@ -16,13 +16,26 @@
     - { path: rancher/k3s/server, mode: '0700', setype: container_var_lib_t }
     - { path: rancher/k3s/server/manifests, mode: '0700', setype: container_var_lib_t }
   loop_control:
-    loop_var: kubevip_dir
+    loop_var: manifest_dir
   when: '"k3s-master" or "k3s-controller" in packer_build_name'
 
-- name: "kube-vip : Assert the manifest template"
+- name: "Auto-deploy : Assert the kube-vip manifest"
   template:
     src: kube-vip.yaml.j2
     dest: /var/lib/rancher/k3s/server/manifests/kube-vip.yaml
+    owner: root
+    group: root
+    mode: 0600
+    seuser: system_u
+    serole: object_r
+    setype: container_var_lib_t
+    selevel: s0
+  when: '"k3s-master" or "k3s-controller" in packer_build_name'
+
+- name: "Auto-deploy : Assert the gitlab-agent manifest"
+  template:
+    src: gitlab-agent.yaml.j2
+    dest: /var/lib/rancher/k3s/server/manifests/gitlab-agent.yaml
     owner: root
     group: root
     mode: 0600

@@ -37,25 +37,3 @@ module "k3s-workers" {
 
   depends_on      = [ module.k3s-controllers ]
 }
-
-resource "helm_release" "argo-cd" {
-  name             = "argocd"
-  repository       = "https://argoproj.github.io/argo-helm"
-  chart            = "argo-cd"
-  version          = "4.9.10"
-  namespace        = "argocd"
-  create_namespace = true
-  wait             = true
-  values           = [ "${file("../cluster/bootstrap/argocd/values.yaml")}" ]
-
-  depends_on       = [ module.k3s-workers ]
-}
-
-resource "helm_release" "gitops-config" {
-  name       = "gitops-config"
-  chart      = "../cluster/bootstrap/gitops-config"
-  namespace  = "argocd"
-  values     = [ "${file("../cluster/bootstrap/gitops-config/values.yaml")}" ]
-
-  depends_on = [ helm_release.argo-cd ]
-}

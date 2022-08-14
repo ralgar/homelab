@@ -5,3 +5,6 @@ k3s_service_file: /usr/local/lib/systemd/system/k3s.service
 k3s_enable_selinux: true
 k3s_kubevip_version: v0.5.0
 k3s_kubevip_address: 192.168.1.11
+
+k3s_gitlab_agent_version: 15.2.0
+k3s_gitlab_agent_token: "NTI1QXBma2VqTjlHWFJxQlFmRVB5eXEzb3RzYTg2SnJ1UEhzNTlZLTF3RUxzWFMtUVE="

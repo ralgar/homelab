@@ -1,0 +1,128 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: gitlab-agent
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: gitlab-agent
+  namespace: gitlab-agent
+  labels:
+    app.kubernetes.io/name: gitlab-agent
+    app.kubernetes.io/version: v{{ k3s_gitlab_agent_version }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: gitlab-agent-token
+  namespace: gitlab-agent
+  labels:
+    app.kubernetes.io/name: gitlab-agent
+    app.kubernetes.io/version: v{{ k3s_gitlab_agent_version }}
+data:
+  token: {{ k3s_gitlab_agent_token }}
+type: Opaque
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gitlab-agent
+  namespace: gitlab-agent
+  labels:
+    app.kubernetes.io/name: gitlab-agent
+    app.kubernetes.io/version: v{{ k3s_gitlab_agent_version }}
+data:
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: gitlab-agent:gitlab-agent-cluster-admin
+  labels:
+    app.kubernetes.io/name: gitlab-agent
+    app.kubernetes.io/version: v{{ k3s_gitlab_agent_version }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+  - kind: ServiceAccount
+    name: gitlab-agent
+    namespace: gitlab-agent
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitlab-agent
+  namespace: gitlab-agent
+  labels:
+    app.kubernetes.io/name: gitlab-agent
+    app.kubernetes.io/version: v{{ k3s_gitlab_agent_version }}
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: gitlab-agent
+  template:
+    metadata:
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "8080"
+        prometheus.io/scrape: "true"
+      labels:
+        app.kubernetes.io/name: gitlab-agent
+        app: gitlab-agent
+    spec:
+      serviceAccountName: gitlab-agent
+      containers:
+        - name: gitlab-agent
+          image: registry.gitlab.com/gitlab-org/cluster-integration/gitlab-agent/agentk:v{{ k3s_gitlab_agent_version }}
+          imagePullPolicy: IfNotPresent
+          args:
+            - --token-file=/etc/agentk/secrets/token
+            - --kas-address=wss://kas.gitlab.com
+          livenessProbe:
+            httpGet:
+              path: /liveness
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /readiness
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            {}
+          env:
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: SERVICE_ACCOUNT_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.serviceAccountName
+          volumeMounts:
+            - name: secret-volume
+              mountPath: /etc/agentk/secrets
+            - name: config-volume
+              mountPath: /etc/agentk/config
+      volumes:
+        - name: secret-volume
+          secret:
+            secretName: gitlab-agent-token
+        - name: config-volume
+          configMap:
+            name: gitlab-agent

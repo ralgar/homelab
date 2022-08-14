@@ -26,6 +26,7 @@ cache:
 
 variables:
   PKR_ROOT: ${CI_PROJECT_DIR}/templates
+  PACKER_PLUGIN_PATH: "${CI_PROJECT_DIR}/.packer/plugins"
   TF_ROOT: ${CI_PROJECT_DIR}/infra
   TF_STATE_NAME: staging
 
@@ -38,8 +39,6 @@ terraform:init:
 
 packer:init:
   stage: prepare
-  variables:
-    PACKER_PLUGIN_PATH: "$CI_PROJECT_DIR/.packer/plugins"
   script:
     - apk add ansible~=5.8.0 packer~=1.8.1
     - packer init -upgrade ${PKR_ROOT}
@@ -64,8 +63,6 @@ ansible-lint:
 
 packer-validate:
   stage: lint
-  variables:
-    PACKER_PLUGIN_PATH: "$CI_PROJECT_DIR/.packer/plugins"
   script:
     - apk add ansible~=5.8.0 packer~=1.8.1
     - packer init ${PKR_ROOT}
@@ -77,23 +74,6 @@ terraform-validate:
   script:
     - cd ${TF_ROOT}
     - gitlab-terraform validate
-
-build-templates:
-  stage: build
-  rules:
-    - if: $CI_COMMIT_TAG
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      changes:
-        - templates/
-      when: manual
-  variables:
-    PACKER_PLUGIN_PATH: "$CI_PROJECT_DIR/.packer/plugins"
-  script:
-    - apk add ansible~=5.8.0 packer~=1.8.1
-    - >
-      packer build -var varsFile=${VARS_FILE}
-      -only proxmox-clone.k3s-master,proxmox-clone.k3s-controller,proxmox-clone.k3s-worker
-      ${PKR_ROOT}
 
 plan-infrastructure:
   stage: build
@@ -109,31 +89,29 @@ plan-infrastructure:
     reports:
       terraform: ${CI_PROJECT_DIR}/infra/plan.json
 
+build-templates:
+  stage: build
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - templates/
+      when: manual
+  script:
+    - apk add ansible~=5.8.0 packer~=1.8.1
+    - >
+      packer build -var varsFile=${VARS_FILE}
+      -only proxmox-clone.k3s-master,proxmox-clone.k3s-controller,proxmox-clone.k3s-worker
+      ${PKR_ROOT}
+
 apply-infrastructure:
   stage: deploy
   environment:
-    name: testing
-    url: https://homelab.internal
-    on_stop: destroy-infrastructure
+    name: staging
   image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:1.2.6
   rules:
-    - if: $CI_COMMIT_BRANCH == 'feature/k8s-rework'
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: manual
   script:
     - cat ${SSH_PUBKEY_FILE} > ${CI_PROJECT_DIR}/ssh_key.pub
     - cd ${TF_ROOT}
-    - gitlab-terraform apply
-
-destroy-infrastructure:
-  stage: cleanup
-  environment:
-    name: testing
-    action: stop
-  image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:1.2.6
-  rules:
-    - if: $CI_COMMIT_BRANCH == 'feature/k8s-rework'
-      when: manual
-  script:
-    - cat ${SSH_PUBKEY_FILE} > ${CI_PROJECT_DIR}/ssh_key.pub
-    - cd ${TF_ROOT}
-    - gitlab-terraform destroy
+    - gitlab-terraform apply plan.cache
