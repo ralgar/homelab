@@ -1,5 +1,6 @@
 ---
 role_privs:
+  - Datastore.Allocate
   - Datastore.AllocateSpace
   - Datastore.AllocateTemplate
   - Datastore.Audit
