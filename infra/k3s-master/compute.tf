@@ -49,7 +49,7 @@ resource "proxmox_vm_qemu" "vm-compute" {
   searchdomain = var.netDomain
   nameserver   = join(" ", var.netDnsHosts)
   sshkeys      = file(var.guestPubKeyFile)
-  ipconfig0    = "ip=dhcp"
+  ipconfig0    = "ip=${var.guestIPAddr},gw=${var.netGateway}"
 
   provisioner "local-exec" {
     environment = {

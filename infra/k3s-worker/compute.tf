@@ -1,8 +1,7 @@
 resource "proxmox_vm_qemu" "vm-compute" {
-  count = var.replicas
-  name  = "k3s-worker-${count.index}"
+  name  = "k3s-worker-${var.guestNumber}"
   desc  = <<-EOT
-    ## K3s Worker #${count.index}
+    ## K3s Worker #${var.guestNumber}
     ---
 
     A K3s worker node.
@@ -50,5 +49,5 @@ resource "proxmox_vm_qemu" "vm-compute" {
   searchdomain = var.netDomain
   nameserver   = join(" ", var.netDnsHosts)
   sshkeys      = file(var.guestPubKeyFile)
-  ipconfig0    = "ip=dhcp"
+  ipconfig0    = "ip=${var.guestIPAddr},gw=${var.netGateway}"
 }

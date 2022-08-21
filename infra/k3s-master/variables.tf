@@ -1,3 +1,8 @@
+variable "guestIPAddr" {
+  description = "Static IP address of the guest"
+  type        = string
+}
+
 variable "guestPubKeyFile" {
   description = "Path to the SSH public key file"
   type        = string
@@ -22,4 +27,9 @@ variable "netDomain" {
   description = "Local domain name (used for DNS)"
   type        = string
   sensitive   = true
+}
+
+variable "netGateway" {
+  description = "Local network gateway"
+  type        = string
 }

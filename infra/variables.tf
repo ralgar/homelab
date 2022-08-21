@@ -17,4 +17,9 @@ locals {
   guest_pubKeyFile = local.root.globalVars.ssh.pubKeyFile
   net_dnsServers   = sensitive(local.root.globalVars.net.dnsServers)
   net_domain       = sensitive(local.root.globalVars.net.domainRoot)
+  net_gateway      = sensitive(local.root.globalVars.net.gateway)
+
+  // K3s Node Settings
+  k3s_controllerNodes = local.root.k3s.controller.nodes
+  k3s_workerNodes     = local.root.k3s.worker.nodes
 }

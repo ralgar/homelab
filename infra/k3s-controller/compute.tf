@@ -1,8 +1,7 @@
 resource "proxmox_vm_qemu" "vm-compute" {
-  count = var.replicas
-  name  = "k3s-controller-${count.index + 1}"
+  name  = "k3s-controller-${var.guestNumber}"
   desc  = <<-EOT
-    ## K3s Controller #${count.index + 1}
+    ## K3s Controller #${var.guestNumber}
     ---
 
     A K3s control-plane node.
@@ -50,5 +49,5 @@ resource "proxmox_vm_qemu" "vm-compute" {
   searchdomain = var.netDomain
   nameserver   = join(" ", var.netDnsHosts)
   sshkeys      = file(var.guestPubKeyFile)
-  ipconfig0    = "ip=dhcp"
+  ipconfig0    = "ip=${var.guestIPAddr},gw=${var.netGateway}"
 }

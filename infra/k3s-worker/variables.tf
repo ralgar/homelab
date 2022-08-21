@@ -1,3 +1,13 @@
+variable "guestIPAddr" {
+  description = "Static IP address of the guest"
+  type        = string
+}
+
+variable "guestNumber" {
+  description = "Numbered position in the list"
+  type        = number
+}
+
 variable "guestPubKeyFile" {
   description = "Path to the SSH public key file"
   type        = string
@@ -24,7 +34,7 @@ variable "netDomain" {
   sensitive   = true
 }
 
-variable "replicas" {
-  description = "Number of control-plane node replicas."
-  type        = number
+variable "netGateway" {
+  description = "Local network gateway"
+  type        = string
 }
