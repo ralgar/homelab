@@ -21,10 +21,9 @@ resource "proxmox_vm_qemu" "vm-compute" {
   tags     = "k3s-cluster,k3s-worker"
 
   // System Resources
-  #pool    = "pool0"
-  cores   = 4
-  sockets = 1
-  memory  = 8192
+  cores   = var.guestCores
+  vcpus   = var.guestVCPUs
+  memory  = var.guestMemory
 
   disk {
     type    = "scsi"

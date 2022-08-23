@@ -4,6 +4,9 @@ module "k3s-master" {
   guestTargetNode  = local.k3s_controllerNodes[0].pve_node
   guestStoragePool = local.k3s_controllerNodes[0].pve_storage_pool
   guestIPAddr      = local.k3s_controllerNodes[0].ip_addr
+  guestCores       = local.k3s_controllerNodes[0].cores
+  guestVCPUs       = local.k3s_controllerNodes[0].vcpus
+  guestMemory      = local.k3s_controllerNodes[0].memory
 
   // Global Variables
   guestPubKeyFile = local.guest_pubKeyFile
@@ -20,6 +23,9 @@ module "k3s-controllers" {
   guestTargetNode  = each.value.pve_node
   guestStoragePool = each.value.pve_storage_pool
   guestIPAddr      = each.value.ip_addr
+  guestCores       = each.value.cores
+  guestVCPUs       = each.value.vcpus
+  guestMemory      = each.value.memory
 
   // Global Variables
   guestPubKeyFile = local.guest_pubKeyFile
@@ -36,6 +42,9 @@ module "k3s-workers" {
   guestTargetNode  = each.value.pve_node
   guestStoragePool = each.value.pve_storage_pool
   guestIPAddr      = each.value.ip_addr
+  guestCores       = each.value.cores
+  guestVCPUs       = each.value.vcpus
+  guestMemory      = each.value.memory
 
   // Global Variables
   guestPubKeyFile = local.guest_pubKeyFile
