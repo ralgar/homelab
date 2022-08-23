@@ -1,44 +1,51 @@
-# Homelab Provisioning
+# My Homelab
 
-[![Latest Tag](https://img.shields.io/github/v/tag/ralgar/homelab-provisioning?style=for-the-badge&logo=semver&logoColor=white)](https://github.com/ralgar/homelab-provisioning/tags)
-[![Software License](https://img.shields.io/github/license/ralgar/homelab-provisioning?style=for-the-badge&logo=gnu&logoColor=white)](https://www.gnu.org/licenses/gpl-3.0.html)
-[![Github Stars](https://img.shields.io/github/stars/ralgar/homelab-provisioning?style=for-the-badge&logo=github&logoColor=white&color=gold)](https://github.com/ralgar/homelab-provisioning)
+[![Latest Tag](https://img.shields.io/github/v/tag/ralgar/homelab?style=for-the-badge&logo=semver&logoColor=white)](https://github.com/ralgar/homelab/tags)
+[![Pipeline Status](https://img.shields.io/gitlab/pipeline-status/ralgar/homelab?branch=feature%2Fk8s-rework&label=Pipeline&logo=gitlab&style=for-the-badge)](https://gitlab.com/ralgar/homelab/-/pipelines)
+[![Code Coverage](https://img.shields.io/gitlab/coverage/ralgar/homelab/master?label=Coverage&logo=gitlab&style=for-the-badge)](https://gitlab.com/ralgar/homelab)
+[![Software License](https://img.shields.io/badge/License-GPL--3.0-orange?style=for-the-badge&logo=gnu&logoColor=white)](https://www.gnu.org/licenses/gpl-3.0.html)
+[![GitLab Stars](https://img.shields.io/gitlab/stars/ralgar/homelab?color=gold&label=Stars&logo=gitlab&style=for-the-badge)](https://gitlab.com/ralgar/homelab)
 
 ## Overview
 
-A set of Ansible/Terraform deployments to automate the provisioning of my homelab.
- The services run on a combination of Debian LXC containers, and Rocky Linux
- (RHEL) 8 virtual machines with rootless podman containers.
+By following the [GitOps](https://about.gitlab.com/topics/gitops) paradigm, this
+ project is able to automate the provisioning, deployment, and operation, of my
+ sophisticated, virtualized/containerized homelab. It can serve as a framework
+ for your homelab too.
 
 ### Features
 
-- [x] Basic Proxmox host management
-- [x] Automated internal DNS
-- [x] PostgreSQL database
-- [x] Automated PKI system
-- [x] LDAP server
-- [x] GitLab and a GitLab Runner for CI/CD jobs
-- [x] Kubernetes Cluster (using K3s)
-- [x] Simple Minecraft server
-- [ ] Automated backups (coming soon)
-- [ ] Media server (coming soon)
-- [ ] Improved Proxmox host management (coming soon)
+- [x] **Proxmox Host Management**
+  - [x] Basic Ansible role to batch upgrade Proxmox hosts
+  - [ ] Rolling upgrades of Proxmox hosts (coming soon)
+- [x] **Kubernetes Cluster**
+  - [x] Fully-automated provisioning
+  - [x] Easy horizontal and vertical scaling
+  - [x] Optional, highly-available control plane
+  - [x] Distributed object storage
+  - [x] SELinux enabled
+  - [x] Automatic upgrades (base OS and K3s distribution)
+  - [x] Self-healing, [Continuous Deployment](https://about.gitlab.com/blog/2016/08/05/continuous-integration-delivery-and-deployment-with-gitlab)
+  - [ ] Automated backups (coming soon)
+- [x] **Applications and Services**
+  - [x] Automated PKI
+  - [x] LDAP server
+  - [x] ~~GitLab and~~ a GitLab Runner for CI/CD jobs
+  - [ ] Horizontally scalable Minecraft server (coming soon)
+  - [ ] Home automation / media server (coming soon)
 
 ## Requirements
 
 Dependencies:
 
 - [Ansible](https://www.ansible.com/)
-- [Terraform](https://www.terraform.io/)
 - [kubectl](https://kubernetes.io/docs/reference/kubectl/)
 - [Kubernetes Python Client](https://github.com/kubernetes-client/python/)
-- [dnspython](https://github.com/rthalley/dnspython/)
-- [netaddr](https://github.com/netaddr/netaddr)
-- [psycopg2](https://github.com/psycopg/psycopg2)
+- [Terraform](https://www.terraform.io/)
 
 Other requirements:
 
-- [Proxmox VE](https://www.proxmox.com/) host
+- At least one [Proxmox VE](https://www.proxmox.com/) host
 
 ## Usage
 
@@ -51,53 +58,48 @@ Other requirements:
    ssh-copy-id -i ~/.ssh/id_ed25519.pub root@<proxmox-host-ip>
    ```
 
-1. Clone this repository and change directory into it.
+1. Clone the repository and change directory into it.
 
    ```sh
-   git clone --recurse-submodules https://github.com/basschaser/homelab-provisioning.git
-   cd homelab-provisioning
+   git clone https://gitlab.com/ralgar/homelab.git
+   cd homelab
    ```
 
-1. Copy the `vars.template` directory to `vars`.
+1. Create a copy of the `vars.template/` directory at `vars/`.
 
    ```sh
-   cp -r vars.template vars`
+   cp -r vars.template vars
    ```
 
-1. Edit the variables in `vars/global.yml` and `vars/hosts.proxmox.yml` as needed.
-1. Initialize the Terraform deployment.
+Now we are ready to start provisioning the infrastructure.
+
+### Building the cluster
+
+You can build the cluster infrastructure as follows:
+
+1. Edit the variables in `vars/secret.yml` as needed.
+1. Use the included `Makefile` to provision the infrastructure.
 
    ```sh
-   cd deploy
-   terraform init
-   cd ..
+   # To build everything from scratch:
+   make all
+
+   # To build targets individually, in order:
+   make template-rocky8
+   make template-k3s-cluster
+   make apply-infrastructure
    ```
 
-Now we are ready to start deploying the infrastructure.
+### Deploying apps in the cluster
 
-### Deploying the infrastructure
+Apps are deployed to the cluster by use of the `cluster` directory.
 
-The base infrastructure is required to properly configure the user-facing services.
+1. Add or edit files in `cluster/<category>/<app-namespace>`.
+1. Commit the changes in `git` and push them to your repository.
 
-You can deploy the base infrastructure as follows:
+### Destroying the cluster
 
-1. **Optional:** Initialize the Proxmox host(s).
-  - Run the `proxmox-host.yml` playbook
-1. Deploy the base infrastructure services.
-  - Run the `10-nameservers.yml` playbook
-  - Run the `20-infrastructure.yml` playbook
-1. Change your router and/or device settings to use the new domain and DNS servers.
-
-### Deploying the user-facing services
-
-The user-facing services can be deployed modularly, in any desired combination.
-
-1. Edit the variables in `vars/<service-name>.yml` as needed.
-1. Run the `<service-name>.yml` playbook.
-
-### Destroying services
-
-To destroy the infrastructure:
+To completely destroy the cluster infrastructure:
 
 ```sh
 make destroy-infrastructure
@@ -105,6 +107,6 @@ make destroy-infrastructure
 
 ## License
 
-Copyright: (c) 2022, Ryan Algar [ralgar/homelab](https://github.com/ralgar/homelab)
+Copyright: (c) 2022, Ryan Algar ([ralgar/homelab](https://gitlab.com/ralgar/homelab))
 
 GNU General Public License v3.0 (see LICENSE or [GPL-3.0](https://www.gnu.org/licenses/gpl-3.0.txt)
