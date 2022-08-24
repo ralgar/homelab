@@ -21,9 +21,9 @@ metadata:
   labels:
     app.kubernetes.io/name: gitlab-agent
     app.kubernetes.io/version: v{{ k3s_gitlab_agent_version }}
-data:
-  token: {{ k3s_gitlab_agent_token }}
 type: Opaque
+data:
+  token: {{ k3s_gitlab_agent_token | b64encode }}
 ---
 apiVersion: v1
 kind: ConfigMap
