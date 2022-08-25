@@ -1,0 +1,10 @@
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: worker-pool
+  namespace: metallb-system
+spec:
+  addresses:
+    - 192.168.1.70-192.168.1.79
+    # - 192.168.1.70/32

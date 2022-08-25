@@ -4,5 +4,7 @@ gitops:
     - id: ralgar/homelab
       default_namespace: default
       paths:
-        - glob: '/cluster/gitlab-managed/**/*.{yaml,yml,json}'
+        - glob: '/cluster/gitlab-managed/system/**/*.{yaml,yml,json}'
+        - glob: '/cluster/gitlab-managed/gitlab-runner/*.{yaml,yml,json}'
+        # - glob: '/cluster/gitlab-managed/**/*.{yaml,yml,json}'
       dry_run_strategy: none
