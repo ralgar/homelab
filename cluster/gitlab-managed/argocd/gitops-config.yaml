@@ -11,7 +11,7 @@ spec:
         revision: feature/k8s-rework
         directories:
           - path: cluster/system/*
-          # - path: cluster/platform/*
+          - path: cluster/platform/*
   template:
     metadata:
       name: '{{path.basename}}'

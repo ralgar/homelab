@@ -5,7 +5,7 @@ metadata:
   name: 389ds-data
   namespace: 389ds
 spec:
-  storageClassName: longhorn
+  storageClassName: csi-cephfs-sc
   accessModes:
     - ReadWriteOnce
   resources:
