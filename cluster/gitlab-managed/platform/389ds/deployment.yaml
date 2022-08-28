@@ -31,9 +31,6 @@ spec:
             {}
           image: "389ds/dirsrv:2.1"
           imagePullPolicy: IfNotPresent
-          env:
-            - name: DS_DM_PASSWORD
-              value: '{{ .Values.rootPassword }}'
           ports:
             - name: ldap-tcp
               containerPort: 3389
