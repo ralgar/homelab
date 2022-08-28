@@ -4,6 +4,8 @@ kind: Deployment
 metadata:
   name: 389ds
   namespace: 389ds
+  annotations:
+    config.kubernetes.io/depends-on: apps/namespaces/cert-manager/Deployment/cert-manager
   labels:
     app.kubernetes.io/name: 389ds
     app.kubernetes.io/instance: 389ds
