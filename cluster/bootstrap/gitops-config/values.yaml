@@ -1,9 +1,0 @@
----
-gitOps:
-  repoUrl: https://github.com/ralgar/homelab
-  revision: feature/k8s-rework
-  stacksRoot: cluster
-stacks:
-  - name: bootstrap
-  - name: system
-  - name: platform
