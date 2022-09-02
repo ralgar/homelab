@@ -10,6 +10,10 @@
     attributes:
       cn: gitlab_users
     state: present
+  register: result
+  retries: 5
+  delay: 1
+  until: result is not failed
 
 - name: Assert 'gitlab_users' group members
   ldap_attrs:
@@ -22,6 +26,10 @@
     - "uid={{ default_user_uid }}"
   loop_control:
     loop_var: dirsrv_gitlab_users
+  register: result
+  retries: 5
+  delay: 1
+  until: result is not failed
 
 - name: Create 'gitlab' service account
   ldap_entry:
@@ -35,6 +43,10 @@
       description: GitLab Service Account
       userPassword: password
     state: present
+  register: result
+  retries: 5
+  delay: 1
+  until: result is not failed
 
 - name: Assert that 'gitlab' account has 'user_read' permission
   ldap_attrs:
@@ -43,6 +55,10 @@
     attributes:
       member: "cn=gitlab,ou=services,{{ dirsrv_domain }}"
     state: present
+  register: result
+  retries: 5
+  delay: 1
+  until: result is not failed
 
 - name: Assert that 'gitlab' account has 'user_passwd_reset' permission
   ldap_attrs:
@@ -51,3 +67,7 @@
     attributes:
       member: "cn=gitlab,ou=services,{{ dirsrv_domain }}"
     state: present
+  register: result
+  retries: 5
+  delay: 1
+  until: result is not failed

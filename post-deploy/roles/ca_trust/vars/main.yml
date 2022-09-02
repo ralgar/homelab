@@ -1,2 +1,2 @@
 ---
-net_root_domain: "{{ net.domain }}"
+net_root_domain: "{{ globalVars.net.domainRoot }}"

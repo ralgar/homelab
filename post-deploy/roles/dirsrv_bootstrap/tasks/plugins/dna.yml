@@ -10,6 +10,10 @@
       nsslapd-pluginEnabled: "on"
     state: exact
   notify: restart_dirsrv
+  register: result
+  retries: 5
+  delay: 1
+  until: result is not failed
 
 # Create the shared OU
 - name: Create the DNA Shared Ranges OU
@@ -22,6 +26,10 @@
       - organizationalUnit
     state: present
   notify: restart_dirsrv
+  register: result
+  retries: 5
+  delay: 1
+  until: result is not failed
 
 # Create the shared objects
 - name: Create the DNA Shared Account and Group Objects
@@ -38,6 +46,10 @@
     - Account GIDs
   loop_control:
     loop_var: dna_loop1
+  register: result
+  retries: 5
+  delay: 1
+  until: result is not failed
 
 # Set host-specific replication parameters
 - name: Configure DNA replication parameters
@@ -58,6 +70,10 @@
     - GID
   loop_control:
     loop_var: dna_loop2
+  register: result
+  retries: 5
+  delay: 1
+  until: result is not failed
 
 # Ensure that the DNA configuration entries exist
 - name: Create DNA plugin configuration entries
@@ -82,6 +98,10 @@
     - GID
   loop_control:
     loop_var: dna_loop3
+  register: result
+  retries: 5
+  delay: 1
+  until: result is not failed
 
 # Assert that the actual DNA plugin parameters are correct
 - name: Configure DNA plugin
@@ -103,3 +123,7 @@
     - GID
   loop_control:
     loop_var: dna_loop4
+  register: result
+  retries: 5
+  delay: 1
+  until: result is not failed

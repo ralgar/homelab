@@ -10,6 +10,10 @@
     attributes:
       cn: administrators
     state: present
+  register: result
+  retries: 5
+  delay: 1
+  until: result is not failed
 
 - name: Assert 'administrators' group members
   ldap_attrs:
@@ -18,3 +22,7 @@
     attributes:
       member: "uid={{ default_user_uid }},ou=people,{{ dirsrv_domain }}"
     state: exact
+  register: result
+  retries: 5
+  delay: 1
+  until: result is not failed

@@ -29,6 +29,10 @@
     - gidNumber
   loop_control:
     loop_var: attr_uniq
+  register: result
+  retries: 5
+  delay: 1
+  until: result is not failed
 
 - name: Assert Attribute Uniqueness configuration
   ldap_attrs:
@@ -48,3 +52,7 @@
     - gidNumber
   loop_control:
     loop_var: attr_uniq
+  register: result
+  retries: 5
+  delay: 1
+  until: result is not failed

@@ -7,3 +7,7 @@
       nsslapd-allow-anonymous-access: "off"
     state: exact
   notify: restart_dirsrv
+  register: result
+  retries: 5
+  delay: 1
+  until: result is not failed

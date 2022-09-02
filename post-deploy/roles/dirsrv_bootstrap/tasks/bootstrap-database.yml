@@ -3,6 +3,9 @@
   ansible.builtin.stat:
     path: /data/db/userRoot
   register: dirsrv_existing_backend
+  retries: 5
+  delay: 1
+  until: dirsrv_existing_backend is not failed
 
 - name: Create the database backend
   ansible.builtin.command: |
@@ -11,6 +14,10 @@
     --suffix {{ dirsrv_domain }}
     --be-name userRoot
   when: not dirsrv_existing_backend.stat.exists
+  register: result
+  retries: 5
+  delay: 1
+  until: result is not failed
 
 - name: Create LDIF database template
   ansible.builtin.template:
@@ -20,6 +27,10 @@
     group: dirsrv
     mode: 0640
   when: not dirsrv_existing_backend.stat.exists
+  register: result
+  retries: 5
+  delay: 1
+  until: result is not failed
 
 - name: Import the base LDIF template
   ansible.builtin.command: |
@@ -28,3 +39,7 @@
     userRoot
     template.ldif
   when: not dirsrv_existing_backend.stat.exists
+  register: result
+  retries: 5
+  delay: 1
+  until: result is not failed
