@@ -11,7 +11,7 @@ metadata:
   namespace: gitlab-runner
   labels:
     app.kubernetes.io/name: gitlab-runner
-    app.kubernetes.io/version: v15.2.1
+    app.kubernetes.io/version: v15.3.0
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -20,7 +20,7 @@ metadata:
   namespace: gitlab-runner
   labels:
     app.kubernetes.io/name: gitlab-runner
-    app.kubernetes.io/version: v15.2.1
+    app.kubernetes.io/version: v15.3.0
 rules:
   - apiGroups: [""]
     resources: ["*"]
@@ -33,7 +33,7 @@ metadata:
   namespace: gitlab-runner
   labels:
     app.kubernetes.io/name: gitlab-runner
-    app.kubernetes.io/version: v15.2.1
+    app.kubernetes.io/version: v15.3.0
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -50,7 +50,7 @@ metadata:
   namespace: gitlab-runner
   labels:
     app.kubernetes.io/name: gitlab-runner
-    app.kubernetes.io/version: v15.2.1
+    app.kubernetes.io/version: v15.3.0
 type: Opaque
 data:
   runner-registration-token: "R1IxMzQ4OTQxNHVBQ1ZhMVB0VGRMaUhzWFcxdnM="
@@ -62,7 +62,7 @@ metadata:
   namespace: gitlab-runner
   labels:
     app.kubernetes.io/name: gitlab-runner
-    app.kubernetes.io/version: v15.2.1
+    app.kubernetes.io/version: v15.3.0
 data:
   entrypoint: |
     #!/bin/bash
@@ -162,9 +162,9 @@ data:
 
   check-live: |
     #!/bin/bash
-    if /usr/bin/pgrep -f .*register-the-runner; then
+    if /usr/bin/pgrep -f .*register-the-runner ; then
       exit 0
-    elif /usr/bin/pgrep gitlab.*runner; then
+    elif /usr/bin/pgrep gitlab.*runner ; then
       exit 0
     else
       exit 1
@@ -179,7 +179,7 @@ metadata:
   namespace: gitlab-runner
   labels:
     app.kubernetes.io/name: gitlab-runner
-    app.kubernetes.io/version: v15.2.1
+    app.kubernetes.io/version: v15.3.0
 spec:
   replicas: 1
   revisionHistoryLimit: 10
@@ -190,7 +190,7 @@ spec:
     metadata:
       labels:
         app: gitlab-runner
-        version: 15.2.1
+        version: 15.3.0
     spec:
       securityContext:
         fsGroup: 65533
@@ -199,7 +199,7 @@ spec:
       serviceAccountName: "gitlab-runner"
       containers:
         - name: gitlab-runner
-          image: registry.gitlab.com/gitlab-org/gitlab-runner:alpine-v15.2.1
+          image: registry.gitlab.com/gitlab-org/gitlab-runner:alpine-v15.3.0
           imagePullPolicy: "IfNotPresent"
           securityContext:
             allowPrivilegeEscalation: false
@@ -212,12 +212,15 @@ spec:
           lifecycle:
             preStop:
               exec:
-                command: ["/entrypoint", "unregister", "--config=/home/gitlab-runner/.gitlab-runner/config.toml"]
-          # lifecycle:
-          #   preStop:
-          #     exec:
-          #       command: ["/entrypoint", "unregister", "--all-runners"]
-          command: ["/usr/bin/dumb-init", "--", "/bin/bash", "/configmaps/entrypoint"]
+                command: [
+                  "/entrypoint",
+                  "unregister",
+                  "--config=/home/gitlab-runner/.gitlab-runner/config.toml"
+                ]
+          command: [
+            "/usr/bin/dumb-init", "--", "/bin/bash",
+            "/configmaps/entrypoint"
+          ]
           env:
             - name: CI_SERVER_URL
               value: "https://gitlab.com/"
@@ -239,7 +242,7 @@ spec:
             failureThreshold: 3
           readinessProbe:
             exec:
-              command: ["/usr/bin/pgrep","gitlab.*runner"]
+              command: ["/usr/bin/pgrep", "gitlab.*runner"]
             initialDelaySeconds: 10
             timeoutSeconds: 1
             periodSeconds: 10
