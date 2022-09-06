@@ -10,6 +10,7 @@
     - permissions/user_read.yml
     - users/default-user.yml
     - groups/administrators.yml
-    - gitlab.yml
+    # - services/gitlab.yml
+    - services/jellyfin.yml
   loop_control:
     loop_var: dirsrv_tasks
