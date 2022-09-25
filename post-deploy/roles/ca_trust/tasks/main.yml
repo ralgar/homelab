@@ -8,7 +8,7 @@
   register: ca_secret
 
 - name: Create local CA certificate file from secret
-  ansible.builtin.copy:
+  ansible.builtin.copy:  # noqa template-instead-of-copy
     content: "{{ ca_secret.resources[0].data['root-cert.pem'] }}"
     dest: "/etc/ca-certificates/trust-source/anchors/{{ net_root_domain }}.pem"
     owner: root
