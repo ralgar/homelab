@@ -1,0 +1,591 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jellyfin-config
+  namespace: media-server
+data:
+  init.sh: |
+    #!/bin/bash
+
+    # Initialize media libraries
+    function create_libraries {
+
+      [ -d "/config/root/default/Movies" ] || {
+        mkdir -p "/config/root/default/Movies" || return 1
+      }
+
+      [ -f "/config/root/default/Movies/options.xml" ] || {
+        cp "/configmaps/library-movies.xml" \
+          "/config/root/default/Movies/options.xml" || return 1
+      }
+
+      [ -f "/config/root/default/Movies/Movies.mblink" ] || {
+        printf "/media/library/Movies" \
+          > "/config/root/default/Movies/Movies.mblink" || return 1
+      }
+
+      [ -f "/config/root/default/Movies/movies.collection" ] || {
+        touch "/config/root/default/Movies/movies.collection" || return 1
+      }
+
+      [ -d "/config/root/default/TV Shows" ] || {
+        mkdir -p "/config/root/default/TV Shows" || return 1
+      }
+
+      [ -f "/config/root/default/TV Shows/options.xml" ] || {
+        cp "/configmaps/library-tvshows.xml" \
+          "/config/root/default/TV Shows/options.xml" || return 1
+      }
+
+      [ -f "/config/root/default/TV Shows/TV Shows.mblink" ] || {
+        printf "/media/library/TV Shows" \
+          > "/config/root/default/TV Shows/TV Shows.mblink" || return 1
+      }
+
+      [ -f "/config/root/default/TV Shows/tvshows.collection" ] || {
+        touch "/config/root/default/TV Shows/tvshows.collection" || return 1
+      }
+    }
+
+    # Install and configure the LDAP plugin
+    function install_ldap_plugin {
+      local plugin_repo="https://repo.jellyfin.org/releases/plugin"
+      local plugin_version="16.0.0.0"
+
+      [ -d /config/plugins/configurations ] || {
+        mkdir -p /config/plugins/configurations || return 1
+      }
+
+      [ -f /config/plugins/configurations/LDAP-Auth.xml ] || {
+        cp /configmaps/LDAP-Auth.xml \
+          /config/plugins/configurations/LDAP-Auth.xml || return 1
+      }
+
+      [ -d /config/plugins/LDAP* ] || {
+
+        curl --fail -Lo "/tmp/ldap-authentication_$plugin_version.zip" \
+          "$plugin_repo/ldap-authentication/ldap-authentication_$plugin_version.zip" \
+          || return 1
+
+        mkdir "/config/plugins/LDAP Authentication_$plugin_version" || return 1
+
+        bsdtar \
+          -C "/config/plugins/LDAP Authentication_$plugin_version" \
+          -xvf "/tmp/ldap-authentication_$plugin_version.zip" || return 1
+      }
+    }
+
+    # Create directory skeleton
+    for dir in config data ; do
+      [ -d "/config/$dir" ] || {
+        mkdir -p "/config/$dir" || exit 1
+      }
+    done
+
+    # Seed the config directory
+    for config in dlna encoding migrations network system ; do
+      [ -f /config/$config.xml ] || {
+        cp /configmaps/$config.xml /config/config/$config.xml || exit 1
+      }
+    done
+
+    # Seed the device ID
+    [ -f /config/data/device.txt ] || {
+      cp /secrets/jellyfin-server-id /config/data/device.txt || exit 1
+    }
+
+    create_libraries || exit 1
+    install_ldap_plugin || exit 1
+
+  dlna.xml: |
+    <?xml version="1.0" encoding="utf-8"?>
+    <DlnaOptions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <EnablePlayTo>false</EnablePlayTo>
+      <EnableServer>false</EnableServer>
+      <EnableDebugLog>false</EnableDebugLog>
+      <EnablePlayToTracing>false</EnablePlayToTracing>
+      <ClientDiscoveryIntervalSeconds>60</ClientDiscoveryIntervalSeconds>
+      <AliveMessageIntervalSeconds>1800</AliveMessageIntervalSeconds>
+      <BlastAliveMessageIntervalSeconds>1800</BlastAliveMessageIntervalSeconds>
+      <AutoCreatePlayToProfiles>false</AutoCreatePlayToProfiles>
+      <BlastAliveMessages>false</BlastAliveMessages>
+      <SendOnlyMatchedHost>true</SendOnlyMatchedHost>
+    </DlnaOptions>
+
+  encoding.xml: |
+    <?xml version="1.0" encoding="utf-8"?>
+    <EncodingOptions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <EncodingThreadCount>-1</EncodingThreadCount>
+      <TranscodingTempPath>/media/library/transcodes</TranscodingTempPath>
+      <EnableFallbackFont>false</EnableFallbackFont>
+      <DownMixAudioBoost>2</DownMixAudioBoost>
+      <MaxMuxingQueueSize>2048</MaxMuxingQueueSize>
+      <EnableThrottling>false</EnableThrottling>
+      <ThrottleDelaySeconds>180</ThrottleDelaySeconds>
+      <EncoderAppPathDisplay>/usr/lib/jellyfin-ffmpeg/ffmpeg</EncoderAppPathDisplay>
+      <VaapiDevice>/dev/dri/renderD128</VaapiDevice>
+      <EnableTonemapping>false</EnableTonemapping>
+      <EnableVppTonemapping>false</EnableVppTonemapping>
+      <TonemappingAlgorithm>hable</TonemappingAlgorithm>
+      <TonemappingRange>auto</TonemappingRange>
+      <TonemappingDesat>0</TonemappingDesat>
+      <TonemappingThreshold>0.8</TonemappingThreshold>
+      <TonemappingPeak>100</TonemappingPeak>
+      <TonemappingParam>0</TonemappingParam>
+      <VppTonemappingBrightness>0</VppTonemappingBrightness>
+      <VppTonemappingContrast>1.2</VppTonemappingContrast>
+      <H264Crf>23</H264Crf>
+      <H265Crf>28</H265Crf>
+      <DeinterlaceDoubleRate>false</DeinterlaceDoubleRate>
+      <DeinterlaceMethod>yadif</DeinterlaceMethod>
+      <EnableDecodingColorDepth10Hevc>true</EnableDecodingColorDepth10Hevc>
+      <EnableDecodingColorDepth10Vp9>true</EnableDecodingColorDepth10Vp9>
+      <EnableEnhancedNvdecDecoder>true</EnableEnhancedNvdecDecoder>
+      <PreferSystemNativeHwDecoder>true</PreferSystemNativeHwDecoder>
+      <EnableIntelLowPowerH264HwEncoder>false</EnableIntelLowPowerH264HwEncoder>
+      <EnableIntelLowPowerHevcHwEncoder>false</EnableIntelLowPowerHevcHwEncoder>
+      <EnableHardwareEncoding>true</EnableHardwareEncoding>
+      <AllowHevcEncoding>true</AllowHevcEncoding>
+      <EnableSubtitleExtraction>true</EnableSubtitleExtraction>
+      <HardwareDecodingCodecs>
+        <string>h264</string>
+        <string>vc1</string>
+      </HardwareDecodingCodecs>
+      <AllowOnDemandMetadataBasedKeyframeExtractionForExtensions>
+        <string>mkv</string>
+      </AllowOnDemandMetadataBasedKeyframeExtractionForExtensions>
+    </EncodingOptions>
+
+  LDAP-Auth.xml: |
+    <?xml version="1.0" encoding="utf-8"?>
+    <PluginConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <LdapServer>dirsrv.389ds.svc</LdapServer>
+      <LdapPort>636</LdapPort>
+      <UseSsl>true</UseSsl>
+      <UseStartTls>false</UseStartTls>
+      <SkipSslVerify>false</SkipSslVerify>
+      <LdapBindUser>cn=jellyfin,ou=services,dc=homelab,dc=internal</LdapBindUser>
+      <LdapBindPassword>mG2FHb8ptWwegp</LdapBindPassword>
+      <LdapBaseDn>ou=people,dc=homelab,dc=internal</LdapBaseDn>
+      <LdapSearchFilter>(objectClass=nsOrgPerson)</LdapSearchFilter>
+      <LdapAdminBaseDn />
+      <LdapAdminFilter>(memberOf=cn=administrators,ou=groups,dc=homelab,dc=internal)</LdapAdminFilter>
+      <LdapSearchAttributes>uid</LdapSearchAttributes>
+      <EnableCaseInsensitiveUsername>false</EnableCaseInsensitiveUsername>
+      <CreateUsersFromLdap>true</CreateUsersFromLdap>
+      <AllowPassChange>false</AllowPassChange>
+      <LdapUsernameAttribute>uid</LdapUsernameAttribute>
+      <LdapPasswordAttribute>userPassword</LdapPasswordAttribute>
+      <EnableAllFolders>true</EnableAllFolders>
+      <EnabledFolders />
+      <PasswordResetUrl />
+    </PluginConfiguration>
+
+  library-movies.xml: |
+    <?xml version="1.0" encoding="utf-8"?>
+    <LibraryOptions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <EnablePhotos>true</EnablePhotos>
+      <EnableRealtimeMonitor>true</EnableRealtimeMonitor>
+      <EnableChapterImageExtraction>false</EnableChapterImageExtraction>
+      <ExtractChapterImagesDuringLibraryScan>false</ExtractChapterImagesDuringLibraryScan>
+      <PathInfos>
+        <MediaPathInfo>
+          <Path>/media/library/Movies</Path>
+        </MediaPathInfo>
+      </PathInfos>
+      <SaveLocalMetadata>false</SaveLocalMetadata>
+      <EnableInternetProviders>true</EnableInternetProviders>
+      <EnableAutomaticSeriesGrouping>false</EnableAutomaticSeriesGrouping>
+      <EnableEmbeddedTitles>false</EnableEmbeddedTitles>
+      <EnableEmbeddedEpisodeInfos>false</EnableEmbeddedEpisodeInfos>
+      <AutomaticRefreshIntervalDays>30</AutomaticRefreshIntervalDays>
+      <PreferredMetadataLanguage>en</PreferredMetadataLanguage>
+      <MetadataCountryCode>US</MetadataCountryCode>
+      <SeasonZeroDisplayName>Specials</SeasonZeroDisplayName>
+      <MetadataSavers />
+      <DisabledLocalMetadataReaders />
+      <LocalMetadataReaderOrder>
+        <string>Nfo</string>
+      </LocalMetadataReaderOrder>
+      <DisabledSubtitleFetchers />
+      <SubtitleFetcherOrder />
+      <SkipSubtitlesIfEmbeddedSubtitlesPresent>false</SkipSubtitlesIfEmbeddedSubtitlesPresent>
+      <SkipSubtitlesIfAudioTrackMatches>false</SkipSubtitlesIfAudioTrackMatches>
+      <SubtitleDownloadLanguages />
+      <RequirePerfectSubtitleMatch>true</RequirePerfectSubtitleMatch>
+      <SaveSubtitlesWithMedia>true</SaveSubtitlesWithMedia>
+      <TypeOptions>
+        <TypeOptions>
+          <Type>Movie</Type>
+          <MetadataFetchers>
+            <string>TheMovieDb</string>
+            <string>The Open Movie Database</string>
+          </MetadataFetchers>
+          <MetadataFetcherOrder>
+            <string>TheMovieDb</string>
+            <string>The Open Movie Database</string>
+          </MetadataFetcherOrder>
+          <ImageFetchers>
+            <string>TheMovieDb</string>
+            <string>The Open Movie Database</string>
+            <string>Screen Grabber</string>
+          </ImageFetchers>
+          <ImageFetcherOrder>
+            <string>TheMovieDb</string>
+            <string>The Open Movie Database</string>
+            <string>Screen Grabber</string>
+          </ImageFetcherOrder>
+          <ImageOptions />
+        </TypeOptions>
+      </TypeOptions>
+    </LibraryOptions>
+
+  library-tvshows.xml: |
+    <?xml version="1.0" encoding="utf-8"?>
+    <LibraryOptions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <EnablePhotos>true</EnablePhotos>
+      <EnableRealtimeMonitor>true</EnableRealtimeMonitor>
+      <EnableChapterImageExtraction>false</EnableChapterImageExtraction>
+      <ExtractChapterImagesDuringLibraryScan>false</ExtractChapterImagesDuringLibraryScan>
+      <PathInfos>
+        <MediaPathInfo>
+          <Path>/media/library/TV Shows</Path>
+        </MediaPathInfo>
+      </PathInfos>
+      <SaveLocalMetadata>false</SaveLocalMetadata>
+      <EnableInternetProviders>true</EnableInternetProviders>
+      <EnableAutomaticSeriesGrouping>false</EnableAutomaticSeriesGrouping>
+      <EnableEmbeddedTitles>false</EnableEmbeddedTitles>
+      <EnableEmbeddedEpisodeInfos>false</EnableEmbeddedEpisodeInfos>
+      <AutomaticRefreshIntervalDays>30</AutomaticRefreshIntervalDays>
+      <PreferredMetadataLanguage>en</PreferredMetadataLanguage>
+      <MetadataCountryCode>US</MetadataCountryCode>
+      <SeasonZeroDisplayName>Specials</SeasonZeroDisplayName>
+      <MetadataSavers />
+      <DisabledLocalMetadataReaders />
+      <LocalMetadataReaderOrder>
+        <string>Nfo</string>
+      </LocalMetadataReaderOrder>
+      <DisabledSubtitleFetchers />
+      <SubtitleFetcherOrder />
+      <SkipSubtitlesIfEmbeddedSubtitlesPresent>false</SkipSubtitlesIfEmbeddedSubtitlesPresent>
+      <SkipSubtitlesIfAudioTrackMatches>false</SkipSubtitlesIfAudioTrackMatches>
+      <SubtitleDownloadLanguages />
+      <RequirePerfectSubtitleMatch>true</RequirePerfectSubtitleMatch>
+      <SaveSubtitlesWithMedia>true</SaveSubtitlesWithMedia>
+      <TypeOptions>
+        <TypeOptions>
+          <Type>Series</Type>
+          <MetadataFetchers>
+            <string>TheMovieDb</string>
+            <string>The Open Movie Database</string>
+          </MetadataFetchers>
+          <MetadataFetcherOrder>
+            <string>TheMovieDb</string>
+            <string>The Open Movie Database</string>
+          </MetadataFetcherOrder>
+          <ImageFetchers>
+            <string>TheMovieDb</string>
+          </ImageFetchers>
+          <ImageFetcherOrder>
+            <string>TheMovieDb</string>
+          </ImageFetcherOrder>
+          <ImageOptions />
+        </TypeOptions>
+        <TypeOptions>
+          <Type>Season</Type>
+          <MetadataFetchers>
+            <string>TheMovieDb</string>
+          </MetadataFetchers>
+          <MetadataFetcherOrder>
+            <string>TheMovieDb</string>
+          </MetadataFetcherOrder>
+          <ImageFetchers>
+            <string>TheMovieDb</string>
+          </ImageFetchers>
+          <ImageFetcherOrder>
+            <string>TheMovieDb</string>
+          </ImageFetcherOrder>
+          <ImageOptions />
+        </TypeOptions>
+        <TypeOptions>
+          <Type>Episode</Type>
+          <MetadataFetchers>
+            <string>TheMovieDb</string>
+            <string>The Open Movie Database</string>
+          </MetadataFetchers>
+          <MetadataFetcherOrder>
+            <string>TheMovieDb</string>
+            <string>The Open Movie Database</string>
+          </MetadataFetcherOrder>
+          <ImageFetchers>
+            <string>TheMovieDb</string>
+            <string>The Open Movie Database</string>
+            <string>Screen Grabber</string>
+          </ImageFetchers>
+          <ImageFetcherOrder>
+            <string>TheMovieDb</string>
+            <string>The Open Movie Database</string>
+            <string>Screen Grabber</string>
+          </ImageFetcherOrder>
+          <ImageOptions />
+        </TypeOptions>
+      </TypeOptions>
+    </LibraryOptions>
+
+  migrations.xml: |
+    <?xml version="1.0" encoding="utf-8"?>
+    <MigrationOptions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <Applied>
+        <ValueTupleOfGuidString>
+          <Item1>4124c2cd-e939-4ffb-9be9-9b311c413638</Item1>
+          <Item2>DisableTranscodingThrottling</Item2>
+        </ValueTupleOfGuidString>
+        <ValueTupleOfGuidString>
+          <Item1>ef103419-8451-40d8-9f34-d1a8e93a1679</Item1>
+          <Item2>CreateLoggingConfigHeirarchy</Item2>
+        </ValueTupleOfGuidString>
+        <ValueTupleOfGuidString>
+          <Item1>3793eb59-bc8c-456c-8b9f-bd5a62a42978</Item1>
+          <Item2>MigrateActivityLogDatabase</Item2>
+        </ValueTupleOfGuidString>
+        <ValueTupleOfGuidString>
+          <Item1>acbe17b7-8435-4a83-8b64-6fcf162cb9bd</Item1>
+          <Item2>RemoveDuplicateExtras</Item2>
+        </ValueTupleOfGuidString>
+        <ValueTupleOfGuidString>
+          <Item1>5c4b82a2-f053-4009-bd05-b6fcad82f14c</Item1>
+          <Item2>MigrateUserDatabase</Item2>
+        </ValueTupleOfGuidString>
+        <ValueTupleOfGuidString>
+          <Item1>06387815-c3cc-421f-a888-fb5f9992bea8</Item1>
+          <Item2>MigrateDisplayPreferencesDatabase</Item2>
+        </ValueTupleOfGuidString>
+        <ValueTupleOfGuidString>
+          <Item1>a81f75e0-8f43-416f-a5e8-516ccab4d8cc</Item1>
+          <Item2>RemoveDownloadImagesInAdvance</Item2>
+        </ValueTupleOfGuidString>
+        <ValueTupleOfGuidString>
+          <Item1>eb58ebee-9514-4b9b-8225-12e1a40020df</Item1>
+          <Item2>AddDefaultPluginRepository</Item2>
+        </ValueTupleOfGuidString>
+        <ValueTupleOfGuidString>
+          <Item1>5f86e7f6-d966-4c77-849d-7a7b40b68c4e</Item1>
+          <Item2>ReaddDefaultPluginRepository</Item2>
+        </ValueTupleOfGuidString>
+        <ValueTupleOfGuidString>
+          <Item1>de009b59-baae-428d-a810-f67762dc05b8</Item1>
+          <Item2>AddPeopleQueryIndex</Item2>
+        </ValueTupleOfGuidString>
+        <ValueTupleOfGuidString>
+          <Item1>9b354818-94d5-4b68-ac49-e35cb85f9d84</Item1>
+          <Item2>CreateNetworkConfiguration</Item2>
+        </ValueTupleOfGuidString>
+        <ValueTupleOfGuidString>
+          <Item1>5bd72f41-e6f3-4f60-90aa-09869abe0e22</Item1>
+          <Item2>MigrateAuthenticationDatabase</Item2>
+        </ValueTupleOfGuidString>
+      </Applied>
+    </MigrationOptions>
+
+  network.xml: |
+    <?xml version="1.0" encoding="utf-8"?>
+    <NetworkConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <EnableUPnP>false</EnableUPnP>
+      <PublicPort>8096</PublicPort>
+      <UPnPCreateHttpPortMap>false</UPnPCreateHttpPortMap>
+      <UDPPortRange />
+      <EnableIPV6>false</EnableIPV6>
+      <EnableIPV4>true</EnableIPV4>
+      <EnableSSDPTracing>false</EnableSSDPTracing>
+      <SSDPTracingFilter />
+      <UDPSendCount>2</UDPSendCount>
+      <UDPSendDelay>100</UDPSendDelay>
+      <IgnoreVirtualInterfaces>true</IgnoreVirtualInterfaces>
+      <VirtualInterfaceNames>vEthernet*</VirtualInterfaceNames>
+      <GatewayMonitorPeriod>60</GatewayMonitorPeriod>
+      <TrustAllIP6Interfaces>false</TrustAllIP6Interfaces>
+      <HDHomerunPortRange />
+      <PublishedServerUriBySubnet />
+      <AutoDiscoveryTracing>false</AutoDiscoveryTracing>
+      <AutoDiscovery>true</AutoDiscovery>
+      <PublicHttpsPort>8920</PublicHttpsPort>
+      <HttpServerPortNumber>8096</HttpServerPortNumber>
+      <HttpsPortNumber>8920</HttpsPortNumber>
+      <EnableHttps>false</EnableHttps>
+      <CertificatePath />
+      <CertificatePassword />
+      <EnableRemoteAccess>false</EnableRemoteAccess>
+      <BaseUrl />
+      <LocalNetworkSubnets />
+      <LocalNetworkAddresses />
+      <RequireHttps>false</RequireHttps>
+      <RemoteIPFilter />
+      <IsRemoteIPFilterBlacklist>false</IsRemoteIPFilterBlacklist>
+      <KnownProxies />
+    </NetworkConfiguration>
+
+  system.xml: |
+    <?xml version="1.0" encoding="utf-8"?>
+    <ServerConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <LogFileRetentionDays>3</LogFileRetentionDays>
+      <IsStartupWizardCompleted>true</IsStartupWizardCompleted>
+      <CachePath>/cache</CachePath>
+      <EnableMetrics>false</EnableMetrics>
+      <EnableNormalizedItemByNameIds>true</EnableNormalizedItemByNameIds>
+      <IsPortAuthorized>true</IsPortAuthorized>
+      <QuickConnectAvailable>false</QuickConnectAvailable>
+      <EnableCaseSensitiveItemIds>true</EnableCaseSensitiveItemIds>
+      <DisableLiveTvChannelUserDataName>true</DisableLiveTvChannelUserDataName>
+      <MetadataPath>/config/metadata</MetadataPath>
+      <MetadataNetworkPath />
+      <PreferredMetadataLanguage>en</PreferredMetadataLanguage>
+      <MetadataCountryCode>US</MetadataCountryCode>
+      <SortReplaceCharacters>
+        <string>.</string>
+        <string>+</string>
+        <string>%</string>
+      </SortReplaceCharacters>
+      <SortRemoveCharacters>
+        <string>,</string>
+        <string>&amp;</string>
+        <string>-</string>
+        <string>{</string>
+        <string>}</string>
+        <string>'</string>
+      </SortRemoveCharacters>
+      <SortRemoveWords>
+        <string>the</string>
+        <string>a</string>
+        <string>an</string>
+      </SortRemoveWords>
+      <MinResumePct>5</MinResumePct>
+      <MaxResumePct>85</MaxResumePct>
+      <MinResumeDurationSeconds>300</MinResumeDurationSeconds>
+      <MinAudiobookResume>5</MinAudiobookResume>
+      <MaxAudiobookResume>5</MaxAudiobookResume>
+      <LibraryMonitorDelay>60</LibraryMonitorDelay>
+      <ImageSavingConvention>Legacy</ImageSavingConvention>
+      <MetadataOptions>
+        <MetadataOptions>
+          <ItemType>Book</ItemType>
+          <DisabledMetadataSavers />
+          <LocalMetadataReaderOrder />
+          <DisabledMetadataFetchers />
+          <MetadataFetcherOrder />
+          <DisabledImageFetchers />
+          <ImageFetcherOrder />
+        </MetadataOptions>
+        <MetadataOptions>
+          <ItemType>Movie</ItemType>
+          <DisabledMetadataSavers />
+          <LocalMetadataReaderOrder />
+          <DisabledMetadataFetchers />
+          <MetadataFetcherOrder />
+          <DisabledImageFetchers />
+          <ImageFetcherOrder />
+        </MetadataOptions>
+        <MetadataOptions>
+          <ItemType>MusicVideo</ItemType>
+          <DisabledMetadataSavers />
+          <LocalMetadataReaderOrder />
+          <DisabledMetadataFetchers>
+            <string>The Open Movie Database</string>
+          </DisabledMetadataFetchers>
+          <MetadataFetcherOrder />
+          <DisabledImageFetchers>
+            <string>The Open Movie Database</string>
+          </DisabledImageFetchers>
+          <ImageFetcherOrder />
+        </MetadataOptions>
+        <MetadataOptions>
+          <ItemType>Series</ItemType>
+          <DisabledMetadataSavers />
+          <LocalMetadataReaderOrder />
+          <DisabledMetadataFetchers />
+          <MetadataFetcherOrder />
+          <DisabledImageFetchers />
+          <ImageFetcherOrder />
+        </MetadataOptions>
+        <MetadataOptions>
+          <ItemType>MusicAlbum</ItemType>
+          <DisabledMetadataSavers />
+          <LocalMetadataReaderOrder />
+          <DisabledMetadataFetchers>
+            <string>TheAudioDB</string>
+          </DisabledMetadataFetchers>
+          <MetadataFetcherOrder />
+          <DisabledImageFetchers />
+          <ImageFetcherOrder />
+        </MetadataOptions>
+        <MetadataOptions>
+          <ItemType>MusicArtist</ItemType>
+          <DisabledMetadataSavers />
+          <LocalMetadataReaderOrder />
+          <DisabledMetadataFetchers>
+            <string>TheAudioDB</string>
+          </DisabledMetadataFetchers>
+          <MetadataFetcherOrder />
+          <DisabledImageFetchers />
+          <ImageFetcherOrder />
+        </MetadataOptions>
+        <MetadataOptions>
+          <ItemType>BoxSet</ItemType>
+          <DisabledMetadataSavers />
+          <LocalMetadataReaderOrder />
+          <DisabledMetadataFetchers />
+          <MetadataFetcherOrder />
+          <DisabledImageFetchers />
+          <ImageFetcherOrder />
+        </MetadataOptions>
+        <MetadataOptions>
+          <ItemType>Season</ItemType>
+          <DisabledMetadataSavers />
+          <LocalMetadataReaderOrder />
+          <DisabledMetadataFetchers />
+          <MetadataFetcherOrder />
+          <DisabledImageFetchers />
+          <ImageFetcherOrder />
+        </MetadataOptions>
+        <MetadataOptions>
+          <ItemType>Episode</ItemType>
+          <DisabledMetadataSavers />
+          <LocalMetadataReaderOrder />
+          <DisabledMetadataFetchers />
+          <MetadataFetcherOrder />
+          <DisabledImageFetchers />
+          <ImageFetcherOrder />
+        </MetadataOptions>
+      </MetadataOptions>
+      <SkipDeserializationForBasicTypes>true</SkipDeserializationForBasicTypes>
+      <ServerName>Jellyfin</ServerName>
+      <UICulture>en-US</UICulture>
+      <SaveMetadataHidden>false</SaveMetadataHidden>
+      <ContentTypes />
+      <RemoteClientBitrateLimit>0</RemoteClientBitrateLimit>
+      <EnableFolderView>false</EnableFolderView>
+      <EnableGroupingIntoCollections>true</EnableGroupingIntoCollections>
+      <DisplaySpecialsWithinSeasons>true</DisplaySpecialsWithinSeasons>
+      <CodecsUsed />
+      <PluginRepositories>
+        <RepositoryInfo>
+          <Name>Jellyfin Stable</Name>
+          <Url>https://repo.jellyfin.org/releases/plugin/manifest-stable.json</Url>
+          <Enabled>true</Enabled>
+        </RepositoryInfo>
+      </PluginRepositories>
+      <EnableExternalContentInSuggestions>true</EnableExternalContentInSuggestions>
+      <ImageExtractionTimeoutMs>0</ImageExtractionTimeoutMs>
+      <PathSubstitutions />
+      <EnableSlowResponseWarning>true</EnableSlowResponseWarning>
+      <SlowResponseThresholdMs>500</SlowResponseThresholdMs>
+      <CorsHosts>
+        <string>*</string>
+      </CorsHosts>
+      <ActivityLogRetentionDays>30</ActivityLogRetentionDays>
+      <LibraryScanFanoutConcurrency>0</LibraryScanFanoutConcurrency>
+      <LibraryMetadataRefreshConcurrency>0</LibraryMetadataRefreshConcurrency>
+      <RemoveOldPlugins>true</RemoveOldPlugins>
+      <AllowClientLogUpload>true</AllowClientLogUpload>
+    </ServerConfiguration>

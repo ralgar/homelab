@@ -1,0 +1,92 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prowlarr
+  namespace: media-server
+  labels:
+    app.kubernetes.io/name: prowlarr
+spec:
+  revisionHistoryLimit: 3
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: prowlarr
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: prowlarr
+    spec:
+      # serviceAccountName: default
+      # automountServiceAccountToken: true
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: true
+      securityContext:
+        runAsUser: 109696
+        runAsGroup: 109696
+      initContainers:
+        - name: prowlarr-init
+          image: "nouchka/sqlite3:latest"
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: prowlarr-configmap
+              mountPath: /configmaps
+            - name: prowlarr-data
+              mountPath: /config
+            - name: prowlarr-secrets
+              mountPath: /secrets
+          command: ["/configmaps/init.sh"]
+      containers:
+        - name: prowlarr
+          image: "ghcr.io/onedr0p/prowlarr-develop:0.4.4.1947"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: prowlarr-http
+              containerPort: 9696
+              protocol: TCP
+          volumeMounts:
+            - name: prowlarr-data
+              mountPath: /config
+          # livenessProbe:
+          #   exec:
+          #     command:
+          #     - /usr/bin/env
+          #     - bash
+          #     - -c
+          #     - curl --fail localhost:7878/api/v3/system/status?apiKey=`IFS=\> && while read -d
+          #       \< E C; do if [[ $E = "ApiKey" ]]; then echo $C; fi; done < /config/config.xml`
+          #   failureThreshold: 5
+          #   initialDelaySeconds: 60
+          #   periodSeconds: 10
+          #   successThreshold: 1
+          #   timeoutSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: 9696
+            initialDelaySeconds: 0
+            failureThreshold: 3
+            timeoutSeconds: 1
+            periodSeconds: 10
+          startupProbe:
+            tcpSocket:
+              port: 9696
+            initialDelaySeconds: 0
+            failureThreshold: 30
+            timeoutSeconds: 1
+            periodSeconds: 5
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+      volumes:
+        - name: prowlarr-configmap
+          configMap:
+            name: prowlarr-configmap
+            defaultMode: 0777
+        - name: prowlarr-data
+          persistentVolumeClaim:
+            claimName: prowlarr-data
+        - name: prowlarr-secrets
+          secret:
+            secretName: prowlarr-secrets

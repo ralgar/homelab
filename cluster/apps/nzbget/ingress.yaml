@@ -1,0 +1,57 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: nzbget.homelab.internal
+  namespace: media-server
+  labels:
+    app.kubernetes.io/name: nzbget
+spec:
+  commonName: nzbget.homelab.internal
+  dnsNames:
+    - nzbget.homelab.internal
+    - nzbget.nzbget.svc
+  issuerRef:
+    name: internal-issuer
+    kind: ClusterIssuer
+  secretName: nzbget-cert
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nzbget
+  namespace: media-server
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: nzbget
+  ports:
+    - name: nzbget-http
+      port: 6789
+      protocol: TCP
+      targetPort: nzbget-http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nzbget
+  namespace: media-server
+  labels:
+    app.kubernetes.io/name: nzbget
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - nzbget.homelab.internal
+      secretName: nzbget-cert
+  rules:
+    - host: nzbget.homelab.internal
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nzbget
+                port:
+                  name: nzbget-http

@@ -1,0 +1,96 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: radarr
+  namespace: media-server
+  labels:
+    app.kubernetes.io/name: radarr
+spec:
+  revisionHistoryLimit: 3
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: radarr
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: radarr
+    spec:
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: true
+      securityContext:
+        runAsUser: 107878
+        runAsGroup: 109030
+      initContainers:
+        - name: radarr-init
+          image: "nouchka/sqlite3:latest"
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: radarr-configmap
+              mountPath: /configmaps
+            - name: radarr-data
+              mountPath: /config
+            - name: radarr-secrets
+              mountPath: /secrets
+          command: ["/configmaps/init.sh"]
+      containers:
+        - name: radarr
+          image: "ghcr.io/onedr0p/radarr:4.1.0.6175"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: radarr-http
+              containerPort: 7878
+              protocol: TCP
+          volumeMounts:
+            - name: radarr-data
+              mountPath: /config
+            - name: media
+              mountPath: /media
+          livenessProbe:
+            exec:
+              command:
+              - /usr/bin/env
+              - bash
+              - -c
+              - curl --fail localhost:7878/api/v3/system/status?apiKey=`IFS=\> && while read -d
+                \< E C; do if [[ $E = "ApiKey" ]]; then echo $C; fi; done < /config/config.xml`
+            failureThreshold: 5
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: 7878
+            initialDelaySeconds: 0
+            failureThreshold: 3
+            timeoutSeconds: 1
+            periodSeconds: 10
+          startupProbe:
+            tcpSocket:
+              port: 7878
+            initialDelaySeconds: 0
+            failureThreshold: 30
+            timeoutSeconds: 1
+            periodSeconds: 5
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+      volumes:
+        - name: radarr-configmap
+          configMap:
+            name: radarr-configmap
+            defaultMode: 0777
+        - name: radarr-data
+          persistentVolumeClaim:
+            claimName: radarr-data
+        - name: radarr-secrets
+          secret:
+            secretName: radarr-secrets
+        - name: media
+          nfs:
+            server: 192.168.1.10
+            path: /mnt/storage/mediasrv

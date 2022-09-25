@@ -1,0 +1,366 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sonarr-configmap
+  namespace: media-server
+data:
+  init.sh: |
+    #!/bin/bash
+
+    [ -f /secrets/apiKey ] || exit 1
+
+    [ -f /config/config.xml ] || {
+      cp /configmaps/config.xml /config/config.xml || exit 1
+      sed -i "s|insert-api-key-here|$(</secrets/apiKey)|" /config/config.xml || exit 1
+    }
+
+    [ -f /config/sonarr.db ] || {
+      cp /configmaps/download-client.sql /config/download-client.sql || exit 1
+      sed -i "s|nzbget-api-password|$(</secrets/nzbget-api-password)|" \
+        /config/download-client.sql || exit 1
+      sqlite3 /config/sonarr.db < /configmaps/sonarr.sql || exit 1
+      sqlite3 /config/sonarr.db < /config/download-client.sql || exit 1
+      rm -f /config/download-client.sql || exit 1
+    }
+
+  config.xml: |
+    <Config>
+      <LogLevel>info</LogLevel>
+      <UpdateMechanism>Docker</UpdateMechanism>
+      <EnableSsl>False</EnableSsl>
+      <Port>8989</Port>
+      <SslPort>9898</SslPort>
+      <UrlBase></UrlBase>
+      <BindAddress>*</BindAddress>
+      <ApiKey>insert-api-key-here</ApiKey>
+      <AuthenticationMethod>None</AuthenticationMethod>
+      <LaunchBrowser>False</LaunchBrowser>
+      <Branch>main</Branch>
+      <SslCertHash></SslCertHash>
+      <AnalyticsEnabled>False</AnalyticsEnabled>
+      <InstanceName>Sonarr</InstanceName>
+    </Config>
+
+  download-client.sql: |
+    INSERT INTO "main"."DownloadClients" ("Id", "Enable", "Name", "Implementation", "Settings", "ConfigContract", "Priority", "RemoveCompletedDownloads", "RemoveFailedDownloads") VALUES ('1', '1', 'NZBGet', 'Nzbget', '{
+      "host": "nzbget.media-server.svc",
+      "port": 6789,
+      "useSsl": false,
+      "username": "api",
+      "password": "nzbget-api-password",
+      "tvCategory": "Series",
+      "recentTvPriority": 0,
+      "olderTvPriority": 0,
+      "addPaused": false
+    }', 'NzbgetSettings', '1', '1', '1');
+
+  sonarr.sql: |
+    PRAGMA foreign_keys=OFF;
+    BEGIN TRANSACTION;
+    CREATE TABLE IF NOT EXISTS "VersionInfo" ("Version" INTEGER NOT NULL, "AppliedOn" DATETIME, "Description" TEXT);
+    INSERT INTO VersionInfo VALUES(1,'2022-09-05T22:39:38','InitialSetup');
+    INSERT INTO VersionInfo VALUES(2,'2022-09-05T22:39:38','remove_tvrage_imdb_unique_constraint');
+    INSERT INTO VersionInfo VALUES(3,'2022-09-05T22:39:38','remove_renamed_scene_mapping_columns');
+    INSERT INTO VersionInfo VALUES(4,'2022-09-05T22:39:38','updated_history');
+    INSERT INTO VersionInfo VALUES(5,'2022-09-05T22:39:38','added_eventtype_to_history');
+    INSERT INTO VersionInfo VALUES(6,'2022-09-05T22:39:38','add_index_to_log_time');
+    INSERT INTO VersionInfo VALUES(7,'2022-09-05T22:39:38','add_renameEpisodes_to_naming');
+    INSERT INTO VersionInfo VALUES(8,'2022-09-05T22:39:38','remove_backlog');
+    INSERT INTO VersionInfo VALUES(9,'2022-09-05T22:39:38','fix_rename_episodes');
+    INSERT INTO VersionInfo VALUES(10,'2022-09-05T22:39:38','add_monitored');
+    INSERT INTO VersionInfo VALUES(11,'2022-09-05T22:39:38','remove_ignored');
+    INSERT INTO VersionInfo VALUES(12,'2022-09-05T22:39:38','remove_custom_start_date');
+    INSERT INTO VersionInfo VALUES(13,'2022-09-05T22:39:38','add_air_date_utc');
+    INSERT INTO VersionInfo VALUES(14,'2022-09-05T22:39:38','drop_air_date');
+    INSERT INTO VersionInfo VALUES(15,'2022-09-05T22:39:38','add_air_date_as_string');
+    INSERT INTO VersionInfo VALUES(16,'2022-09-05T22:39:39','updated_imported_history_item');
+    INSERT INTO VersionInfo VALUES(17,'2022-09-05T22:39:39','reset_scene_names');
+    INSERT INTO VersionInfo VALUES(18,'2022-09-05T22:39:39','remove_duplicates');
+    INSERT INTO VersionInfo VALUES(19,'2022-09-05T22:39:39','restore_unique_constraints');
+    INSERT INTO VersionInfo VALUES(20,'2022-09-05T22:39:39','add_year_and_seasons_to_series');
+    INSERT INTO VersionInfo VALUES(21,'2022-09-05T22:39:39','drop_seasons_table');
+    INSERT INTO VersionInfo VALUES(22,'2022-09-05T22:39:39','move_indexer_to_generic_provider');
+    INSERT INTO VersionInfo VALUES(23,'2022-09-05T22:39:39','add_config_contract_to_indexers');
+    INSERT INTO VersionInfo VALUES(24,'2022-09-05T22:39:39','drop_tvdb_episodeid');
+    INSERT INTO VersionInfo VALUES(25,'2022-09-05T22:39:39','move_notification_to_generic_provider');
+    INSERT INTO VersionInfo VALUES(26,'2022-09-05T22:39:39','add_config_contract_to_notifications');
+    INSERT INTO VersionInfo VALUES(27,'2022-09-05T22:39:39','fix_omgwtfnzbs');
+    INSERT INTO VersionInfo VALUES(28,'2022-09-05T22:39:39','add_blacklist_table');
+    INSERT INTO VersionInfo VALUES(29,'2022-09-05T22:39:39','add_formats_to_naming_config');
+    INSERT INTO VersionInfo VALUES(30,'2022-09-05T22:39:39','add_season_folder_format_to_naming_config');
+    INSERT INTO VersionInfo VALUES(31,'2022-09-05T22:39:39','delete_old_naming_config_columns');
+    INSERT INTO VersionInfo VALUES(32,'2022-09-05T22:39:39','set_default_release_group');
+    INSERT INTO VersionInfo VALUES(33,'2022-09-05T22:39:39','add_api_key_to_pushover');
+    INSERT INTO VersionInfo VALUES(34,'2022-09-05T22:39:39','remove_series_contraints');
+    INSERT INTO VersionInfo VALUES(35,'2022-09-05T22:39:39','add_series_folder_format_to_naming_config');
+    INSERT INTO VersionInfo VALUES(36,'2022-09-05T22:39:39','update_with_quality_converters');
+    INSERT INTO VersionInfo VALUES(37,'2022-09-05T22:39:39','add_configurable_qualities');
+    INSERT INTO VersionInfo VALUES(38,'2022-09-05T22:39:39','add_on_upgrade_to_notifications');
+    INSERT INTO VersionInfo VALUES(39,'2022-09-05T22:39:39','add_metadata_tables');
+    INSERT INTO VersionInfo VALUES(40,'2022-09-05T22:39:39','add_metadata_to_episodes_and_series');
+    INSERT INTO VersionInfo VALUES(41,'2022-09-05T22:39:39','fix_xbmc_season_images_metadata');
+    INSERT INTO VersionInfo VALUES(42,'2022-09-05T22:39:39','add_download_clients_table');
+    INSERT INTO VersionInfo VALUES(43,'2022-09-05T22:39:39','convert_config_to_download_clients');
+    INSERT INTO VersionInfo VALUES(44,'2022-09-05T22:39:39','fix_xbmc_episode_metadata');
+    INSERT INTO VersionInfo VALUES(45,'2022-09-05T22:39:39','add_indexes');
+    INSERT INTO VersionInfo VALUES(46,'2022-09-05T22:39:39','fix_nzb_su_url');
+    INSERT INTO VersionInfo VALUES(47,'2022-09-05T22:39:39','add_temporary_blacklist_columns');
+    INSERT INTO VersionInfo VALUES(48,'2022-09-05T22:39:39','add_title_to_scenemappings');
+    INSERT INTO VersionInfo VALUES(49,'2022-09-05T22:39:39','fix_dognzb_url');
+    INSERT INTO VersionInfo VALUES(50,'2022-09-05T22:39:39','add_hash_to_metadata_files');
+    INSERT INTO VersionInfo VALUES(51,'2022-09-05T22:39:40','download_client_import');
+    INSERT INTO VersionInfo VALUES(52,'2022-09-05T22:39:40','add_columns_for_anime');
+    INSERT INTO VersionInfo VALUES(53,'2022-09-05T22:39:40','add_series_sorttitle');
+    INSERT INTO VersionInfo VALUES(54,'2022-09-05T22:39:40','rename_profiles');
+    INSERT INTO VersionInfo VALUES(55,'2022-09-05T22:39:40','drop_old_profile_columns');
+    INSERT INTO VersionInfo VALUES(56,'2022-09-05T22:39:40','add_mediainfo_to_episodefile');
+    INSERT INTO VersionInfo VALUES(57,'2022-09-05T22:39:40','convert_episode_file_path_to_relative');
+    INSERT INTO VersionInfo VALUES(58,'2022-09-05T22:39:40','drop_episode_file_path');
+    INSERT INTO VersionInfo VALUES(59,'2022-09-05T22:39:40','add_enable_options_to_indexers');
+    INSERT INTO VersionInfo VALUES(60,'2022-09-05T22:39:40','remove_enable_from_indexers');
+    INSERT INTO VersionInfo VALUES(61,'2022-09-05T22:39:40','clear_bad_scene_names');
+    INSERT INTO VersionInfo VALUES(62,'2022-09-05T22:39:40','convert_quality_models');
+    INSERT INTO VersionInfo VALUES(63,'2022-09-05T22:39:40','add_remotepathmappings');
+    INSERT INTO VersionInfo VALUES(64,'2022-09-05T22:39:40','remove_method_from_logs');
+    INSERT INTO VersionInfo VALUES(65,'2022-09-05T22:39:40','make_scene_numbering_nullable');
+    INSERT INTO VersionInfo VALUES(66,'2022-09-05T22:39:40','add_tags');
+    INSERT INTO VersionInfo VALUES(67,'2022-09-05T22:39:40','add_added_to_series');
+    INSERT INTO VersionInfo VALUES(68,'2022-09-05T22:39:40','add_release_restrictions');
+    INSERT INTO VersionInfo VALUES(69,'2022-09-05T22:39:40','quality_proper');
+    INSERT INTO VersionInfo VALUES(70,'2022-09-05T22:39:40','delay_profile');
+    INSERT INTO VersionInfo VALUES(71,'2022-09-05T22:39:40','unknown_quality_in_profile');
+    INSERT INTO VersionInfo VALUES(72,'2022-09-05T22:39:40','history_downloadId');
+    INSERT INTO VersionInfo VALUES(73,'2022-09-05T22:39:40','clear_ratings');
+    INSERT INTO VersionInfo VALUES(74,'2022-09-05T22:39:40','disable_eztv');
+    INSERT INTO VersionInfo VALUES(75,'2022-09-05T22:39:40','force_lib_update');
+    INSERT INTO VersionInfo VALUES(76,'2022-09-05T22:39:41','add_users_table');
+    INSERT INTO VersionInfo VALUES(77,'2022-09-05T22:39:41','add_add_options_to_series');
+    INSERT INTO VersionInfo VALUES(78,'2022-09-05T22:39:41','add_commands_table');
+    INSERT INTO VersionInfo VALUES(79,'2022-09-05T22:39:41','dedupe_tags');
+    INSERT INTO VersionInfo VALUES(81,'2022-09-05T22:39:41','move_dot_prefix_to_transmission_category');
+    INSERT INTO VersionInfo VALUES(82,'2022-09-05T22:39:41','add_fanzub_settings');
+    INSERT INTO VersionInfo VALUES(83,'2022-09-05T22:39:41','additonal_blacklist_columns');
+    INSERT INTO VersionInfo VALUES(84,'2022-09-05T22:39:41','update_quality_minmax_size');
+    INSERT INTO VersionInfo VALUES(85,'2022-09-05T22:39:41','expand_transmission_urlbase');
+    INSERT INTO VersionInfo VALUES(86,'2022-09-05T22:39:41','pushbullet_device_ids');
+    INSERT INTO VersionInfo VALUES(87,'2022-09-05T22:39:41','remove_eztv');
+    INSERT INTO VersionInfo VALUES(88,'2022-09-05T22:39:41','pushbullet_devices_channels_list');
+    INSERT INTO VersionInfo VALUES(89,'2022-09-05T22:39:41','add_on_rename_to_notifcations');
+    INSERT INTO VersionInfo VALUES(90,'2022-09-05T22:39:41','update_kickass_url');
+    INSERT INTO VersionInfo VALUES(91,'2022-09-05T22:39:41','added_indexerstatus');
+    INSERT INTO VersionInfo VALUES(92,'2022-09-05T22:39:41','add_unverifiedscenenumbering');
+    INSERT INTO VersionInfo VALUES(93,'2022-09-05T22:39:41','naming_config_replace_illegal_characters');
+    INSERT INTO VersionInfo VALUES(94,'2022-09-05T22:39:41','add_tvmazeid');
+    INSERT INTO VersionInfo VALUES(95,'2022-09-05T22:39:41','add_additional_episodes_index');
+    INSERT INTO VersionInfo VALUES(96,'2022-09-05T22:39:41','disable_kickass');
+    INSERT INTO VersionInfo VALUES(97,'2022-09-05T22:39:41','add_reason_to_pending_releases');
+    INSERT INTO VersionInfo VALUES(98,'2022-09-05T22:39:41','remove_titans_of_tv');
+    INSERT INTO VersionInfo VALUES(99,'2022-09-05T22:39:41','extra_and_subtitle_files');
+    INSERT INTO VersionInfo VALUES(100,'2022-09-05T22:39:41','add_scene_season_number');
+    INSERT INTO VersionInfo VALUES(101,'2022-09-05T22:39:41','add_ultrahd_quality_in_profiles');
+    INSERT INTO VersionInfo VALUES(102,'2022-09-05T22:39:41','add_language_to_episodeFiles_history_and_blacklist');
+    INSERT INTO VersionInfo VALUES(103,'2022-09-05T22:39:41','fix_metadata_file_extensions');
+    INSERT INTO VersionInfo VALUES(104,'2022-09-05T22:39:41','remove_kickass');
+    INSERT INTO VersionInfo VALUES(105,'2022-09-05T22:39:41','rename_torrent_downloadstation');
+    INSERT INTO VersionInfo VALUES(106,'2022-09-05T22:39:42','update_btn_url');
+    INSERT INTO VersionInfo VALUES(107,'2022-09-05T22:39:42','remove_wombles');
+    INSERT INTO VersionInfo VALUES(108,'2022-09-05T22:39:42','fix_extra_file_extension');
+    INSERT INTO VersionInfo VALUES(109,'2022-09-05T22:39:42','import_extra_files');
+    INSERT INTO VersionInfo VALUES(110,'2022-09-05T22:39:42','fix_extra_files_config');
+    INSERT INTO VersionInfo VALUES(111,'2022-09-05T22:39:42','create_language_profiles');
+    INSERT INTO VersionInfo VALUES(112,'2022-09-05T22:39:42','added_regex_to_scenemapping');
+    INSERT INTO VersionInfo VALUES(113,'2022-09-05T22:39:42','consolidate_indexer_baseurl');
+    INSERT INTO VersionInfo VALUES(114,'2022-09-05T22:39:42','rename_indexer_status_id');
+    INSERT INTO VersionInfo VALUES(115,'2022-09-05T22:39:42','add_downloadclient_status');
+    INSERT INTO VersionInfo VALUES(116,'2022-09-05T22:39:42','disable_nyaa');
+    INSERT INTO VersionInfo VALUES(117,'2022-09-05T22:39:42','add_webrip_and_br480_qualites_in_profile');
+    INSERT INTO VersionInfo VALUES(118,'2022-09-05T22:39:42','add_history_eventType_index');
+    INSERT INTO VersionInfo VALUES(119,'2022-09-05T22:39:42','separate_automatic_and_interactive_searches');
+    INSERT INTO VersionInfo VALUES(120,'2022-09-05T22:39:42','update_series_episodes_history_indexes');
+    INSERT INTO VersionInfo VALUES(121,'2022-09-05T22:39:42','update_animetosho_url');
+    INSERT INTO VersionInfo VALUES(122,'2022-09-05T22:39:42','add_remux_qualities_in_profile');
+    INSERT INTO VersionInfo VALUES(123,'2022-09-05T22:39:42','add_history_seriesId_index');
+    INSERT INTO VersionInfo VALUES(124,'2022-09-05T22:39:42','remove_media_browser_metadata');
+    INSERT INTO VersionInfo VALUES(125,'2022-09-05T22:39:42','remove_notify_my_android_and_pushalot_notifications');
+    INSERT INTO VersionInfo VALUES(126,'2022-09-05T22:39:42','add_custom_filters');
+    INSERT INTO VersionInfo VALUES(127,'2022-09-05T22:39:42','rename_restrictions_to_release_profiles');
+    INSERT INTO VersionInfo VALUES(128,'2022-09-05T22:39:42','rename_quality_profiles_add_upgrade_allowed');
+    INSERT INTO VersionInfo VALUES(129,'2022-09-05T22:39:42','add_relative_original_path_to_episode_file');
+    INSERT INTO VersionInfo VALUES(130,'2022-09-05T22:39:42','episode_last_searched_time');
+    INSERT INTO VersionInfo VALUES(131,'2022-09-05T22:39:42','download_propers_config');
+    INSERT INTO VersionInfo VALUES(132,'2022-09-05T22:39:42','add_download_client_priority');
+    INSERT INTO VersionInfo VALUES(134,'2022-09-05T22:39:42','add_specials_folder_format');
+    INSERT INTO VersionInfo VALUES(135,'2022-09-05T22:39:42','health_issue_notification');
+    INSERT INTO VersionInfo VALUES(136,'2022-09-05T22:39:42','add_indexer_and_enabled_to_release_profiles');
+    INSERT INTO VersionInfo VALUES(137,'2022-09-05T22:39:42','add_airedbefore_to_episodes');
+    INSERT INTO VersionInfo VALUES(138,'2022-09-05T22:39:42','remove_bitmetv');
+    INSERT INTO VersionInfo VALUES(139,'2022-09-05T22:39:43','add_download_history');
+    INSERT INTO VersionInfo VALUES(140,'2022-09-05T22:39:43','remove_chown_and_folderchmod_config_v2');
+    INSERT INTO VersionInfo VALUES(141,'2022-09-05T22:39:43','add_update_history');
+    INSERT INTO VersionInfo VALUES(142,'2022-09-05T22:39:43','import_lists');
+    INSERT INTO VersionInfo VALUES(143,'2022-09-05T22:39:43','add_priority_to_indexers');
+    INSERT INTO VersionInfo VALUES(144,'2022-09-05T22:39:43','import_lists_series_type_and_season_folder');
+    INSERT INTO VersionInfo VALUES(145,'2022-09-05T22:39:43','remove_growl');
+    INSERT INTO VersionInfo VALUES(146,'2022-09-05T22:39:43','cleanup_duplicates_updatehistory');
+    INSERT INTO VersionInfo VALUES(147,'2022-09-05T22:39:43','swap_filechmod_for_folderchmod');
+    INSERT INTO VersionInfo VALUES(148,'2022-09-05T22:39:43','mediainfo_channels');
+    INSERT INTO VersionInfo VALUES(149,'2022-09-05T22:39:43','add_on_delete_to_notifications');
+    INSERT INTO VersionInfo VALUES(150,'2022-09-05T22:39:43','add_scene_mapping_origin');
+    INSERT INTO VersionInfo VALUES(151,'2022-09-05T22:39:43','remove_custom_filter_type');
+    INSERT INTO VersionInfo VALUES(152,'2022-09-05T22:39:43','update_btn_url_to_https');
+    INSERT INTO VersionInfo VALUES(153,'2022-09-05T22:39:43','add_on_episodefiledelete_for_upgrade');
+    INSERT INTO VersionInfo VALUES(154,'2022-09-05T22:39:43','add_name_release_profile');
+    INSERT INTO VersionInfo VALUES(155,'2022-09-05T22:39:43','add_arabic_and_hindi_languages');
+    INSERT INTO VersionInfo VALUES(156,'2022-09-05T22:39:43','add_bypass_to_delay_profile');
+    INSERT INTO VersionInfo VALUES(157,'2022-09-05T22:39:43','email_multiple_addresses');
+    INSERT INTO VersionInfo VALUES(158,'2022-09-05T22:39:43','cdh_per_downloadclient');
+    INSERT INTO VersionInfo VALUES(159,'2022-09-05T22:39:43','add_indexer_tags');
+    INSERT INTO VersionInfo VALUES(160,'2022-09-05T22:39:43','rename_blacklist_to_blocklist');
+    INSERT INTO VersionInfo VALUES(162,'2022-09-05T22:39:43','release_profile_to_array');
+    INSERT INTO VersionInfo VALUES(164,'2022-09-05T22:39:43','download_client_per_indexer');
+    INSERT INTO VersionInfo VALUES(165,'2022-09-05T22:39:43','add_on_update_to_notifications');
+    INSERT INTO VersionInfo VALUES(166,'2022-09-05T22:39:43','update_series_sort_title');
+    INSERT INTO VersionInfo VALUES(167,'2022-09-05T22:39:43','add_tvdbid_to_episode');
+    INSERT INTO VersionInfo VALUES(168,'2022-09-05T22:39:43','add_additional_info_to_pending_releases');
+    INSERT INTO VersionInfo VALUES(169,'2022-09-05T22:39:43','add_malayalam_and_ukrainian_languages');
+    CREATE TABLE IF NOT EXISTS "Config" ("Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "Key" TEXT NOT NULL, "Value" TEXT NOT NULL);
+    INSERT INTO Config VALUES(1,'enablecompleteddownloadhandling','True');
+    CREATE TABLE IF NOT EXISTS "RootFolders" ("Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "Path" TEXT NOT NULL);
+    INSERT INTO RootFolders VALUES(1,'/media/library/TV Shows');
+    CREATE TABLE IF NOT EXISTS "ScheduledTasks" ("Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "TypeName" TEXT NOT NULL, "Interval" INTEGER NOT NULL, "LastExecution" DATETIME NOT NULL);
+    INSERT INTO ScheduledTasks VALUES(1,'NzbDrone.Core.Download.RefreshMonitoredDownloadsCommand',1,'2022-09-05 22:41:18.291606Z');
+    INSERT INTO ScheduledTasks VALUES(2,'NzbDrone.Core.Messaging.Commands.MessagingCleanupCommand',5,'2022-09-05 22:39:48.180434Z');
+    INSERT INTO ScheduledTasks VALUES(3,'NzbDrone.Core.Update.Commands.ApplicationUpdateCheckCommand',360,'2022-09-05 22:39:48.199003Z');
+    INSERT INTO ScheduledTasks VALUES(4,'NzbDrone.Core.DataAugmentation.Scene.UpdateSceneMappingCommand',180,'2022-09-05 22:39:48.218941Z');
+    INSERT INTO ScheduledTasks VALUES(5,'NzbDrone.Core.HealthCheck.CheckHealthCommand',360,'2022-09-05 22:39:48.224976Z');
+    INSERT INTO ScheduledTasks VALUES(6,'NzbDrone.Core.Tv.Commands.RefreshSeriesCommand',720,'2022-09-05 22:39:48.231996Z');
+    INSERT INTO ScheduledTasks VALUES(7,'NzbDrone.Core.Housekeeping.HousekeepingCommand',1440,'2022-09-05 22:39:48.238095Z');
+    INSERT INTO ScheduledTasks VALUES(8,'NzbDrone.Core.MediaFiles.Commands.CleanUpRecycleBinCommand',1440,'2022-09-05 22:39:48.249015Z');
+    INSERT INTO ScheduledTasks VALUES(9,'NzbDrone.Core.ImportLists.ImportListSyncCommand',1440,'2022-09-05 22:39:48.257951Z');
+    INSERT INTO ScheduledTasks VALUES(10,'NzbDrone.Core.Backup.BackupCommand',10080,'2022-09-05 22:39:48.266321Z');
+    INSERT INTO ScheduledTasks VALUES(11,'NzbDrone.Core.Indexers.RssSyncCommand',15,'2022-09-05 22:39:48.27457Z');
+    CREATE TABLE IF NOT EXISTS "History" ("Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "EpisodeId" INTEGER NOT NULL, "SeriesId" INTEGER NOT NULL, "SourceTitle" TEXT NOT NULL, "Date" DATETIME NOT NULL, "Quality" TEXT NOT NULL, "Data" TEXT NOT NULL, "EventType" INTEGER, "DownloadId" TEXT, "Language" INTEGER NOT NULL DEFAULT 0);
+    CREATE TABLE IF NOT EXISTS "Episodes" ("Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "SeriesId" INTEGER NOT NULL, "SeasonNumber" INTEGER NOT NULL, "EpisodeNumber" INTEGER NOT NULL, "Title" TEXT, "Overview" TEXT, "EpisodeFileId" INTEGER, "AbsoluteEpisodeNumber" INTEGER, "SceneAbsoluteEpisodeNumber" INTEGER, "SceneSeasonNumber" INTEGER, "SceneEpisodeNumber" INTEGER, "Monitored" INTEGER, "AirDateUtc" DATETIME, "AirDate" TEXT, "Ratings" TEXT, "Images" TEXT, "UnverifiedSceneNumbering" INTEGER NOT NULL DEFAULT 0, "LastSearchTime" DATETIME, "AiredAfterSeasonNumber" INTEGER, "AiredBeforeSeasonNumber" INTEGER, "AiredBeforeEpisodeNumber" INTEGER, "TvdbId" INTEGER);
+    CREATE TABLE IF NOT EXISTS "Blocklist" ("Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "SeriesId" INTEGER NOT NULL, "EpisodeIds" TEXT NOT NULL, "SourceTitle" TEXT NOT NULL, "Quality" TEXT NOT NULL, "Date" DATETIME NOT NULL, "PublishedDate" DATETIME, "Size" INTEGER, "Protocol" INTEGER, "Indexer" TEXT, "Message" TEXT, "TorrentInfoHash" TEXT, "Language" INTEGER NOT NULL DEFAULT 0);
+    CREATE TABLE IF NOT EXISTS "NamingConfig" ("Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "MultiEpisodeStyle" INTEGER NOT NULL, "RenameEpisodes" INTEGER, "StandardEpisodeFormat" TEXT, "DailyEpisodeFormat" TEXT, "SeasonFolderFormat" TEXT, "SeriesFolderFormat" TEXT, "AnimeEpisodeFormat" TEXT, "ReplaceIllegalCharacters" INTEGER NOT NULL DEFAULT 1, "SpecialsFolderFormat" TEXT);
+    CREATE TABLE IF NOT EXISTS "Metadata" ("Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "Enable" INTEGER NOT NULL, "Name" TEXT NOT NULL, "Implementation" TEXT NOT NULL, "Settings" TEXT NOT NULL, "ConfigContract" TEXT NOT NULL);
+    INSERT INTO Metadata VALUES(1,0,'Kodi (XBMC) / Emby','XbmcMetadata',replace('{\n  "seriesMetadata": true,\n  "seriesMetadataUrl": false,\n  "episodeMetadata": true,\n  "seriesImages": true,\n  "seasonImages": true,\n  "episodeImages": true,\n  "isValid": true\n}','\n',char(10)),'XbmcMetadataSettings');
+    INSERT INTO Metadata VALUES(2,0,'WDTV','WdtvMetadata',replace('{\n  "episodeMetadata": true,\n  "seriesImages": true,\n  "seasonImages": true,\n  "episodeImages": true,\n  "isValid": true\n}','\n',char(10)),'WdtvMetadataSettings');
+    INSERT INTO Metadata VALUES(3,0,'Roksbox','RoksboxMetadata',replace('{\n  "episodeMetadata": true,\n  "seriesImages": true,\n  "seasonImages": true,\n  "episodeImages": true,\n  "isValid": true\n}','\n',char(10)),'RoksboxMetadataSettings');
+    CREATE TABLE IF NOT EXISTS "PendingReleases" ("Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "SeriesId" INTEGER NOT NULL, "Title" TEXT NOT NULL, "Added" DATETIME NOT NULL, "ParsedEpisodeInfo" TEXT NOT NULL, "Release" TEXT NOT NULL, "Reason" INTEGER NOT NULL DEFAULT 0, "AdditionalInfo" TEXT);
+    CREATE TABLE IF NOT EXISTS "EpisodeFiles" ("Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "SeriesId" INTEGER NOT NULL, "Quality" TEXT NOT NULL, "Size" INTEGER NOT NULL, "DateAdded" DATETIME NOT NULL, "SeasonNumber" INTEGER NOT NULL, "SceneName" TEXT, "ReleaseGroup" TEXT, "MediaInfo" TEXT, "RelativePath" TEXT, "Language" INTEGER NOT NULL DEFAULT 0, "OriginalFilePath" TEXT);
+    CREATE TABLE IF NOT EXISTS "DownloadClients" ("Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "Enable" INTEGER NOT NULL, "Name" TEXT NOT NULL, "Implementation" TEXT NOT NULL, "Settings" TEXT NOT NULL, "ConfigContract" TEXT NOT NULL, "Priority" INTEGER NOT NULL DEFAULT 1, "RemoveCompletedDownloads" INTEGER NOT NULL DEFAULT 1, "RemoveFailedDownloads" INTEGER NOT NULL DEFAULT 1);
+    CREATE TABLE IF NOT EXISTS "RemotePathMappings" ("Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "Host" TEXT NOT NULL, "RemotePath" TEXT NOT NULL, "LocalPath" TEXT NOT NULL);
+    CREATE TABLE IF NOT EXISTS "ReleaseProfiles" ("Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "Required" TEXT, "Preferred" TEXT, "Ignored" TEXT, "Tags" TEXT NOT NULL, "IncludePreferredWhenRenaming" INTEGER NOT NULL DEFAULT 1, "Enabled" INTEGER NOT NULL DEFAULT 1, "IndexerId" INTEGER NOT NULL DEFAULT 0, "Name" TEXT DEFAULT NULL);
+    CREATE TABLE IF NOT EXISTS "DelayProfiles" ("Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "EnableUsenet" INTEGER NOT NULL, "EnableTorrent" INTEGER NOT NULL, "PreferredProtocol" INTEGER NOT NULL, "UsenetDelay" INTEGER NOT NULL, "TorrentDelay" INTEGER NOT NULL, "Order" INTEGER NOT NULL, "Tags" TEXT NOT NULL, "BypassIfHighestQuality" INTEGER NOT NULL DEFAULT 0);
+    INSERT INTO DelayProfiles VALUES(1,1,1,1,0,0,2147483647,'[]',1);
+    CREATE TABLE IF NOT EXISTS "Users" ("Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "Identifier" TEXT NOT NULL, "Username" TEXT NOT NULL, "Password" TEXT NOT NULL);
+    CREATE TABLE IF NOT EXISTS "Commands" ("Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "Name" TEXT NOT NULL, "Body" TEXT NOT NULL, "Priority" INTEGER NOT NULL, "Status" INTEGER NOT NULL, "QueuedAt" DATETIME NOT NULL, "StartedAt" DATETIME, "EndedAt" DATETIME, "Duration" TEXT, "Exception" TEXT, "Trigger" INTEGER NOT NULL);
+    INSERT INTO Commands VALUES(1,'RefreshMonitoredDownloads',replace('{\n  "sendUpdatesToClient": false,\n  "updateScheduledTask": true,\n  "completionMessage": "Completed",\n  "requiresDiskAccess": false,\n  "isExclusive": false,\n  "name": "RefreshMonitoredDownloads",\n  "lastExecutionTime": "2022-09-05T22:39:48.166852Z",\n  "trigger": "scheduled",\n  "suppressMessages": false\n}','\n',char(10)),1,2,'2022-09-05 22:41:18.180798Z','2022-09-05 22:41:18.214436Z','2022-09-05 22:41:18.266642Z','00:00:00.0522060',NULL,2);
+    INSERT INTO Commands VALUES(2,'ProcessMonitoredDownloads',replace('{\n  "requiresDiskAccess": true,\n  "sendUpdatesToClient": false,\n  "updateScheduledTask": true,\n  "completionMessage": "Completed",\n  "isExclusive": false,\n  "name": "ProcessMonitoredDownloads",\n  "trigger": "unspecified",\n  "suppressMessages": false\n}','\n',char(10)),1,2,'2022-09-05 22:41:18.252798Z','2022-09-05 22:41:18.266153Z','2022-09-05 22:41:18.331439Z','00:00:00.0652860',NULL,0);
+    CREATE TABLE IF NOT EXISTS "Tags" ("Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "Label" TEXT NOT NULL);
+    CREATE TABLE IF NOT EXISTS "QualityDefinitions" ("Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "Quality" INTEGER NOT NULL, "Title" TEXT NOT NULL, "MinSize" NUMERIC, "MaxSize" NUMERIC);
+    INSERT INTO QualityDefinitions VALUES(1,0,'Unknown',1,199.90000000000000567);
+    INSERT INTO QualityDefinitions VALUES(2,1,'SDTV',2,100);
+    INSERT INTO QualityDefinitions VALUES(3,12,'WEBRip-480p',2,100);
+    INSERT INTO QualityDefinitions VALUES(4,8,'WEBDL-480p',2,100);
+    INSERT INTO QualityDefinitions VALUES(5,2,'DVD',2,100);
+    INSERT INTO QualityDefinitions VALUES(6,13,'Bluray-480p',2,100);
+    INSERT INTO QualityDefinitions VALUES(7,4,'HDTV-720p',3,125);
+    INSERT INTO QualityDefinitions VALUES(8,9,'HDTV-1080p',4,125);
+    INSERT INTO QualityDefinitions VALUES(9,10,'Raw-HD',4,NULL);
+    INSERT INTO QualityDefinitions VALUES(10,14,'WEBRip-720p',3,130);
+    INSERT INTO QualityDefinitions VALUES(11,5,'WEBDL-720p',3,130);
+    INSERT INTO QualityDefinitions VALUES(12,6,'Bluray-720p',4,130);
+    INSERT INTO QualityDefinitions VALUES(13,15,'WEBRip-1080p',4,130);
+    INSERT INTO QualityDefinitions VALUES(14,3,'WEBDL-1080p',4,130);
+    INSERT INTO QualityDefinitions VALUES(15,7,'Bluray-1080p',4,155);
+    INSERT INTO QualityDefinitions VALUES(16,20,'Bluray-1080p Remux',35,NULL);
+    INSERT INTO QualityDefinitions VALUES(17,16,'HDTV-2160p',35,199.90000000000000567);
+    INSERT INTO QualityDefinitions VALUES(18,17,'WEBRip-2160p',35,NULL);
+    INSERT INTO QualityDefinitions VALUES(19,18,'WEBDL-2160p',35,NULL);
+    INSERT INTO QualityDefinitions VALUES(20,19,'Bluray-2160p',35,NULL);
+    INSERT INTO QualityDefinitions VALUES(21,21,'Bluray-2160p Remux',35,NULL);
+    CREATE TABLE IF NOT EXISTS "Notifications" ("Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "Name" TEXT NOT NULL, "OnGrab" INTEGER NOT NULL, "OnDownload" INTEGER NOT NULL, "Settings" TEXT NOT NULL, "Implementation" TEXT NOT NULL, "ConfigContract" TEXT, "OnUpgrade" INTEGER, "Tags" TEXT, "OnRename" INTEGER NOT NULL, "OnHealthIssue" INTEGER NOT NULL DEFAULT 0, "IncludeHealthWarnings" INTEGER NOT NULL DEFAULT 0, "OnSeriesDelete" INTEGER NOT NULL DEFAULT 0, "OnEpisodeFileDelete" INTEGER NOT NULL DEFAULT 0, "OnEpisodeFileDeleteForUpgrade" INTEGER NOT NULL DEFAULT 1, "OnApplicationUpdate" INTEGER NOT NULL DEFAULT 0);
+    CREATE TABLE IF NOT EXISTS "ExtraFiles" ("Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "SeriesId" INTEGER NOT NULL, "SeasonNumber" INTEGER NOT NULL, "EpisodeFileId" INTEGER NOT NULL, "RelativePath" TEXT NOT NULL, "Extension" TEXT NOT NULL, "Added" DATETIME NOT NULL, "LastUpdated" DATETIME NOT NULL);
+    CREATE TABLE IF NOT EXISTS "SubtitleFiles" ("Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "SeriesId" INTEGER NOT NULL, "SeasonNumber" INTEGER NOT NULL, "EpisodeFileId" INTEGER NOT NULL, "RelativePath" TEXT NOT NULL, "Extension" TEXT NOT NULL, "Added" DATETIME NOT NULL, "LastUpdated" DATETIME NOT NULL, "Language" INTEGER NOT NULL);
+    CREATE TABLE IF NOT EXISTS "MetadataFiles" ("Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "SeriesId" INTEGER NOT NULL, "Consumer" TEXT NOT NULL, "Type" INTEGER NOT NULL, "RelativePath" TEXT NOT NULL, "LastUpdated" DATETIME NOT NULL, "SeasonNumber" INTEGER, "EpisodeFileId" INTEGER, "Hash" TEXT, "Added" DATETIME, "Extension" TEXT NOT NULL);
+    CREATE TABLE IF NOT EXISTS "SceneMappings" ("Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "TvdbId" INTEGER NOT NULL, "SeasonNumber" INTEGER, "SearchTerm" TEXT NOT NULL, "ParseTerm" TEXT NOT NULL, "Title" TEXT, "Type" TEXT, "SceneSeasonNumber" INTEGER, "FilterRegex" TEXT, "SceneOrigin" TEXT, "SearchMode" INTEGER, "Comment" TEXT);
+    CREATE TABLE IF NOT EXISTS "LanguageProfiles" ("Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "Name" TEXT NOT NULL, "Languages" TEXT NOT NULL, "Cutoff" INTEGER NOT NULL, "UpgradeAllowed" INTEGER);
+    INSERT INTO LanguageProfiles VALUES(1,'English',replace('[\n  {\n    "language": 13,\n    "allowed": false\n  },\n  {\n    "language": 0,\n    "allowed": false\n  },\n  {\n    "language": 30,\n    "allowed": false\n  },\n  {\n    "language": 17,\n    "allowed": false\n  },\n  {\n    "language": 14,\n    "allowed": false\n  },\n  {\n    "language": 3,\n    "allowed": false\n  },\n  {\n    "language": 11,\n    "allowed": false\n  },\n  {\n    "language": 18,\n    "allowed": false\n  },\n  {\n    "language": 12,\n    "allowed": false\n  },\n  {\n    "language": 15,\n    "allowed": false\n  },\n  {\n    "language": 29,\n    "allowed": false\n  },\n  {\n    "language": 24,\n    "allowed": false\n  },\n  {\n    "language": 21,\n    "allowed": false\n  },\n  {\n    "language": 8,\n    "allowed": false\n  },\n  {\n    "language": 5,\n    "allowed": false\n  },\n  {\n    "language": 9,\n    "allowed": false\n  },\n  {\n    "language": 22,\n    "allowed": false\n  },\n  {\n    "language": 27,\n    "allowed": false\n  },\n  {\n    "language": 23,\n    "allowed": false\n  },\n  {\n    "language": 20,\n    "allowed": false\n  },\n  {\n    "language": 4,\n    "allowed": false\n  },\n  {\n    "language": 2,\n    "allowed": false\n  },\n  {\n    "language": 19,\n    "allowed": false\n  },\n  {\n    "language": 16,\n    "allowed": false\n  },\n  {\n    "language": 1,\n    "allowed": true\n  },\n  {\n    "language": 7,\n    "allowed": false\n  },\n  {\n    "language": 6,\n    "allowed": false\n  },\n  {\n    "language": 25,\n    "allowed": false\n  },\n  {\n    "language": 10,\n    "allowed": false\n  },\n  {\n    "language": 28,\n    "allowed": false\n  },\n  {\n    "language": 26,\n    "allowed": false\n  }\n]','\n',char(10)),1,0);
+    CREATE TABLE IF NOT EXISTS "QualityProfiles" ("Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "Name" TEXT NOT NULL, "Cutoff" INTEGER NOT NULL, "Items" TEXT NOT NULL, "UpgradeAllowed" INTEGER);
+    INSERT INTO QualityProfiles VALUES(1,'Any',1,replace('[\n  {\n    "quality": 0,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 1,\n    "items": [],\n    "allowed": true\n  },\n  {\n    "id": 1000,\n    "name": "WEB 480p",\n    "items": [\n      {\n        "quality": 12,\n        "items": [],\n        "allowed": true\n      },\n      {\n        "quality": 8,\n        "items": [],\n        "allowed": true\n      }\n    ],\n    "allowed": true\n  },\n  {\n    "quality": 2,\n    "items": [],\n    "allowed": true\n  },\n  {\n    "quality": 13,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 4,\n    "items": [],\n    "allowed": true\n  },\n  {\n    "quality": 9,\n    "items": [],\n    "allowed": true\n  },\n  {\n    "quality": 10,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "id": 1001,\n    "name": "WEB 720p",\n    "items": [\n      {\n        "quality": 14,\n        "items": [],\n        "allowed": true\n      },\n      {\n        "quality": 5,\n        "items": [],\n        "allowed": true\n      }\n    ],\n    "allowed": true\n  },\n  {\n    "quality": 6,\n    "items": [],\n    "allowed": true\n  },\n  {\n    "id": 1002,\n    "name": "WEB 1080p",\n    "items": [\n      {\n        "quality": 15,\n        "items": [],\n        "allowed": true\n      },\n      {\n        "quality": 3,\n        "items": [],\n        "allowed": true\n      }\n    ],\n    "allowed": true\n  },\n  {\n    "quality": 7,\n    "items": [],\n    "allowed": true\n  },\n  {\n    "quality": 20,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 16,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "id": 1003,\n    "name": "WEB 2160p",\n    "items": [\n      {\n        "quality": 17,\n        "items": [],\n        "allowed": false\n      },\n      {\n        "quality": 18,\n        "items": [],\n        "allowed": false\n      }\n    ],\n    "allowed": false\n  },\n  {\n    "quality": 19,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 21,\n    "items": [],\n    "allowed": false\n  }\n]','\n',char(10)),0);
+    INSERT INTO QualityProfiles VALUES(2,'SD',1,replace('[\n  {\n    "quality": 0,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 1,\n    "items": [],\n    "allowed": true\n  },\n  {\n    "id": 1000,\n    "name": "WEB 480p",\n    "items": [\n      {\n        "quality": 12,\n        "items": [],\n        "allowed": true\n      },\n      {\n        "quality": 8,\n        "items": [],\n        "allowed": true\n      }\n    ],\n    "allowed": true\n  },\n  {\n    "quality": 2,\n    "items": [],\n    "allowed": true\n  },\n  {\n    "quality": 13,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 4,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 9,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 10,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "id": 1001,\n    "name": "WEB 720p",\n    "items": [\n      {\n        "quality": 14,\n        "items": [],\n        "allowed": false\n      },\n      {\n        "quality": 5,\n        "items": [],\n        "allowed": false\n      }\n    ],\n    "allowed": false\n  },\n  {\n    "quality": 6,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "id": 1002,\n    "name": "WEB 1080p",\n    "items": [\n      {\n        "quality": 15,\n        "items": [],\n        "allowed": false\n      },\n      {\n        "quality": 3,\n        "items": [],\n        "allowed": false\n      }\n    ],\n    "allowed": false\n  },\n  {\n    "quality": 7,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 20,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 16,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "id": 1003,\n    "name": "WEB 2160p",\n    "items": [\n      {\n        "quality": 17,\n        "items": [],\n        "allowed": false\n      },\n      {\n        "quality": 18,\n        "items": [],\n        "allowed": false\n      }\n    ],\n    "allowed": false\n  },\n  {\n    "quality": 19,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 21,\n    "items": [],\n    "allowed": false\n  }\n]','\n',char(10)),0);
+    INSERT INTO QualityProfiles VALUES(3,'HD-720p',4,replace('[\n  {\n    "quality": 0,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 1,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "id": 1000,\n    "name": "WEB 480p",\n    "items": [\n      {\n        "quality": 12,\n        "items": [],\n        "allowed": false\n      },\n      {\n        "quality": 8,\n        "items": [],\n        "allowed": false\n      }\n    ],\n    "allowed": false\n  },\n  {\n    "quality": 2,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 13,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 4,\n    "items": [],\n    "allowed": true\n  },\n  {\n    "quality": 9,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 10,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "id": 1001,\n    "name": "WEB 720p",\n    "items": [\n      {\n        "quality": 14,\n        "items": [],\n        "allowed": true\n      },\n      {\n        "quality": 5,\n        "items": [],\n        "allowed": true\n      }\n    ],\n    "allowed": true\n  },\n  {\n    "quality": 6,\n    "items": [],\n    "allowed": true\n  },\n  {\n    "id": 1002,\n    "name": "WEB 1080p",\n    "items": [\n      {\n        "quality": 15,\n        "items": [],\n        "allowed": false\n      },\n      {\n        "quality": 3,\n        "items": [],\n        "allowed": false\n      }\n    ],\n    "allowed": false\n  },\n  {\n    "quality": 7,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 20,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 16,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "id": 1003,\n    "name": "WEB 2160p",\n    "items": [\n      {\n        "quality": 17,\n        "items": [],\n        "allowed": false\n      },\n      {\n        "quality": 18,\n        "items": [],\n        "allowed": false\n      }\n    ],\n    "allowed": false\n  },\n  {\n    "quality": 19,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 21,\n    "items": [],\n    "allowed": false\n  }\n]','\n',char(10)),0);
+    INSERT INTO QualityProfiles VALUES(4,'HD-1080p',9,replace('[\n  {\n    "quality": 0,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 1,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "id": 1000,\n    "name": "WEB 480p",\n    "items": [\n      {\n        "quality": 12,\n        "items": [],\n        "allowed": false\n      },\n      {\n        "quality": 8,\n        "items": [],\n        "allowed": false\n      }\n    ],\n    "allowed": false\n  },\n  {\n    "quality": 2,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 13,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 4,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 9,\n    "items": [],\n    "allowed": true\n  },\n  {\n    "quality": 10,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "id": 1001,\n    "name": "WEB 720p",\n    "items": [\n      {\n        "quality": 14,\n        "items": [],\n        "allowed": false\n      },\n      {\n        "quality": 5,\n        "items": [],\n        "allowed": false\n      }\n    ],\n    "allowed": false\n  },\n  {\n    "quality": 6,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "id": 1002,\n    "name": "WEB 1080p",\n    "items": [\n      {\n        "quality": 15,\n        "items": [],\n        "allowed": true\n      },\n      {\n        "quality": 3,\n        "items": [],\n        "allowed": true\n      }\n    ],\n    "allowed": true\n  },\n  {\n    "quality": 7,\n    "items": [],\n    "allowed": true\n  },\n  {\n    "quality": 20,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 16,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "id": 1003,\n    "name": "WEB 2160p",\n    "items": [\n      {\n        "quality": 17,\n        "items": [],\n        "allowed": false\n      },\n      {\n        "quality": 18,\n        "items": [],\n        "allowed": false\n      }\n    ],\n    "allowed": false\n  },\n  {\n    "quality": 19,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 21,\n    "items": [],\n    "allowed": false\n  }\n]','\n',char(10)),0);
+    INSERT INTO QualityProfiles VALUES(5,'Ultra-HD',16,replace('[\n  {\n    "quality": 0,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 1,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "id": 1000,\n    "name": "WEB 480p",\n    "items": [\n      {\n        "quality": 12,\n        "items": [],\n        "allowed": false\n      },\n      {\n        "quality": 8,\n        "items": [],\n        "allowed": false\n      }\n    ],\n    "allowed": false\n  },\n  {\n    "quality": 2,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 13,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 4,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 9,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 10,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "id": 1001,\n    "name": "WEB 720p",\n    "items": [\n      {\n        "quality": 14,\n        "items": [],\n        "allowed": false\n      },\n      {\n        "quality": 5,\n        "items": [],\n        "allowed": false\n      }\n    ],\n    "allowed": false\n  },\n  {\n    "quality": 6,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "id": 1002,\n    "name": "WEB 1080p",\n    "items": [\n      {\n        "quality": 15,\n        "items": [],\n        "allowed": false\n      },\n      {\n        "quality": 3,\n        "items": [],\n        "allowed": false\n      }\n    ],\n    "allowed": false\n  },\n  {\n    "quality": 7,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 20,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 16,\n    "items": [],\n    "allowed": true\n  },\n  {\n    "id": 1003,\n    "name": "WEB 2160p",\n    "items": [\n      {\n        "quality": 17,\n        "items": [],\n        "allowed": true\n      },\n      {\n        "quality": 18,\n        "items": [],\n        "allowed": true\n      }\n    ],\n    "allowed": true\n  },\n  {\n    "quality": 19,\n    "items": [],\n    "allowed": true\n  },\n  {\n    "quality": 21,\n    "items": [],\n    "allowed": false\n  }\n]','\n',char(10)),0);
+    INSERT INTO QualityProfiles VALUES(6,'HD - 720p/1080p',4,replace('[\n  {\n    "quality": 0,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 1,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "id": 1000,\n    "name": "WEB 480p",\n    "items": [\n      {\n        "quality": 12,\n        "items": [],\n        "allowed": false\n      },\n      {\n        "quality": 8,\n        "items": [],\n        "allowed": false\n      }\n    ],\n    "allowed": false\n  },\n  {\n    "quality": 2,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 13,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 4,\n    "items": [],\n    "allowed": true\n  },\n  {\n    "quality": 9,\n    "items": [],\n    "allowed": true\n  },\n  {\n    "quality": 10,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "id": 1001,\n    "name": "WEB 720p",\n    "items": [\n      {\n        "quality": 14,\n        "items": [],\n        "allowed": true\n      },\n      {\n        "quality": 5,\n        "items": [],\n        "allowed": true\n      }\n    ],\n    "allowed": true\n  },\n  {\n    "quality": 6,\n    "items": [],\n    "allowed": true\n  },\n  {\n    "id": 1002,\n    "name": "WEB 1080p",\n    "items": [\n      {\n        "quality": 15,\n        "items": [],\n        "allowed": true\n      },\n      {\n        "quality": 3,\n        "items": [],\n        "allowed": true\n      }\n    ],\n    "allowed": true\n  },\n  {\n    "quality": 7,\n    "items": [],\n    "allowed": true\n  },\n  {\n    "quality": 20,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 16,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "id": 1003,\n    "name": "WEB 2160p",\n    "items": [\n      {\n        "quality": 17,\n        "items": [],\n        "allowed": false\n      },\n      {\n        "quality": 18,\n        "items": [],\n        "allowed": false\n      }\n    ],\n    "allowed": false\n  },\n  {\n    "quality": 19,\n    "items": [],\n    "allowed": false\n  },\n  {\n    "quality": 21,\n    "items": [],\n    "allowed": false\n  }\n]','\n',char(10)),0);
+    CREATE TABLE IF NOT EXISTS "IndexerStatus" ("Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "ProviderId" INTEGER NOT NULL, "InitialFailure" DATETIME, "MostRecentFailure" DATETIME, "EscalationLevel" INTEGER NOT NULL, "DisabledTill" DATETIME, "LastRssSyncReleaseInfo" TEXT);
+    CREATE TABLE IF NOT EXISTS "DownloadClientStatus" ("Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "ProviderId" INTEGER NOT NULL, "InitialFailure" DATETIME, "MostRecentFailure" DATETIME, "EscalationLevel" INTEGER NOT NULL, "DisabledTill" DATETIME);
+    CREATE TABLE IF NOT EXISTS "Indexers" ("Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "Name" TEXT NOT NULL, "Implementation" TEXT NOT NULL, "Settings" TEXT, "ConfigContract" TEXT, "EnableRss" INTEGER, "EnableAutomaticSearch" INTEGER, "EnableInteractiveSearch" INTEGER NOT NULL, "Priority" INTEGER NOT NULL DEFAULT 25, "Tags" TEXT, "DownloadClientId" INTEGER NOT NULL DEFAULT 0);
+    CREATE TABLE IF NOT EXISTS "CustomFilters" ("Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "Type" TEXT NOT NULL, "Label" TEXT NOT NULL, "Filters" TEXT NOT NULL);
+    CREATE TABLE IF NOT EXISTS "Series" ("Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "TvdbId" INTEGER NOT NULL, "TvRageId" INTEGER NOT NULL, "ImdbId" TEXT, "Title" TEXT NOT NULL, "TitleSlug" TEXT, "CleanTitle" TEXT NOT NULL, "Status" INTEGER NOT NULL, "Overview" TEXT, "AirTime" TEXT, "Images" TEXT NOT NULL, "Path" TEXT NOT NULL, "Monitored" INTEGER NOT NULL, "SeasonFolder" INTEGER NOT NULL, "LastInfoSync" DATETIME, "LastDiskSync" DATETIME, "Runtime" INTEGER NOT NULL, "SeriesType" INTEGER NOT NULL, "Network" TEXT, "UseSceneNumbering" INTEGER NOT NULL, "FirstAired" DATETIME, "NextAiring" DATETIME, "Year" INTEGER, "Seasons" TEXT, "Actors" TEXT, "Ratings" TEXT, "Genres" TEXT, "Certification" TEXT, "SortTitle" TEXT, "QualityProfileId" INTEGER, "Tags" TEXT, "Added" DATETIME, "AddOptions" TEXT, "TvMazeId" INTEGER NOT NULL, "LanguageProfileId" INTEGER NOT NULL);
+    CREATE TABLE IF NOT EXISTS "DownloadHistory" ("Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "EventType" INTEGER NOT NULL, "SeriesId" INTEGER NOT NULL, "DownloadId" TEXT NOT NULL, "SourceTitle" TEXT NOT NULL, "Date" DATETIME NOT NULL, "Protocol" INTEGER, "IndexerId" INTEGER, "DownloadClientId" INTEGER, "Release" TEXT, "Data" TEXT);
+    CREATE TABLE IF NOT EXISTS "ImportLists" ("Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "Name" TEXT NOT NULL, "Implementation" TEXT NOT NULL, "Settings" TEXT, "ConfigContract" TEXT, "EnableAutomaticAdd" INTEGER, "RootFolderPath" TEXT NOT NULL, "ShouldMonitor" INTEGER NOT NULL, "QualityProfileId" INTEGER NOT NULL, "LanguageProfileId" INTEGER NOT NULL, "Tags" TEXT, "SeriesType" INTEGER NOT NULL DEFAULT 0, "SeasonFolder" INTEGER NOT NULL DEFAULT 1);
+    CREATE TABLE IF NOT EXISTS "ImportListStatus" ("Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "ProviderId" INTEGER NOT NULL, "InitialFailure" DATETIME, "MostRecentFailure" DATETIME, "EscalationLevel" INTEGER NOT NULL, "DisabledTill" DATETIME, "LastSyncListInfo" TEXT);
+    CREATE TABLE IF NOT EXISTS "ImportListExclusions" ("Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "TvdbId" TEXT NOT NULL, "Title" TEXT NOT NULL);
+    DELETE FROM sqlite_sequence;
+    INSERT INTO sqlite_sequence VALUES('Episodes',0);
+    INSERT INTO sqlite_sequence VALUES('NamingConfig',0);
+    INSERT INTO sqlite_sequence VALUES('Config',1);
+    INSERT INTO sqlite_sequence VALUES('EpisodeFiles',0);
+    INSERT INTO sqlite_sequence VALUES('DownloadClients',0);
+    INSERT INTO sqlite_sequence VALUES('DelayProfiles',1);
+    INSERT INTO sqlite_sequence VALUES('Tags',0);
+    INSERT INTO sqlite_sequence VALUES('QualityDefinitions',21);
+    INSERT INTO sqlite_sequence VALUES('Notifications',0);
+    INSERT INTO sqlite_sequence VALUES('MetadataFiles',0);
+    INSERT INTO sqlite_sequence VALUES('SceneMappings',0);
+    INSERT INTO sqlite_sequence VALUES('QualityProfiles',6);
+    INSERT INTO sqlite_sequence VALUES('IndexerStatus',0);
+    INSERT INTO sqlite_sequence VALUES('Indexers',0);
+    INSERT INTO sqlite_sequence VALUES('Series',0);
+    INSERT INTO sqlite_sequence VALUES('LanguageProfiles',1);
+    INSERT INTO sqlite_sequence VALUES('ScheduledTasks',11);
+    INSERT INTO sqlite_sequence VALUES('Metadata',3);
+    INSERT INTO sqlite_sequence VALUES('Commands',2);
+    INSERT INTO sqlite_sequence VALUES('RootFolders',1);
+    CREATE UNIQUE INDEX "UC_Version" ON "VersionInfo" ("Version" ASC);
+    CREATE UNIQUE INDEX "IX_Config_Key" ON "Config" ("Key" ASC);
+    CREATE UNIQUE INDEX "IX_RootFolders_Path" ON "RootFolders" ("Path" ASC);
+    CREATE UNIQUE INDEX "IX_ScheduledTasks_TypeName" ON "ScheduledTasks" ("TypeName" ASC);
+    CREATE INDEX "IX_Blacklist_SeriesId" ON "Blocklist" ("SeriesId" ASC);
+    CREATE INDEX "IX_Episodes_EpisodeFileId" ON "Episodes" ("EpisodeFileId" ASC);
+    CREATE INDEX "IX_Episodes_SeriesId" ON "Episodes" ("SeriesId" ASC);
+    CREATE INDEX "IX_History_Date" ON "History" ("Date" ASC);
+    CREATE INDEX "IX_EpisodeFiles_SeriesId" ON "EpisodeFiles" ("SeriesId" ASC);
+    CREATE UNIQUE INDEX "IX_Users_Identifier" ON "Users" ("Identifier" ASC);
+    CREATE UNIQUE INDEX "IX_Users_Username" ON "Users" ("Username" ASC);
+    CREATE UNIQUE INDEX "IX_Tags_Label" ON "Tags" ("Label" ASC);
+    CREATE UNIQUE INDEX "IX_QualityDefinitions_Quality" ON "QualityDefinitions" ("Quality" ASC);
+    CREATE UNIQUE INDEX "IX_QualityDefinitions_Title" ON "QualityDefinitions" ("Title" ASC);
+    CREATE INDEX "IX_Episodes_SeriesId_SeasonNumber_EpisodeNumber" ON "Episodes" ("SeriesId" ASC, "SeasonNumber" ASC, "EpisodeNumber" ASC);
+    CREATE UNIQUE INDEX "IX_LanguageProfiles_Name" ON "LanguageProfiles" ("Name" ASC);
+    CREATE UNIQUE INDEX "IX_QualityProfiles_Name" ON "QualityProfiles" ("Name" ASC);
+    CREATE UNIQUE INDEX "IX_IndexerStatus_ProviderId" ON "IndexerStatus" ("ProviderId" ASC);
+    CREATE UNIQUE INDEX "IX_DownloadClientStatus_ProviderId" ON "DownloadClientStatus" ("ProviderId" ASC);
+    CREATE INDEX "IX_History_EventType" ON "History" ("EventType" ASC);
+    CREATE UNIQUE INDEX "IX_Indexers_Name" ON "Indexers" ("Name" ASC);
+    CREATE INDEX "IX_Episodes_SeriesId_AirDate" ON "Episodes" ("SeriesId" ASC, "AirDate" ASC);
+    CREATE INDEX "IX_History_EpisodeId_Date" ON "History" ("EpisodeId" ASC, "Date" DESC);
+    CREATE INDEX "IX_History_DownloadId_Date" ON "History" ("DownloadId" ASC, "Date" DESC);
+    CREATE INDEX "IX_History_SeriesId" ON "History" ("SeriesId" ASC);
+    CREATE UNIQUE INDEX "IX_Series_TvdbId" ON "Series" ("TvdbId" ASC);
+    CREATE UNIQUE INDEX "IX_Series_TitleSlug" ON "Series" ("TitleSlug" ASC);
+    CREATE INDEX "IX_Series_Path" ON "Series" ("Path" ASC);
+    CREATE INDEX "IX_Series_CleanTitle" ON "Series" ("CleanTitle" ASC);
+    CREATE INDEX "IX_Series_TvRageId" ON "Series" ("TvRageId" ASC);
+    CREATE INDEX "IX_Series_TvMazeId" ON "Series" ("TvMazeId" ASC);
+    CREATE INDEX "IX_DownloadHistory_EventType" ON "DownloadHistory" ("EventType" ASC);
+    CREATE INDEX "IX_DownloadHistory_SeriesId" ON "DownloadHistory" ("SeriesId" ASC);
+    CREATE INDEX "IX_DownloadHistory_DownloadId" ON "DownloadHistory" ("DownloadId" ASC);
+    CREATE UNIQUE INDEX "IX_ImportLists_Name" ON "ImportLists" ("Name" ASC);
+    CREATE UNIQUE INDEX "IX_ImportListStatus_ProviderId" ON "ImportListStatus" ("ProviderId" ASC);
+    CREATE UNIQUE INDEX "IX_ImportListExclusions_TvdbId" ON "ImportListExclusions" ("TvdbId" ASC);
+    COMMIT;

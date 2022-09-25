@@ -1,0 +1,57 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: jellyseerr.homelab.internal
+  namespace: media-server
+  labels:
+    app.kubernetes.io/name: jellyseerr
+spec:
+  commonName: jellyseerr.homelab.internal
+  dnsNames:
+    - jellyseerr.homelab.internal
+    - jellyseerr.jellyseerr.svc
+  issuerRef:
+    name: internal-issuer
+    kind: ClusterIssuer
+  secretName: jellyseerr-cert
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jellyseerr
+  namespace: media-server
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: jellyseerr
+  ports:
+    - name: jellyseerr-http
+      port: 5055
+      protocol: TCP
+      targetPort: jellyseerr-http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jellyseerr
+  namespace: media-server
+  labels:
+    app.kubernetes.io/name: jellyseerr
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - jellyseerr.homelab.internal
+      secretName: jellyseerr-cert
+  rules:
+    - host: jellyseerr.homelab.internal
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: jellyseerr
+                port:
+                  name: jellyseerr-http
