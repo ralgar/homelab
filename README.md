@@ -27,7 +27,7 @@ By following the [GitOps](https://about.gitlab.com/topics/gitops) paradigm, this
   - [x] Backed by Ceph (distributed object storage)
   - [x] SELinux enforcing
   - [x] Automated upgrades (base OS and K3s distribution)
-  - [x] [Continuously Deployed](https://about.gitlab.com/blog/2016/08/05/continuous-integration-delivery-and-deployment-with-gitlab), using the GitLab Kubernetes Agent
+  - [x] [Continuously Deployed](https://about.gitlab.com/blog/2016/08/05/continuous-integration-delivery-and-deployment-with-gitlab)
   - [x] Automated internal PKI
   - [x] Automated secret generation
   - [ ] Monitoring and alerts (coming soon)
