@@ -1,25 +1,20 @@
 ---
 default:
-  image: alpine:3.16
   tags:
     - private-cluster
   interruptible: true
-  before_script:
-    - if [[ ! -d $CI_PROJECT_DIR/.pkg_cache ]] ; then mkdir "$CI_PROJECT_DIR/.pkg_cache" ; fi
-    - ln -s "$CI_PROJECT_DIR/.pkg_cache" /etc/apk/cache
 
 stages:
   - prepare
   - lint
   - build
   - deploy
-  - cleanup
+  # - cleanup
 
 # TODO: Set up cache for Kubernetes runner
 cache:
   key: "$CI_COMMIT_REF_NAME"
   paths:
-    - .pkg_cache/
     - .packer/
     - infra/.terraform/
     - infra/.terraform.lock.hcl
@@ -28,7 +23,7 @@ variables:
   PKR_ROOT: ${CI_PROJECT_DIR}/templates
   PACKER_PLUGIN_PATH: "${CI_PROJECT_DIR}/.packer/plugins"
   TF_ROOT: ${CI_PROJECT_DIR}/infra
-  TF_STATE_NAME: production
+  TF_STATE_NAME: staging
 
 terraform:init:
   stage: prepare
@@ -39,8 +34,8 @@ terraform:init:
 
 packer:init:
   stage: prepare
+  image: registry.gitlab.com/ralgar/packer-ansible:1.0.0
   script:
-    - apk add ansible~=5.8.0 packer~=1.8.1
     - packer init -upgrade ${PKR_ROOT}
 
 markdownlint:
@@ -61,14 +56,14 @@ ansible-lint:
   script:
     - ansible-lint -P production --exclude cluster
 
-packer-validate:
+packer:validate:
   stage: lint
+  image: registry.gitlab.com/ralgar/packer-ansible:1.0.0
   script:
-    - apk add ansible~=5.8.0 packer~=1.8.1
     - packer init ${PKR_ROOT}
     - packer validate -var varsFile=${VARS_FILE} ${PKR_ROOT}
 
-terraform-validate:
+terraform:validate:
   stage: lint
   image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:1.2.6
   script:
@@ -79,7 +74,7 @@ plan-infrastructure:
   stage: build
   image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:1.2.6
   environment:
-    name: production
+    name: staging
   script:
     - cat ${SSH_PUBKEY_FILE} > ${CI_PROJECT_DIR}/ssh_key.pub
     - cd ${TF_ROOT}
@@ -93,15 +88,15 @@ plan-infrastructure:
 
 build-templates:
   stage: build
+  image: registry.gitlab.com/ralgar/packer-ansible:1.0.0
   environment:
-    name: production
+    name: staging
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
         - templates/
       when: manual
   script:
-    - apk add ansible~=5.8.0 packer~=1.8.1
     - >
       packer build -var varsFile=${VARS_FILE}
       -only proxmox-clone.k3s-master,proxmox-clone.k3s-controller,proxmox-clone.k3s-worker
@@ -111,7 +106,7 @@ apply-infrastructure:
   stage: deploy
   image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:1.2.6
   environment:
-    name: production
+    name: staging
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: manual
