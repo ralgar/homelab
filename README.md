@@ -1,7 +1,7 @@
 # My Homelab
 
-[![Latest Tag](https://img.shields.io/github/v/tag/ralgar/homelab?style=for-the-badge&logo=semver&logoColor=white)](https://github.com/ralgar/homelab/tags)
-[![Pipeline Status](https://img.shields.io/gitlab/pipeline-status/ralgar/homelab?branch=feature%2Fk8s-rework&label=Pipeline&logo=gitlab&style=for-the-badge)](https://gitlab.com/ralgar/homelab/-/pipelines)
+[![Latest Tag](https://img.shields.io/gitlab/v/tag/ralgar/homelab?style=for-the-badge&logo=semver&logoColor=white)](https://gitlab.com/ralgar/homelab/tags)
+[![Pipeline Status](https://img.shields.io/gitlab/pipeline-status/ralgar/homelab?branch=master&label=Pipeline&logo=gitlab&style=for-the-badge)](https://gitlab.com/ralgar/homelab/-/pipelines?page=1&scope=all&ref=master)
 [![Software License](https://img.shields.io/badge/License-GPL--3.0-orange?style=for-the-badge&logo=gnu&logoColor=white)](https://www.gnu.org/licenses/gpl-3.0.html)
 [![GitLab Stars](https://img.shields.io/gitlab/stars/ralgar/homelab?color=gold&label=Stars&logo=gitlab&style=for-the-badge)](https://gitlab.com/ralgar/homelab)
 
@@ -12,8 +12,9 @@ By following the [GitOps](https://about.gitlab.com/topics/gitops) paradigm, this
  sophisticated, virtualized/containerized homelab. It can serve as a framework
  for your homelab as well.
 
-**Note:** While this project is fully-functional, I still consider it to be in
- the *alpha* stage of development. As such, you should expect breaking changes.
+**Note:** While this project is functional as-is, it is currently still in
+ the *alpha* stage of development. As such, you should expect some minor
+ issues, as well as breaking changes in future revisions.
 
 ### Features
 
@@ -39,9 +40,9 @@ By following the [GitOps](https://about.gitlab.com/topics/gitops) paradigm, this
   - [ ] Home automation platform (coming soon)
   - [ ] Horizontally scalable Minecraft server (coming soon)
 
-## Requirements
+## Prerequisites
 
-**Dependencies:**
+##### Dependencies
 
 - [Ansible](https://www.ansible.com/)
 - [kubectl](https://kubernetes.io/docs/reference/kubectl/)
@@ -49,32 +50,39 @@ By following the [GitOps](https://about.gitlab.com/topics/gitops) paradigm, this
 - [Packer](https://www.packer.io/)
 - [Terraform](https://www.terraform.io/)
 
-**Other requirements:**
+##### Other requirements
 
 - A reasonable understanding of the technologies used in this project.
-- At least one [Proxmox VE](https://www.proxmox.com/) host, with sufficient
-  minimum system resources:
+- A GitLab account, with SSH keys configured.
+- At least one [Proxmox VE](https://www.proxmox.com/en/proxmox-ve) host,
+  with sufficient minimum system specifications:
 
-  | CPU       | Memory    | Storage  |
-  |-----------|-----------|----------|
-  | Quad Core | 32 GB RAM | 1 TB SSD |
+  | CPU       | Memory    | Storage  | Network      |
+  |-----------|-----------|----------|--------------|
+  | Quad Core | 32 GB RAM | 1 TB SSD | 1 GbE LAN    |
 
 ## Usage
 
+Please read these instructions in their entirety before continuing,
+ *especially* the [Notes and Issues](#notes-and-issues) section below.
+
 ### Initial Setup
 
-1. Install the required dependencies.
-1. Set up Ceph disributed storage, with CephFS, on the Proxmox host(s).
+1. Install the required [dependencies](#dependencies) on your local system.
+1. Set up Ceph distributed storage, with CephFS, on the Proxmox host(s).
 1. Copy your SSH public key to the root account of the Proxmox host(s).
 
    ```sh
    ssh-copy-id -i ~/.ssh/id_ed25519.pub root@<proxmox-host-ip>
    ```
 
-1. Clone this repository and change directory into it.
+### Forking and Configuring
+
+1. Fork this repository.
+1. Clone your repository with SSH, and change directory into it.
 
    ```sh
-   git clone https://gitlab.com/ralgar/homelab.git
+   git clone git@gitlab.com:<your-username>/homelab.git
    cd homelab
    ```
 
@@ -84,17 +92,39 @@ By following the [GitOps](https://about.gitlab.com/topics/gitops) paradigm, this
    cp -r vars.template vars
    ```
 
+1. Edit the variables in `vars/secret.yml` as needed.
+1. Edit the Project ID in `.gitlab/agents/gitlab-k3s/config.yaml`.
+
+   ```yaml
+   # The ID field must match your GitLab project slug
+   # Format: <your-gitlab-username>/<your-project-name>
+   ---
+   gitops:
+     manifest_projects:
+       - id: ralgar/homelab
+   ```
+
+1. Commit the agent config file, and push the change to your repo.
+
+   ```sh
+   git add .config/agents/gitlab-k3s/config.yaml
+   git commit -m "Configure the GitLab Agent"
+   git push -u origin master
+   ```
+
+1. Finally, [register the GitLab Kubernetes agent](https://docs.gitlab.com/ee/user/clusters/agent/install/#register-the-agent-with-gitlab)
+ in the GitLab Web UI.
+
 Now we are ready to start provisioning the infrastructure.
 
 ### Building the cluster
 
 You can build the cluster infrastructure as follows:
 
-1. Edit the variables in `vars/secret.yml` as needed.
 1. Use the included `Makefile` to provision the infrastructure.
 
    ```sh
-   # To build everything from scratch:
+   # To build everything in one shot:
    make all
 
    # To build targets individually, in order:
@@ -117,14 +147,20 @@ You can build the cluster infrastructure as follows:
    make post-bootstrap
    ```
 
-**Notes:**
+##### Notes and Issues
 
 - Beware, the template building step will overwrite any kubeconfig you have
-  stored at `~/.kube/config`. This will be fixed in a future revision.
+  stored at `~/.kube/config`. You have been warned. I bear no responsibility
+  if you nuke this file and don't have a backup. This issue will be resolved
+  in a future revision.
+- Currently, it can take quite some time for all pods to ready up during the
+  initial deployment. This is due to `cert-manager` getting hung up, and
+  should be resolved in a future revision.
 - The post-deployment bootstrap requires elevated privileges to add the
-  root CA certificate to your local certificate store.
+  root CA certificate to your local certificate store. If you wish to audit
+  the relevant Ansible role, it is located at `post-deploy/roles/ca_trust`.
 - The post-deployment bootstrap doesn't always complete successfully. If it
-  fails, simply run it again until it completes successfully.
+  fails, simply run it again until it succeeds.
 
 ### Deploying additional apps in the cluster
 
@@ -145,4 +181,4 @@ make destroy-infrastructure
 
 Copyright: (c) 2022, Ryan Algar ([ralgar/homelab](https://gitlab.com/ralgar/homelab))
 
-GNU General Public License v3.0 (see LICENSE or [GPL-3.0](https://www.gnu.org/licenses/gpl-3.0.txt)
+GNU General Public License v3.0 (see LICENSE or [GPL-3.0](https://www.gnu.org/licenses/gpl-3.0.txt))
