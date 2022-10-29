@@ -58,9 +58,9 @@ module "k3s-workers" {
 }
 
 resource "helm_release" "argocd" {
-  name             = "argocd"
-  chart            = "${path.root}/../cluster/system/argocd"
+  name              = "argocd"
+  chart             = "${path.root}/../cluster/system/argocd"
   dependency_update = true
-  namespace        = "argocd"
-  create_namespace = true
+  namespace         = "argocd"
+  create_namespace  = true
 }
