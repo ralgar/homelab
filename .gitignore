@@ -1,24 +1,28 @@
 #######################################
 ###   TESTING / DEVELOPMENT FILES   ###
 #######################################
-# Test playbook
-test-playbook.yml
-
-# Python SSL testing file
-ssl-test.py
-
 # Cluster testing directory
 cluster/testing/
 
+# Version lock files
+# TODO: Remove for beta/stable release
+Chart.lock
+.terraform.lock.hcl
 
-############################################
-###   ANSIBLE SECRET FILES / VARIABLES   ###
-############################################
-# Root variables directory
+############################
+###   GENERATED FILES    ###
+############################
+# Helm Chart data
+**/charts/*
+
+# Output directory
+output/
+
+####################################
+###   SECRET FILES / VARIABLES   ###
+####################################
+# Variables directory
 /vars/*
-
-# Not fully implemented / sanitized yet
-**/media-server-v2/*
 
 
 ###########################################
@@ -58,6 +62,3 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
-
-# Ignore lock files
-.terraform.lock.hcl
