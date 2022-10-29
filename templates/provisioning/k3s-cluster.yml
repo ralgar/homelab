@@ -7,4 +7,4 @@
   roles:
     - role: rhel8/timesync-ntp
     - role: rhel8/automatic-upgrades
-    - role: kubernetes/k3s-cluster
+    - role: k3s-cluster
