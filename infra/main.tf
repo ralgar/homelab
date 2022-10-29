@@ -32,6 +32,8 @@ module "k3s-controllers" {
   netDnsHosts     = local.net_dnsServers
   netDomain       = local.net_domain
   netGateway      = local.net_gateway
+
+  depends_on      = [ module.k3s-master ]
 }
 
 module "k3s-workers" {
@@ -53,4 +55,12 @@ module "k3s-workers" {
   netGateway      = local.net_gateway
 
   depends_on      = [ module.k3s-controllers ]
+}
+
+resource "helm_release" "argocd" {
+  name             = "argocd"
+  chart            = "${path.root}/../cluster/system/argocd"
+  dependency_update = true
+  namespace        = "argocd"
+  create_namespace = true
 }

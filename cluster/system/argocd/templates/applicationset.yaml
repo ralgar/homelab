@@ -1,0 +1,42 @@
+{{- range $index, $stack := .Values.gitops.stacks }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: {{ $stack.name }}
+  namespace: {{ $.Release.Namespace }}
+  annotations:
+    helm.sh/hook: post-install
+spec:
+  generators:
+    - git:
+        repoURL: {{ $.Values.gitops.repo }}
+        revision: {{ $.Values.gitops.revision }}
+        directories:
+          - path: "cluster/{{ $stack.name }}/*"
+  template:
+    metadata:
+      name: '{{ `{{path.basename}}` }}'
+    spec:
+      destination:
+        name: in-cluster
+        namespace: '{{ `{{path.basename}}` }}'
+      project: default
+      source:
+        repoURL: {{ $.Values.gitops.repo }}
+        path: '{{ `{{path}}` }}'
+        targetRevision: {{ $.Values.gitops.revision }}
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        retry:
+          limit: 10
+          backoff:
+            duration: 1m
+            factor: 2
+            maxDuration: 10m
+        syncOptions:
+          - CreateNamespace=true
+          - ApplyOutOfSyncOnly=true
+{{- end }}

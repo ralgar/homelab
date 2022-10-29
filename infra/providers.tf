@@ -15,7 +15,10 @@ terraform {
 
 provider "helm" {
   kubernetes {
-    config_path = "~/.kube/config"
+    host                   = "${module.k3s-master.ipv4_address}:6443"
+    client_certificate     = module.k3s-master.client_certificate
+    client_key             = module.k3s-master.client_key
+    cluster_ca_certificate = module.k3s-master.cluster_ca_certificate
   }
 }
 

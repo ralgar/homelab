@@ -3,5 +3,8 @@ terraform {
     proxmox = {
       source  = "telmate/proxmox"
     }
+    local = {
+      source = "hashicorp/local"
+    }
   }
 }
