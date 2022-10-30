@@ -48,3 +48,13 @@ variable "netGateway" {
   description = "Local network gateway"
   type        = string
 }
+
+variable "sshPrivateKeyFile" {
+  description = "Path to your SSH private key file"
+  type        = string
+}
+
+variable "sshUseLocalAgent" {
+  description = "Toggle use of a local SSH agent"
+  type        = bool
+}

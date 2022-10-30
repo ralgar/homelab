@@ -1,12 +1,14 @@
 module "k3s-master" {
   // Module Settings
-  source           = "./k3s-master"
-  guestTargetNode  = local.k3s_controllerNodes[0].pve_node
-  guestStoragePool = local.k3s_controllerNodes[0].pve_storage_pool
-  guestIPAddr      = local.k3s_controllerNodes[0].ip_addr
-  guestCores       = local.k3s_controllerNodes[0].cores
-  guestVCPUs       = local.k3s_controllerNodes[0].vcpus
-  guestMemory      = local.k3s_controllerNodes[0].memory
+  source            = "./k3s-master"
+  guestTargetNode   = local.k3s_controllerNodes[0].pve_node
+  guestStoragePool  = local.k3s_controllerNodes[0].pve_storage_pool
+  guestIPAddr       = local.k3s_controllerNodes[0].ip_addr
+  guestCores        = local.k3s_controllerNodes[0].cores
+  guestVCPUs        = local.k3s_controllerNodes[0].vcpus
+  guestMemory       = local.k3s_controllerNodes[0].memory
+  sshUseLocalAgent  = local.ssh_useLocalAgent
+  sshPrivateKeyFile = local.ssh_privateKeyFile
 
   // Global Variables
   guestPubKeyFile = local.guest_pubKeyFile
@@ -54,12 +56,19 @@ module "k3s-workers" {
   netDomain       = local.net_domain
   netGateway      = local.net_gateway
 
-  depends_on      = [ module.k3s-controllers ]
+  depends_on      = [
+    module.k3s-master,
+    module.k3s-controllers
+  ]
 }
 
-resource "time_sleep" "wait_for_master_node" {
+resource "time_sleep" "wait_for_nodes" {
   create_duration = "60s"
-  depends_on      = [ module.k3s-master ]
+  depends_on      = [
+    module.k3s-master,
+    module.k3s-controllers,
+    module.k3s-workers
+  ]
 }
 
 resource "helm_release" "argocd" {
@@ -68,6 +77,7 @@ resource "helm_release" "argocd" {
   dependency_update = true
   namespace         = "argocd"
   create_namespace  = true
+  atomic            = true
 
-  depends_on        = [ time_sleep.wait_for_master_node ]
+  depends_on        = [ time_sleep.wait_for_nodes ]
 }

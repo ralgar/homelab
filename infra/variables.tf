@@ -22,4 +22,8 @@ locals {
   // K3s Node Settings
   k3s_controllerNodes = local.root.k3s.controller.nodes
   k3s_workerNodes     = local.root.k3s.worker.nodes
+
+  // SSH Authentication Settings
+  ssh_privateKeyFile = local.ssh_useLocalAgent? null :local.root.globalVars.ssh.privateKeyFile
+  ssh_useLocalAgent  = local.root.globalVars.ssh.useLocalAgent
 }

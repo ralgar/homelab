@@ -1,9 +1,10 @@
 data "remote_file" "kube_config" {
   conn {
-    host  = proxmox_vm_qemu.vm-compute.default_ipv4_address
-    user  = "ansible"
-    sudo  = true
-    agent = true
+    host        = proxmox_vm_qemu.vm-compute.default_ipv4_address
+    user        = "ansible"
+    sudo        = true
+    agent       = var.sshUseLocalAgent
+    private_key = var.sshUseLocalAgent ? null : sensitive(file(var.sshPrivateKeyFile))
   }
 
   path = "/etc/rancher/k3s/k3s.yaml"

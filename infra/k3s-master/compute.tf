@@ -51,10 +51,11 @@ resource "proxmox_vm_qemu" "vm-compute" {
   ipconfig0    = "ip=${var.guestIPAddr},gw=${var.netGateway}"
 
   connection {
-    type  = "ssh"
-    host  = self.default_ipv4_address
-    user  = "ansible"
-    agent = true
+    type        = "ssh"
+    host        = self.default_ipv4_address
+    user        = "ansible"
+    agent       = var.sshUseLocalAgent
+    private_key = var.sshUseLocalAgent ? null : sensitive(file(var.sshPrivateKeyFile))
   }
 
   provisioner "remote-exec" {
