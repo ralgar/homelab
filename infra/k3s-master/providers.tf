@@ -6,5 +6,9 @@ terraform {
     local = {
       source = "hashicorp/local"
     }
+    remote = {
+      source = "tenstad/remote"
+      version = "0.1.1"
+    }
   }
 }

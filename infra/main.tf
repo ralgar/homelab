@@ -57,10 +57,17 @@ module "k3s-workers" {
   depends_on      = [ module.k3s-controllers ]
 }
 
+resource "time_sleep" "wait_for_master_node" {
+  create_duration = "60s"
+  depends_on      = [ module.k3s-master ]
+}
+
 resource "helm_release" "argocd" {
   name              = "argocd"
   chart             = "${path.root}/../cluster/system/argocd"
   dependency_update = true
   namespace         = "argocd"
   create_namespace  = true
+
+  depends_on        = [ time_sleep.wait_for_master_node ]
 }

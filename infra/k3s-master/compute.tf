@@ -50,16 +50,16 @@ resource "proxmox_vm_qemu" "vm-compute" {
   sshkeys      = file(var.guestPubKeyFile)
   ipconfig0    = "ip=${var.guestIPAddr},gw=${var.netGateway}"
 
-  provisioner "local-exec" {
-    environment = {
-      ANSIBLE_HOST_KEY_CHECKING = "false"
-    }
-    interpreter = [
-      "ansible-playbook",
-      "-i", "${self.default_ipv4_address},",
-      "-e", "@${path.root}/../vars/secret.yml",
-      "-e", "kubeconfig_path=${path.root}/../../output/kube_config"
+  connection {
+    type  = "ssh"
+    host  = self.default_ipv4_address
+    user  = "ansible"
+    agent = true
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "until [ -f /etc/rancher/k3s/k3s.yaml ] ; do sleep 1 ; done"
     ]
-    command = "${path.root}/ansible/get-kubeconfig.yml"
   }
 }
