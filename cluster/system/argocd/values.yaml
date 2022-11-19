@@ -1,8 +1,0 @@
----
-gitops:
-  repo: https://gitlab.com/ralgar/homelab.git
-  revision: master
-  stacks:
-    - name: apps
-    - name: platform
-    - name: system
