@@ -91,7 +91,12 @@ spec:
         image: ghcr.io/kube-vip/kube-vip:{{ k3s_kubevip_version }}
         imagePullPolicy: Always
         name: kube-vip
-        resources: {}
+        resources:
+          limits:
+            memory: 128Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
         securityContext:
           capabilities:
             add:
