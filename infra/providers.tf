@@ -2,28 +2,17 @@ terraform {
   required_version = ">= 1.0.0"
   backend "http" {}
   required_providers {
-    helm = {
-      source  = "hashicorp/helm"
-      version = "2.6.0"
-    }
-    proxmox = {
-      source  = "telmate/proxmox"
-      version = "2.9.10"
-    }
-    time = {
-      source  = "hashicorp/time"
-      version = "0.9.0"
-    }
+    kubectl = { source  = "gavinbunney/kubectl" }
+    proxmox = { source  = "telmate/proxmox" }
   }
 }
 
-provider "helm" {
-  kubernetes {
-    host                   = "${module.k3s-master.ipv4_address}:6443"
-    client_certificate     = module.k3s-master.client_certificate
-    client_key             = module.k3s-master.client_key
-    cluster_ca_certificate = module.k3s-master.cluster_ca_certificate
-  }
+provider "kubectl" {
+  host                   = "${module.k3s-master.ipv4_address}:6443"
+  client_certificate     = module.k3s-master.client_certificate
+  client_key             = module.k3s-master.client_key
+  cluster_ca_certificate = module.k3s-master.cluster_ca_certificate
+  load_config_file       = false
 }
 
 provider "proxmox" {
