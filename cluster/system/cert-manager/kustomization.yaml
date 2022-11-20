@@ -1,0 +1,9 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: cert-manager
+resources:
+  - cert-manager.yaml
+  - cert-manager-trust.yaml
+  - internal-issuer.yaml
+  - trust-bundle.yaml
