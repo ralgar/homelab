@@ -7,3 +7,6 @@ resources:
   - ceph-config.yaml
   - csi-config-map.yaml
   - cephfs/
+replicas:
+  - name: csi-cephfsplugin-provisioner
+    count: 1
