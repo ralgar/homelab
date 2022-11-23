@@ -26,6 +26,10 @@ spec:
           maxLines: 1000
     promtail:
       enabled: true
+      # Workaround for SELinux https://github.com/grafana/loki/issues/3945
+      containerSecurityContext:
+        privileged: true
+        allowPrivilegeEscalation: true
     loki:
       enabled: true
       isDefault: false
