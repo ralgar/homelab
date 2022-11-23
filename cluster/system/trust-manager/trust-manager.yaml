@@ -1,18 +1,17 @@
 ---
-# Source: cert-manager-trust/templates/serviceaccount.yaml
+# Source: trust-manager/templates/serviceaccount.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: cert-manager-trust
-  namespace: cert-manager
+  name: trust-manager
   labels:
-    app.kubernetes.io/name: cert-manager-trust
-    helm.sh/chart: cert-manager-trust-v0.2.0
-    app.kubernetes.io/instance: cert-manager-trust
-    app.kubernetes.io/version: "v0.2.0"
+    app.kubernetes.io/name: trust-manager
+    helm.sh/chart: trust-manager-v0.3.0
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "v0.3.0"
     app.kubernetes.io/managed-by: Helm
 ---
-# Source: cert-manager-trust/templates/trust.cert-manager.io_bundles.yaml
+# Source: trust-manager/templates/trust.cert-manager.io_bundles.yaml
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
@@ -193,17 +192,17 @@ status:
   conditions: []
   storedVersions: []
 ---
-# Source: cert-manager-trust/templates/clusterrole.yaml
+# Source: trust-manager/templates/clusterrole.yaml
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   labels:
-    app.kubernetes.io/name: cert-manager-trust
-    helm.sh/chart: cert-manager-trust-v0.2.0
-    app.kubernetes.io/instance: cert-manager-trust
-    app.kubernetes.io/version: "v0.2.0"
+    app.kubernetes.io/name: trust-manager
+    helm.sh/chart: trust-manager-v0.3.0
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "v0.3.0"
     app.kubernetes.io/managed-by: Helm
-  name: cert-manager-trust
+  name: trust-manager
 rules:
 - apiGroups:
   - "trust.cert-manager.io"
@@ -233,37 +232,37 @@ rules:
   - "events"
   verbs: ["create", "patch"]
 ---
-# Source: cert-manager-trust/templates/clusterrolebinding.yaml
+# Source: trust-manager/templates/clusterrolebinding.yaml
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   labels:
-    app.kubernetes.io/name: cert-manager-trust
-    helm.sh/chart: cert-manager-trust-v0.2.0
-    app.kubernetes.io/instance: cert-manager-trust
-    app.kubernetes.io/version: "v0.2.0"
+    app.kubernetes.io/name: trust-manager
+    helm.sh/chart: trust-manager-v0.3.0
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "v0.3.0"
     app.kubernetes.io/managed-by: Helm
-  name: cert-manager-trust
+  name: trust-manager
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: cert-manager-trust
+  name: trust-manager
 subjects:
 - kind: ServiceAccount
-  name: cert-manager-trust
+  name: trust-manager
   namespace: cert-manager
 ---
-# Source: cert-manager-trust/templates/role.yaml
+# Source: trust-manager/templates/role.yaml
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: cert-manager-trust
+  name: trust-manager
   namespace: cert-manager
   labels:
-    app.kubernetes.io/name: cert-manager-trust
-    helm.sh/chart: cert-manager-trust-v0.2.0
-    app.kubernetes.io/instance: cert-manager-trust
-    app.kubernetes.io/version: "v0.2.0"
+    app.kubernetes.io/name: trust-manager
+    helm.sh/chart: trust-manager-v0.3.0
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "v0.3.0"
     app.kubernetes.io/managed-by: Helm
 rules:
 - apiGroups:
@@ -285,39 +284,38 @@ rules:
   - "watch"
   - "list"
 ---
-# Source: cert-manager-trust/templates/rolebinding.yaml
+# Source: trust-manager/templates/rolebinding.yaml
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: cert-manager-trust
+  name: trust-manager
   namespace: cert-manager
   labels:
-    app.kubernetes.io/name: cert-manager-trust
-    helm.sh/chart: cert-manager-trust-v0.2.0
-    app.kubernetes.io/instance: cert-manager-trust
-    app.kubernetes.io/version: "v0.2.0"
+    app.kubernetes.io/name: trust-manager
+    helm.sh/chart: trust-manager-v0.3.0
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "v0.3.0"
     app.kubernetes.io/managed-by: Helm
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: cert-manager-trust
+  name: trust-manager
 subjects:
 - kind: ServiceAccount
-  name: cert-manager-trust
+  name: trust-manager
   namespace: cert-manager
 ---
-# Source: cert-manager-trust/templates/metrics-service.yaml
+# Source: trust-manager/templates/metrics-service.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: cert-manager-trust-metrics
-  namespace: cert-manager
+  name: trust-manager-metrics
   labels:
-    app: cert-manager-trust
-    app.kubernetes.io/name: cert-manager-trust
-    helm.sh/chart: cert-manager-trust-v0.2.0
-    app.kubernetes.io/instance: cert-manager-trust
-    app.kubernetes.io/version: "v0.2.0"
+    app: trust-manager
+    app.kubernetes.io/name: trust-manager
+    helm.sh/chart: trust-manager-v0.3.0
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "v0.3.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
@@ -327,20 +325,19 @@ spec:
       protocol: TCP
       name: metrics
   selector:
-    app: cert-manager-trust
+    app: trust-manager
 ---
-# Source: cert-manager-trust/templates/webhook.yaml
+# Source: trust-manager/templates/webhook.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: cert-manager-trust
-  namespace: cert-manager
+  name: trust-manager
   labels:
-    app: cert-manager-trust
-    app.kubernetes.io/name: cert-manager-trust
-    helm.sh/chart: cert-manager-trust-v0.2.0
-    app.kubernetes.io/instance: cert-manager-trust
-    app.kubernetes.io/version: "v0.2.0"
+    app: trust-manager
+    app.kubernetes.io/name: trust-manager
+    helm.sh/chart: trust-manager-v0.3.0
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "v0.3.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
@@ -350,34 +347,33 @@ spec:
       protocol: TCP
       name: webhook
   selector:
-    app: cert-manager-trust
+    app: trust-manager
 ---
-# Source: cert-manager-trust/templates/deployment.yaml
+# Source: trust-manager/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cert-manager-trust
-  namespace: cert-manager
+  name: trust-manager
   labels:
-    app.kubernetes.io/name: cert-manager-trust
-    helm.sh/chart: cert-manager-trust-v0.2.0
-    app.kubernetes.io/instance: cert-manager-trust
-    app.kubernetes.io/version: "v0.2.0"
+    app.kubernetes.io/name: trust-manager
+    helm.sh/chart: trust-manager-v0.3.0
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "v0.3.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: cert-manager-trust
+      app: trust-manager
   template:
     metadata:
       labels:
-        app: cert-manager-trust
+        app: trust-manager
     spec:
-      serviceAccountName: cert-manager-trust
+      serviceAccountName: trust-manager
       containers:
-      - name: cert-manager-trust
-        image: "quay.io/jetstack/cert-manager-trust:v0.2.0"
+      - name: trust-manager
+        image: "quay.io/jetstack/trust-manager:v0.3.0"
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 6443
@@ -388,7 +384,7 @@ spec:
             path: /readyz
           initialDelaySeconds: 3
           periodSeconds: 7
-        command: ["cert-manager-trust"]
+        command: ["trust-manager"]
         args:
           - "--log-level=1"
           - "--metrics-port=9402"
@@ -419,57 +415,58 @@ spec:
       - name: tls
         secret:
           defaultMode: 420
-          secretName: cert-manager-trust-tls
+          secretName: trust-manager-tls
 ---
-# Source: cert-manager-trust/templates/certificate.yaml
+# Source: trust-manager/templates/certificate.yaml
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: cert-manager-trust
-  namespace: cert-manager
+  name: trust-manager
   labels:
-    app.kubernetes.io/name: cert-manager-trust
-    helm.sh/chart: cert-manager-trust-v0.2.0
-    app.kubernetes.io/instance: cert-manager-trust
-    app.kubernetes.io/version: "v0.2.0"
+    app.kubernetes.io/name: trust-manager
+    helm.sh/chart: trust-manager-v0.3.0
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "v0.3.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   dnsNames:
-  - "cert-manager-trust.cert-manager.svc"
-  secretName: cert-manager-trust-tls
+  - "trust-manager.cert-manager.svc"
+  secretName: trust-manager-tls
   revisionHistoryLimit: 1
   issuerRef:
-    name: cert-manager-trust
+    name: trust-manager
+    kind: Issuer
+    group: cert-manager.io
 ---
-# Source: cert-manager-trust/templates/certificate.yaml
+# Source: trust-manager/templates/certificate.yaml
 apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
-  name: cert-manager-trust
-  namespace: cert-manager
+  name: trust-manager
   labels:
-    app.kubernetes.io/name: cert-manager-trust
-    helm.sh/chart: cert-manager-trust-v0.2.0
-    app.kubernetes.io/instance: cert-manager-trust
-    app.kubernetes.io/version: "v0.2.0"
+    app.kubernetes.io/name: trust-manager
+    helm.sh/chart: trust-manager-v0.3.0
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "v0.3.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   selfSigned: {}
 ---
-# Source: cert-manager-trust/templates/webhook.yaml
+# Source: trust-manager/templates/webhook.yaml
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
 metadata:
-  name: cert-manager-trust
+  name: trust-manager
   labels:
-    app: cert-manager-trust
-    app.kubernetes.io/name: cert-manager-trust
-    helm.sh/chart: cert-manager-trust-v0.2.0
-    app.kubernetes.io/instance: cert-manager-trust
-    app.kubernetes.io/version: "v0.2.0"
+    app: trust-manager
+    app.kubernetes.io/name: trust-manager
+    helm.sh/chart: trust-manager-v0.3.0
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "v0.3.0"
     app.kubernetes.io/managed-by: Helm
   annotations:
-    cert-manager.io/inject-ca-from: "cert-manager/cert-manager-trust"
+    cert-manager.io/inject-ca-from: "cert-manager/trust-manager"
+
 webhooks:
   - name: trust.cert-manager.io
     rules:
@@ -488,6 +485,6 @@ webhooks:
     sideEffects: None
     clientConfig:
       service:
-        name: cert-manager-trust
-        namespace: cert-manager
+        name: trust-manager
+        namespace: "cert-manager"
         path: /validate
