@@ -57,3 +57,16 @@
     setype: container_var_lib_t
     selevel: s0
   when: '"k3s-master" or "k3s-controller" in packer_build_name'
+
+- name: "Auto-deploy : Assert the 'Flux v2' manifests"
+  copy:
+    src: flux-install.yaml
+    dest: /var/lib/rancher/k3s/server/manifests/flux-install.yaml
+    owner: root
+    group: root
+    mode: 0600
+    seuser: system_u
+    serole: object_r
+    setype: container_var_lib_t
+    selevel: s0
+  when: '"k3s-master" or "k3s-controller" in packer_build_name'
