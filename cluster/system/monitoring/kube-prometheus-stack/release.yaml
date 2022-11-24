@@ -13,6 +13,7 @@ spec:
         kind: HelmRepository
         name: prometheus-community
       interval: 60m
+  timeout: 10m
   install:
     crds: Create
   upgrade:
