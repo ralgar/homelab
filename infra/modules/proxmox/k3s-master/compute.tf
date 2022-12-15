@@ -50,17 +50,14 @@ resource "proxmox_vm_qemu" "vm-compute" {
   sshkeys      = file(var.guestPubKeyFile)
   ipconfig0    = "ip=${var.guestIPAddr},gw=${var.netGateway}"
 
-  connection {
-    type        = "ssh"
-    host        = self.default_ipv4_address
-    user        = "ansible"
-    agent       = var.sshUseLocalAgent
-    private_key = var.sshUseLocalAgent ? null : sensitive(file(var.sshPrivateKeyFile))
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "until [ -f /etc/rancher/k3s/k3s.yaml ] ; do sleep 1 ; done"
-    ]
+  provisioner "local-exec" {
+    command = <<-EOF
+      echo "Waiting for API server to start..."
+      until curl -sk https://${self.default_ipv4_address}:6443 | grep apiVersion
+      do
+        sleep 1
+      done
+      sleep 10
+      EOF
   }
 }
