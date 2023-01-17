@@ -24,7 +24,7 @@ spec:
   selector:
     matchLabels:
       app: csi-cephfsplugin-provisioner
-  replicas: 2
+  replicas: 3
   template:
     metadata:
       labels:
@@ -44,14 +44,16 @@ spec:
       priorityClassName: system-cluster-critical
       containers:
         - name: csi-provisioner
-          image: k8s.gcr.io/sig-storage/csi-provisioner:v3.1.0
+          image: registry.k8s.io/sig-storage/csi-provisioner:v3.3.0
           args:
             - "--csi-address=$(ADDRESS)"
-            - "--v=5"
+            - "--v=1"
             - "--timeout=150s"
             - "--leader-election=true"
             - "--retry-interval-start=500ms"
             - "--feature-gates=Topology=false"
+            - "--feature-gates=HonorPVReclaimPolicy=true"
+            - "--prevent-volume-mode-conversion=true"
             - "--extra-create-metadata=true"
           env:
             - name: ADDRESS
@@ -61,14 +63,15 @@ spec:
             - name: socket-dir
               mountPath: /csi
         - name: csi-resizer
-          image: k8s.gcr.io/sig-storage/csi-resizer:v1.4.0
+          image: registry.k8s.io/sig-storage/csi-resizer:v1.6.0
           args:
             - "--csi-address=$(ADDRESS)"
-            - "--v=5"
+            - "--v=1"
             - "--timeout=150s"
             - "--leader-election"
             - "--retry-interval-start=500ms"
             - "--handle-volume-inuse-error=false"
+            - "--feature-gates=RecoverVolumeExpansionFailure=true"
           env:
             - name: ADDRESS
               value: unix:///csi/csi-provisioner.sock
@@ -77,12 +80,13 @@ spec:
             - name: socket-dir
               mountPath: /csi
         - name: csi-snapshotter
-          image: k8s.gcr.io/sig-storage/csi-snapshotter:v5.0.1
+          image: registry.k8s.io/sig-storage/csi-snapshotter:v6.1.0
           args:
             - "--csi-address=$(ADDRESS)"
-            - "--v=5"
+            - "--v=1"
             - "--timeout=150s"
             - "--leader-election=true"
+            - "--extra-create-metadata=true"
           env:
             - name: ADDRESS
               value: unix:///csi/csi-provisioner.sock
@@ -90,23 +94,8 @@ spec:
           volumeMounts:
             - name: socket-dir
               mountPath: /csi
-        - name: csi-cephfsplugin-attacher
-          image: k8s.gcr.io/sig-storage/csi-attacher:v3.4.0
-          args:
-            - "--v=5"
-            - "--csi-address=$(ADDRESS)"
-            - "--leader-election=true"
-            - "--retry-interval-start=500ms"
-          env:
-            - name: ADDRESS
-              value: /csi/csi-provisioner.sock
-          imagePullPolicy: "IfNotPresent"
-          volumeMounts:
-            - name: socket-dir
-              mountPath: /csi
         - name: csi-cephfsplugin
-          # for stable functionality replace canary with latest release version
-          image: quay.io/cephcsi/cephcsi:v3.6.2
+          image: quay.io/cephcsi/cephcsi:v3.7.2
           args:
             - "--nodeid=$(NODE_ID)"
             - "--type=cephfs"
@@ -116,6 +105,7 @@ spec:
             - "--drivername=cephfs.csi.ceph.com"
             - "--pidlimit=-1"
             - "--enableprofiling=false"
+            - "--setmetadata=true"
           env:
             - name: POD_IP
               valueFrom:
@@ -127,6 +117,12 @@ spec:
                   fieldPath: spec.nodeName
             - name: CSI_ENDPOINT
               value: unix:///csi/csi-provisioner.sock
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          # - name: KMS_CONFIGMAP_NAME
+          #   value: encryptionConfig
           imagePullPolicy: "IfNotPresent"
           volumeMounts:
             - name: socket-dir
@@ -144,8 +140,10 @@ spec:
               mountPath: /etc/ceph-csi-config/
             - name: keys-tmp-dir
               mountPath: /tmp/csi/keys
+            - name: ceph-csi-encryption-kms-config
+              mountPath: /etc/ceph-csi-encryption-kms-config/
         - name: liveness-prometheus
-          image: quay.io/cephcsi/cephcsi:v3.6.2
+          image: quay.io/cephcsi/cephcsi:v3.7.2
           args:
             - "--type=liveness"
             - "--endpoint=$(CSI_ENDPOINT)"
@@ -188,3 +186,6 @@ spec:
           emptyDir: {
             medium: "Memory"
           }
+        - name: ceph-csi-encryption-kms-config
+          configMap:
+            name: ceph-csi-encryption-kms-config
