@@ -1,6 +1,0 @@
----
-- name: Include base tasks
-  include_tasks: "{{ item }}"
-  loop:
-    - repo-config.yml
-    - subscription-nag.yml

@@ -1,0 +1,54 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: media-server
+---
+apiVersion: postgres-operator.crunchydata.com/v1beta1
+kind: PostgresCluster
+metadata:
+  name: mediasrv
+  namespace: media-server
+spec:
+  image: registry.developers.crunchydata.com/crunchydata/crunchy-postgres:ubi8-14.7-0
+  postgresVersion: 14
+  instances:
+    - name: postgres1
+      dataVolumeClaimSpec:
+        accessModes:
+          - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: 1Gi
+  users:
+    - name: prowlarr
+      databases:
+        - prowlarr-main
+        - prowlarr-log
+      options: "SUPERUSER"
+      password:
+        type: AlphaNumeric
+    - name: radarr
+      databases:
+        - radarr-main
+        - radarr-log
+      password:
+        type: AlphaNumeric
+  patroni:
+    dynamicConfiguration:
+      postgresql:
+        pg_hba:
+          # TODO: Figure out why Prowlarr won't use TLS, and remove this.
+          - "hostnossl all all all md5"
+  backups:
+    pgbackrest:
+      image: registry.developers.crunchydata.com/crunchydata/crunchy-pgbackrest:ubi8-2.41-4
+      repos:
+        - name: repo1
+          volume:
+            volumeClaimSpec:
+              accessModes:
+                - "ReadWriteOnce"
+              resources:
+                requests:
+                  storage: 1Gi

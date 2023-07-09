@@ -1,6 +1,0 @@
----
-- name: Create the 'automation' service account
-  hosts: all
-  remote_user: root
-  roles:
-    - create_account

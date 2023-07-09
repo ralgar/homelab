@@ -1,3 +1,0 @@
----
-k3s_kubevip_address: "{{ k3s.controller.load_balancer_ip }}"
-k3s_gitlab_runner_token: "{{ gitlab.runnerToken }}"

@@ -227,7 +227,7 @@ metadata:
   name: vault-file
   namespace: vault
 spec:
-  storageClassName: csi-cephfs
+  storageClassName: cinder-standard
   accessModes:
     - ReadWriteOnce
   resources:

@@ -26,8 +26,9 @@ spec:
       securityContext:
         runAsUser: 105055
         runAsGroup: 105055
+        fsGroup: 105055
       initContainers:
-        - name: jellyseerr-init
+        - name: init
           image: "redhat/ubi8-minimal"
           imagePullPolicy: IfNotPresent
           volumeMounts:
@@ -77,6 +78,8 @@ spec:
             timeoutSeconds: 1
             periodSeconds: 5
           securityContext:
+            runAsNonRoot: true
+            privileged: false
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: false
       volumes:

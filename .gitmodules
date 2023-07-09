@@ -1,3 +1,6 @@
 [submodule "roles/pki/cfssl-gencert/library"]
 	path = library
 	url = https://github.com/ralgar/ansible-cfssl-certificate
+[submodule "metal"]
+	path = metal
+	url = https://gitlab.com/ralgar/openstack-aio

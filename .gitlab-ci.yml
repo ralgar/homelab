@@ -1,7 +1,16 @@
 ---
+workflow:
+  rules:
+    # Create only a Merge Request pipeline if an MR is open for the branch,
+    #  otherwise create a branch pipeline. Do not duplicate pipelines.
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH
+
 default:
   tags:
-    - private-cluster
+    - openstack
   interruptible: true
 
 stages:
@@ -9,21 +18,17 @@ stages:
   - lint
   - build
   - deploy
-  # - cleanup
+  - cleanup
 
-# TODO: Set up cache for Kubernetes runner
 cache:
   key: "$CI_COMMIT_REF_NAME"
   paths:
-    - .packer/
-    - infra/.terraform/
-    - infra/.terraform.lock.hcl
+    - infra/envs/**/.terraform/
 
 variables:
-  PKR_ROOT: ${CI_PROJECT_DIR}/templates
-  PACKER_PLUGIN_PATH: "${CI_PROJECT_DIR}/.packer/plugins"
-  TF_ROOT: ${CI_PROJECT_DIR}/infra
-  TF_STATE_NAME: staging
+  ENVIRONMENT: prod
+  TF_ROOT: ${CI_PROJECT_DIR}/infra/envs/${ENVIRONMENT}
+  TF_STATE_NAME: ${ENVIRONMENT}
 
 terraform:init:
   stage: prepare
@@ -32,85 +37,83 @@ terraform:init:
     - cd ${TF_ROOT}
     - gitlab-terraform init
 
-packer:init:
-  stage: prepare
-  image: registry.gitlab.com/ralgar/packer-ansible:1.0.0
-  script:
-    - packer init -upgrade ${PKR_ROOT}
-
 markdownlint:
   stage: lint
   image: registry.gitlab.com/pipeline-components/markdownlint:latest
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - "**/*.md"
   script:
     - mdl --style all .
-
-.markdown-spellcheck:
-  stage: lint
-  image: registry.gitlab.com/pipeline-components/markdown-spellcheck:latest
-  script:
-    - mdspell --report '**/*.md'
-
-ansible-lint:
-  stage: lint
-  image: registry.gitlab.com/pipeline-components/ansible-lint:latest
-  script:
-    - ansible-lint -P production --exclude cluster
-
-packer:validate:
-  stage: lint
-  image: registry.gitlab.com/ralgar/packer-ansible:1.0.0
-  script:
-    - packer init ${PKR_ROOT}
-    - packer validate -var varsFile=${VARS_FILE} ${PKR_ROOT}
 
 terraform:validate:
   stage: lint
   image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:1.2.6
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   script:
     - cd ${TF_ROOT}
     - gitlab-terraform validate
 
-plan-infrastructure:
+terraform:plan:
   stage: build
   image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:1.2.6
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - infra/**/*
   environment:
-    name: staging
+    name: ${ENVIRONMENT}
+    action: prepare
   script:
-    - cat ${SSH_PUBKEY_FILE} > ${CI_PROJECT_DIR}/ssh_key.pub
     - cd ${TF_ROOT}
-    - gitlab-terraform plan -var varsFile=${VARS_FILE}
+    - gitlab-terraform plan -var openstack_clouds_file=${OS_CLOUDS} -var-file=${TF_VARS_FILE}
     - gitlab-terraform plan-json
   artifacts:
     paths:
-      - ${CI_PROJECT_DIR}/infra/plan.cache
+      - ${TF_ROOT}/plan.cache
     reports:
-      terraform: ${CI_PROJECT_DIR}/infra/plan.json
+      terraform: ${TF_ROOT}/plan.json
 
-build-templates:
-  stage: build
-  image: registry.gitlab.com/ralgar/packer-ansible:1.0.0
-  environment:
-    name: staging
+terraform:apply:
+  stage: deploy
+  image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:1.2.6
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
-        - templates/
+        - infra/**/*
       when: manual
-  script:
-    - >
-      packer build -var varsFile=${VARS_FILE}
-      -only proxmox-clone.k3s-master,proxmox-clone.k3s-controller,proxmox-clone.k3s-worker
-      ${PKR_ROOT}
-
-apply-infrastructure:
-  stage: deploy
-  image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:1.2.6
+      variables:
+        AUTO_STOP_IN: never
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - infra/**/*
+      when: never
+      variables:
+        AUTO_STOP_IN: 1 day
   environment:
-    name: staging
+    name: ${ENVIRONMENT}
+    action: start
+    on_stop: terraform:destroy
+    auto_stop_in: ${AUTO_STOP_IN}
+  script:
+    - cd ${TF_ROOT}
+    - gitlab-terraform apply -var openstack_clouds_file=${OS_CLOUDS} -var-file=${TF_VARS_FILE}
+
+terraform:destroy:
+  stage: cleanup
+  image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:1.2.6
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      when: manual
+      when: never
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - infra/**/*
+      when: never
+  environment:
+    name: ${ENVIRONMENT}
+    action: stop
   script:
-    - cat ${SSH_PUBKEY_FILE} > ${CI_PROJECT_DIR}/ssh_key.pub
     - cd ${TF_ROOT}
-    - gitlab-terraform apply plan.cache
+    - gitlab-terraform destroy -var openstack_clouds_file=${OS_CLOUDS} -var-file=${TF_VARS_FILE}

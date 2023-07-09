@@ -1,0 +1,23 @@
+[Unit]
+Description=Layer additonal packages with rpm-ostree
+Wants=network-online.target
+After=network-online.target
+# We run before `zincati.service` to avoid conflicting rpm-ostree
+# transactions.
+Before=zincati.service
+ConditionPathExists=!/var/lib/%N.stamp
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+# `--allow-inactive` ensures that rpm-ostree does not return an error
+# if the package is already installed. This is useful if the package is
+# added to the root image in a future Fedora CoreOS release as it will
+# prevent the service from failing.
+ExecStart=/usr/bin/rpm-ostree install -y --apply-live --allow-inactive \
+    rclone \
+    restic
+ExecStart=/bin/touch /var/lib/%N.stamp
+
+[Install]
+WantedBy=multi-user.target

@@ -1,9 +1,0 @@
----
-- name: Dirsrv Bootstrap
-  hosts: namespace_389ds_pods
-  connection: local
-  gather_facts: false
-  vars_files:
-    - ../vars/secret.yml
-  roles:
-    - dirsrv_bootstrap

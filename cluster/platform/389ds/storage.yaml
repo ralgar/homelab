@@ -5,9 +5,9 @@ metadata:
   name: 389ds-data
   namespace: 389ds
 spec:
-  storageClassName: csi-cephfs
+  storageClassName: cinder-standard
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 5Gi
+      storage: 1Gi

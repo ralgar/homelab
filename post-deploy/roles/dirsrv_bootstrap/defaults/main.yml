@@ -1,9 +1,0 @@
----
-dirsrv_domain: dc=homelab,dc=internal
-dirsrv_root_pw: "password"
-
-# Default User Configuration
-default_user_uid: "default_user"
-default_user_displayname: "Default User"
-default_user_email: "user@domain.tld"
-default_user_passwd: "password"

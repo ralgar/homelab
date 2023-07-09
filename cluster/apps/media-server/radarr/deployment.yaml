@@ -24,22 +24,26 @@ spec:
       securityContext:
         runAsUser: 107878
         runAsGroup: 109030
-      initContainers:
-        - name: radarr-init
-          image: "nouchka/sqlite3:latest"
-          imagePullPolicy: IfNotPresent
-          volumeMounts:
-            - name: radarr-configmap
-              mountPath: /configmaps
-            - name: radarr-data
-              mountPath: /config
-            - name: radarr-secrets
-              mountPath: /secrets
-          command: ["/configmaps/init.sh"]
+        fsGroup: 109030
       containers:
         - name: radarr
-          image: "ghcr.io/onedr0p/radarr:4.1.0.6175"
+          image: "ghcr.io/onedr0p/radarr:4.3.2.6857"
           imagePullPolicy: IfNotPresent
+          env:
+            - name: RADARR__API_KEY
+              valueFrom: { secretKeyRef: { name: radarr-secrets, key: apiKey } }
+            - name: RADARR__POSTGRES_HOST
+              valueFrom: { secretKeyRef: { name: mediasrv-pguser-radarr, key: host } }
+            - name: RADARR__POSTGRES_PORT
+              valueFrom: { secretKeyRef: { name: mediasrv-pguser-radarr, key: port } }
+            - name: RADARR__POSTGRES_USER
+              valueFrom: { secretKeyRef: { name: mediasrv-pguser-radarr, key: user } }
+            - name: RADARR__POSTGRES_PASSWORD
+              valueFrom: { secretKeyRef: { name: mediasrv-pguser-radarr, key: password } }
+            - name: RADARR__POSTGRES_MAIN_DB
+              value: radarr-main
+            - name: RADARR__POSTGRES_LOG_DB
+              value: radarr-log
           ports:
             - name: radarr-http
               containerPort: 7878
@@ -77,20 +81,14 @@ spec:
             timeoutSeconds: 1
             periodSeconds: 5
           securityContext:
+            runAsNonRoot: true
+            privileged: false
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: false
       volumes:
-        - name: radarr-configmap
-          configMap:
-            name: radarr-configmap
-            defaultMode: 0777
         - name: radarr-data
           persistentVolumeClaim:
             claimName: radarr-data
-        - name: radarr-secrets
-          secret:
-            secretName: radarr-secrets
         - name: media
-          nfs:
-            server: 192.168.1.10
-            path: /mnt/storage/mediasrv
+          persistentVolumeClaim:
+            claimName: media

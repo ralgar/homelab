@@ -24,6 +24,7 @@ spec:
       securityContext:
         runAsUser: 108096
         runAsGroup: 109030
+        fsGroup: 109030
       initContainers:
         - name: jellyfin-init
           image: "archlinux:base"
@@ -78,6 +79,8 @@ spec:
             periodSeconds: 5
             failureThreshold: 30
           securityContext:
+            runAsNonRoot: true
+            privileged: false
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: false
       volumes:
@@ -95,6 +98,5 @@ spec:
           secret:
             secretName: jellyfin-secrets
         - name: media
-          nfs:
-            server: 192.168.1.10
-            path: /mnt/storage/mediasrv
+          persistentVolumeClaim:
+            claimName: media
