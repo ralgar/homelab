@@ -89,7 +89,7 @@ terraform:apply:
     auto_stop_in: ${AUTO_STOP_IN}
   script:
     - cd ${TF_ROOT}
-    - gitlab-terraform apply -var openstack_clouds_file=${OS_CLOUDS} -var-file=${TF_VARS_FILE}
+    - gitlab-terraform apply
 
 terraform:destroy:
   stage: cleanup
