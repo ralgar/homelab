@@ -75,14 +75,10 @@ terraform:apply:
   image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:1.2.6
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      changes:
-        - infra/**/*
       when: manual
       variables:
         AUTO_STOP_IN: never
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      changes:
-        - infra/**/*
       when: never
       variables:
         AUTO_STOP_IN: 1 day
@@ -102,8 +98,6 @@ terraform:destroy:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: never
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      changes:
-        - infra/**/*
       when: never
   environment:
     name: ${ENVIRONMENT}
