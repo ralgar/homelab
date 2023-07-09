@@ -50,8 +50,6 @@ markdownlint:
 terraform:validate:
   stage: lint
   image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:1.2.6
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   script:
     - cd ${TF_ROOT}
     - gitlab-terraform validate
@@ -59,10 +57,6 @@ terraform:validate:
 terraform:plan:
   stage: build
   image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:1.2.6
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      changes:
-        - infra/**/*
   environment:
     name: ${ENVIRONMENT}
     action: prepare
