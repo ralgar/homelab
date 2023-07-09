@@ -1,0 +1,35 @@
+[Unit]
+Description=NZBGet Container
+Documentation=man:podman-generate-systemd(1)
+Wants=network-online.target
+After=network-online.target
+RequiresMountsFor=%t/containers
+
+[Service]
+Environment=PODMAN_SYSTEMD_UNIT=%n
+Restart=on-failure
+TimeoutStartSec=300
+TimeoutStopSec=70
+
+ExecStartPre=/bin/rm -f %t/%n.ctr-id
+ExecStart=/usr/bin/podman run -d --rm --replace \
+	--cidfile=%t/%n.ctr-id --cgroups=no-conmon --sdnotify=conmon \
+    --label io.containers.autoupdate=registry \
+    --name nzbget \
+    -v /srv/nzbget:/config:Z \
+    -v /mnt/usenet:/media/usenet:z \
+    -e TZ="America/Vancouver" \
+    -e PUID=9030 \
+    -e PGID=9030 \
+    -e UMASK="0007" \
+    -p 6789:6789 \
+    docker.io/linuxserver/nzbget:latest
+
+ExecStop=/usr/bin/podman stop --ignore -t 10 --cidfile=%t/%n.ctr-id
+ExecStopPost=/usr/bin/podman rm -f --ignore -t 10 --cidfile=%t/%n.ctr-id
+
+Type=notify
+NotifyAccess=all
+
+[Install]
+WantedBy=default.target

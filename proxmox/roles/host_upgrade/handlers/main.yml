@@ -1,6 +1,0 @@
----
-- name: Restart PVE web server
-  ansible.builtin.systemd:
-    name: pveproxy
-    state: restarted
-  listen: "restart pveproxy"

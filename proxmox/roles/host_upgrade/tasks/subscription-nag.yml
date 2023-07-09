@@ -1,8 +1,0 @@
----
-- name: Subscription Nag - Remove the notification
-  ansible.builtin.replace:
-    path: /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
-    regexp: 'Ext.Msg.show'
-    before: 'No valid subscription'
-    replace: 'void'
-  notify: "restart pveproxy"

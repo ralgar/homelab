@@ -1,4 +1,0 @@
----
-- name: Restart the directory server
-  include_tasks: restart-dirsrv.yml
-  listen: restart_dirsrv

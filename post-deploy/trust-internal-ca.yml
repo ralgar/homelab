@@ -1,7 +1,0 @@
----
-- name: Trust Internal CA
-  hosts: localhost
-  vars_files:
-    - ../vars/secret.yml
-  roles:
-    - ca_trust

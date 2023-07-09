@@ -11,11 +11,9 @@ data:
     [ -f /secrets/adminPassword ] || exit 1
     [ -f /secrets/apiPassword ] || exit 1
 
-    [ -f /config/nzbget.conf ] || {
-      cp /configmaps/nzbget.conf /config/nzbget.conf || exit 1
-      sed -i "s|nzbget-admin-password|$(</secrets/adminPassword)|" /config/nzbget.conf || exit 1
-      sed -i "s|nzbget-api-password|$(</secrets/apiPassword)|" /config/nzbget.conf || exit 1
-    }
+    cp /configmaps/nzbget.conf /config/nzbget.conf || exit 1
+    sed -i "s|nzbget-admin-password|$(</secrets/adminPassword)|" /config/nzbget.conf || exit 1
+    sed -i "s|nzbget-api-password|$(</secrets/apiPassword)|" /config/nzbget.conf || exit 1
 
   nzbget.conf: |
     ##############################################################################

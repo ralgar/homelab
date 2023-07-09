@@ -4,11 +4,6 @@
 # Cluster testing directory
 cluster/testing/
 
-# Version lock files
-# TODO: Remove for beta/stable release
-Chart.lock
-.terraform.lock.hcl
-
 ############################
 ###   GENERATED FILES    ###
 ############################
@@ -23,7 +18,6 @@ output/
 ####################################
 # Variables directory
 /vars/*
-
 
 ###########################################
 ###   TERRAFORM RECOMMENDED GITIGNORE   ###

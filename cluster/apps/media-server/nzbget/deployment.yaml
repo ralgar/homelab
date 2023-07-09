@@ -26,6 +26,7 @@ spec:
       securityContext:
         runAsUser: 106789
         runAsGroup: 109030
+        fsGroup: 109030
       initContainers:
         - name: nzbget-init
           image: "redhat/ubi8-minimal"
@@ -79,20 +80,21 @@ spec:
             timeoutSeconds: 1
             periodSeconds: 5
           securityContext:
+            runAsNonRoot: true
+            privileged: false
             allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
+            readOnlyRootFilesystem: false
       volumes:
         - name: nzbget-config
           configMap:
             name: nzbget-config
             defaultMode: 0777
         - name: nzbget-data
-          persistentVolumeClaim:
-            claimName: nzbget-data
+          emptyDir:
+            sizeLimit: 1Mi
         - name: nzbget-secrets
           secret:
             secretName: nzbget-secrets
         - name: media
-          nfs:
-            server: 192.168.1.10
-            path: /mnt/storage/mediasrv
+          persistentVolumeClaim:
+            claimName: media

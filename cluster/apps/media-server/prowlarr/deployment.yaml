@@ -26,22 +26,26 @@ spec:
       securityContext:
         runAsUser: 109696
         runAsGroup: 109696
-      initContainers:
-        - name: prowlarr-init
-          image: "nouchka/sqlite3:latest"
-          imagePullPolicy: IfNotPresent
-          volumeMounts:
-            - name: prowlarr-configmap
-              mountPath: /configmaps
-            - name: prowlarr-data
-              mountPath: /config
-            - name: prowlarr-secrets
-              mountPath: /secrets
-          command: ["/configmaps/init.sh"]
+        fsGroup: 109696
       containers:
         - name: prowlarr
-          image: "ghcr.io/onedr0p/prowlarr-develop:0.4.4.1947"
+          image: "ghcr.io/onedr0p/prowlarr:1.2.2.2699"
           imagePullPolicy: IfNotPresent
+          env:
+            - name: PROWLARR__API_KEY
+              valueFrom: { secretKeyRef: { name: prowlarr-secrets, key: prowlarr-api-key } }
+            - name: PROWLARR__POSTGRES_HOST
+              valueFrom: { secretKeyRef: { name: mediasrv-pguser-prowlarr, key: host } }
+            - name: PROWLARR__POSTGRES_PORT
+              valueFrom: { secretKeyRef: { name: mediasrv-pguser-prowlarr, key: port } }
+            - name: PROWLARR__POSTGRES_USER
+              valueFrom: { secretKeyRef: { name: mediasrv-pguser-prowlarr, key: user } }
+            - name: PROWLARR__POSTGRES_PASSWORD
+              valueFrom: { secretKeyRef: { name: mediasrv-pguser-prowlarr, key: password } }
+            - name: PROWLARR__POSTGRES_MAIN_DB
+              value: prowlarr-main
+            - name: PROWLARR__POSTGRES_LOG_DB
+              value: prowlarr-log
           ports:
             - name: prowlarr-http
               containerPort: 9696
@@ -77,16 +81,11 @@ spec:
             timeoutSeconds: 1
             periodSeconds: 5
           securityContext:
+            runAsNonRoot: true
+            privileged: false
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: false
       volumes:
-        - name: prowlarr-configmap
-          configMap:
-            name: prowlarr-configmap
-            defaultMode: 0777
         - name: prowlarr-data
-          persistentVolumeClaim:
-            claimName: prowlarr-data
-        - name: prowlarr-secrets
-          secret:
-            secretName: prowlarr-secrets
+          emptyDir:
+            sizeLimit: 8Mi

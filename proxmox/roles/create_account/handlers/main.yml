@@ -1,9 +1,0 @@
----
-- name: Set access for 'automation' account
-  ansible.builtin.command: pveum aclmod / -user automation@pve -role Automation
-  listen: set_account_access_and_role
-
-- name: Print new API token to STDOUT
-  ansible.builtin.debug:
-    msg: "{{ pve_account_token.stdout }}"
-  listen: print_new_api_token

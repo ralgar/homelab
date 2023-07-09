@@ -1,0 +1,17 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: 389ds
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: trust-manager
+    - name: csi-cinder
+  interval: 60m
+  path: ./cluster/platform/389ds
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
