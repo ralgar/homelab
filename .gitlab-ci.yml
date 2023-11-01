@@ -1,12 +1,12 @@
 ---
 workflow:
   rules:
-    # Create only a Merge Request pipeline if an MR is open for the branch,
-    #  otherwise create a branch pipeline. Do not duplicate pipelines.
+    # Allow pipelines only for Merge Requests, and on push/merge to main.
+    # Do not allow duplicate pipelines.
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
       when: never
-    - if: $CI_COMMIT_BRANCH
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
 default:
   tags:
