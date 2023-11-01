@@ -2,7 +2,7 @@
 
 [![Latest Tag](https://img.shields.io/gitlab/v/tag/ralgar/homelab?style=for-the-badge&logo=semver&logoColor=white)](https://gitlab.com/ralgar/homelab/tags)
 [![Pipeline Status](https://img.shields.io/gitlab/pipeline-status/ralgar/homelab?branch=main&label=Pipeline&logo=gitlab&style=for-the-badge)](https://gitlab.com/ralgar/homelab/-/pipelines?page=1&scope=all&ref=main)
-[![Docs Status](https://img.shields.io/website?label=Docs&logo=gitbook&logoColor=white&style=for-the-badge&url=https%3A%2F%2Fralgar.dev%2Fdocs%2Fcategory/%2Fhomelab%2F)](https://ralgar.dev/docs/category/homelab/)
+[![Docs Status](https://img.shields.io/website?label=Docs&logo=gitbook&logoColor=white&style=for-the-badge&url=https%3A%2F%2Fdocs.ralgar.dev%2Fcategory/%2Fhomelab%2F)](https://docs.ralgar.dev/category/homelab/)
 [![Software License](https://img.shields.io/badge/License-GPL--3.0-orange?style=for-the-badge&logo=gnu&logoColor=white)](https://www.gnu.org/licenses/gpl-3.0.html)
 [![GitLab Stars](https://img.shields.io/gitlab/stars/ralgar/homelab?color=gold&label=Stars&logo=gitlab&style=for-the-badge)](https://gitlab.com/ralgar/homelab)
 
@@ -13,7 +13,7 @@ By following the [GitOps](https://about.gitlab.com/topics/gitops) paradigm, this
  virtualized/containerized OpenStack homelab. It can serve as a framework
  for your homelab as well.
 
-Check out the [documentation](https://ralgar.dev/docs/category/oracle-cloud-lab)
+Check out the [documentation](https://docs.ralgar.dev/category/homelab)
  for more information, and setup instructions.
 
 ## License
