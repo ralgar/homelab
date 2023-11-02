@@ -20,7 +20,7 @@ module "k8s_cluster" {
   bootstrap = {
     enabled    = true
     repository = "https://gitlab.com/ralgar/homelab.git"
-    branch     = "v2"
+    branch     = "main"
     path       = "./cluster/system/flux-cd"
   }
 }
