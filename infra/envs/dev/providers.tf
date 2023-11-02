@@ -17,7 +17,7 @@ terraform {
 }
 
 locals {
-  openstack_yaml = yamldecode(file("${path.root}/../../../metal/output/clouds.yaml"))
+  openstack_yaml = yamldecode(file(var.openstack_clouds_file))
   openstack_auth = sensitive(local.openstack_yaml.clouds.kolla-admin.auth)
 }
 
