@@ -6,6 +6,8 @@ metadata:
   namespace: media-server
   labels:
     app.kubernetes.io/name: sonarr
+  annotations:
+    ignore-check.kube-linter.io/no-read-only-root-fs: "Unsupported for this app."
 spec:
   revisionHistoryLimit: 3
   replicas: 1
@@ -57,6 +59,13 @@ spec:
               mountPath: /config
             - name: media
               mountPath: /media
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 500Mi
+            requests:
+              cpu: 500m
+              memory: 500Mi
           livenessProbe:
             exec:
               command:

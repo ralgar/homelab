@@ -1,7 +1,6 @@
 ---
 checks:
   ignorePaths:
-    - cluster/apps/**
     - cluster/platform/**
     - cluster/system/**
     - cluster/testing/**

@@ -6,6 +6,8 @@ metadata:
   namespace: media-server
   labels:
     app.kubernetes.io/name: jellyseerr
+  annotations:
+    ignore-check.kube-linter.io/no-read-only-root-fs: "Unsupported for this app."
 spec:
   revisionHistoryLimit: 3
   replicas: 1
@@ -29,7 +31,7 @@ spec:
         fsGroup: 105055
       initContainers:
         - name: init
-          image: "redhat/ubi8-minimal"
+          image: "archlinux:base"
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: jellyseerr-config
@@ -39,6 +41,13 @@ spec:
             - name: jellyseerr-secrets
               mountPath: /secrets
           command: ["/configmaps/init.sh"]
+          resources:
+            limits:
+              cpu: 250m
+              memory: 250Mi
+            requests:
+              cpu: 125m
+              memory: 250Mi
       containers:
         - name: jellyseerr
           image: "docker.io/fallenbagel/jellyseerr:1.1.1"
@@ -50,6 +59,13 @@ spec:
           volumeMounts:
             - name: jellyseerr-data
               mountPath: /app/config
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 500Mi
+            requests:
+              cpu: 500m
+              memory: 500Mi
           # livenessProbe:
           #   exec:
           #     command:

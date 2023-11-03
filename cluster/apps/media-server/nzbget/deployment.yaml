@@ -6,6 +6,8 @@ metadata:
   namespace: media-server
   labels:
     app.kubernetes.io/name: nzbget
+  annotations:
+    ignore-check.kube-linter.io/no-read-only-root-fs: "Unsupported for this app."
 spec:
   revisionHistoryLimit: 3
   replicas: 1
@@ -29,7 +31,7 @@ spec:
         fsGroup: 109030
       initContainers:
         - name: nzbget-init
-          image: "redhat/ubi8-minimal"
+          image: "archlinux:base"
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: nzbget-config
@@ -39,6 +41,13 @@ spec:
             - name: nzbget-secrets
               mountPath: /secrets
           command: ["/configmaps/init.sh"]
+          resources:
+            limits:
+              cpu: 250m
+              memory: 250Mi
+            requests:
+              cpu: 125m
+              memory: 250Mi
       containers:
         - name: nzbget
           image: "ghcr.io/onedr0p/nzbget:21.1"
@@ -52,6 +61,13 @@ spec:
               mountPath: /config
             - name: media
               mountPath: /media
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 500Mi
+            requests:
+              cpu: 500m
+              memory: 500Mi
           # livenessProbe:
           #   exec:
           #     command:

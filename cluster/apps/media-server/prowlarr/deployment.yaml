@@ -6,6 +6,8 @@ metadata:
   namespace: media-server
   labels:
     app.kubernetes.io/name: prowlarr
+  annotations:
+    ignore-check.kube-linter.io/no-read-only-root-fs: "Unsupported for this app."
 spec:
   revisionHistoryLimit: 3
   replicas: 1
@@ -55,6 +57,13 @@ spec:
           volumeMounts:
             - name: prowlarr-data
               mountPath: /config
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 500Mi
+            requests:
+              cpu: 500m
+              memory: 500Mi
           livenessProbe:
             exec:
               command:
