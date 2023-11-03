@@ -29,7 +29,7 @@ spec:
         fsGroup: 109696
       containers:
         - name: prowlarr
-          image: "ghcr.io/onedr0p/prowlarr:1.2.2.2699"
+          image: "ghcr.io/onedr0p/prowlarr:1.9.4.4039"
           imagePullPolicy: IfNotPresent
           env:
             - name: PROWLARR__API_KEY
@@ -46,6 +46,8 @@ spec:
               value: prowlarr-main
             - name: PROWLARR__POSTGRES_LOG_DB
               value: prowlarr-log
+            - name: PROWLARR__THEME
+              value: dark
           ports:
             - name: prowlarr-http
               containerPort: 9696
@@ -53,19 +55,19 @@ spec:
           volumeMounts:
             - name: prowlarr-data
               mountPath: /config
-          # livenessProbe:
-          #   exec:
-          #     command:
-          #     - /usr/bin/env
-          #     - bash
-          #     - -c
-          #     - curl --fail localhost:7878/api/v3/system/status?apiKey=`IFS=\> && while read -d
-          #       \< E C; do if [[ $E = "ApiKey" ]]; then echo $C; fi; done < /config/config.xml`
-          #   failureThreshold: 5
-          #   initialDelaySeconds: 60
-          #   periodSeconds: 10
-          #   successThreshold: 1
-          #   timeoutSeconds: 10
+          livenessProbe:
+            exec:
+              command:
+              - /usr/bin/env
+              - bash
+              - -c
+              - curl --fail localhost:9696/api/v1/system/status?apiKey=`IFS=\> && while read -d
+                \< E C; do if [[ $E = "ApiKey" ]]; then echo $C; fi; done < /config/config.xml`
+            failureThreshold: 5
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 10
           readinessProbe:
             tcpSocket:
               port: 9696
@@ -88,4 +90,4 @@ spec:
       volumes:
         - name: prowlarr-data
           emptyDir:
-            sizeLimit: 8Mi
+            sizeLimit: 16Mi

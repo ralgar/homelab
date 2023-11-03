@@ -34,12 +34,11 @@ spec:
         - radarr-log
       password:
         type: AlphaNumeric
-  patroni:
-    dynamicConfiguration:
-      postgresql:
-        pg_hba:
-          # TODO: Figure out why Prowlarr won't use TLS, and remove this.
-          - "hostnossl all all all md5"
+  # patroni:
+  #   dynamicConfiguration:
+  #     postgresql:
+  #       pg_hba:
+  #         - "hostnossl all all all md5"  # Disable TLS
   backups:
     pgbackrest:
       image: registry.developers.crunchydata.com/crunchydata/crunchy-pgbackrest:ubi8-2.41-4
