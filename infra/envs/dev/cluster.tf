@@ -1,7 +1,7 @@
 module "k8s_network" {
   source = "../../modules/openstack/network"
 
-  network_name        = "development"
+  network_name        = "k8s_net"
   default_subnet_cidr = "10.0.0.0/24"
   external_network    = data.openstack_networking_network_v2.public
 }
@@ -11,6 +11,10 @@ module "k8s_cluster" {
 
   image            = openstack_images_image_v2.coreos_37
   keypair          = data.openstack_compute_keypair_v2.admin
+
+  // Node Settings
+  ha_control_plane  = false
+  base_worker_count = 2
 
   // Networking
   internal_network = module.k8s_network.network

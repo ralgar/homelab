@@ -8,8 +8,8 @@ resource "openstack_containerinfra_clustertemplate_v1" "basic" {
   volume_driver         = "cinder"
   network_driver        = "flannel"
   server_type           = "vm"
-  master_lb_enabled     = true
-  floating_ip_enabled   = false
+  master_lb_enabled     = var.ha_control_plane ? true : false
+  floating_ip_enabled   = var.ha_control_plane ? false : true
 
   fixed_network       = var.internal_network.id
   fixed_subnet        = var.internal_subnet.id
@@ -26,7 +26,7 @@ resource "openstack_containerinfra_clustertemplate_v1" "basic" {
     csi_resizer_tag               = "v1.3.0"
     csi_node_driver_registrar_tag = "v2.4.0"
 
-    // API server LB
+    // API server LB (if enabled)
     master_lb_floating_ip_enabled = true
     master_lb_allowed_cidrs       = "0.0.0.0/0"  // comma delimited list
 
