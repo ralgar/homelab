@@ -27,22 +27,27 @@ spec:
         runAsUser: 108989
         runAsGroup: 109030
         fsGroup: 109030
-      initContainers:
-        - name: sonarr-init
-          image: "nouchka/sqlite3:latest"
-          imagePullPolicy: IfNotPresent
-          volumeMounts:
-            - name: sonarr-configmap
-              mountPath: /configmaps
-            - name: sonarr-data
-              mountPath: /config
-            - name: sonarr-secrets
-              mountPath: /secrets
-          command: ["/configmaps/init.sh"]
       containers:
         - name: sonarr
-          image: "ghcr.io/onedr0p/sonarr:3.0.9.1549"
+          image: "ghcr.io/onedr0p/sonarr-develop:4.0.0.710"
           imagePullPolicy: IfNotPresent
+          env:
+            - name: SONARR__API_KEY
+              valueFrom: { secretKeyRef: { name: sonarr-secrets, key: apiKey } }
+            - name: SONARR__POSTGRES_HOST
+              valueFrom: { secretKeyRef: { name: mediasrv-pguser-sonarr, key: host } }
+            - name: SONARR__POSTGRES_PORT
+              valueFrom: { secretKeyRef: { name: mediasrv-pguser-sonarr, key: port } }
+            - name: SONARR__POSTGRES_USER
+              valueFrom: { secretKeyRef: { name: mediasrv-pguser-sonarr, key: user } }
+            - name: SONARR__POSTGRES_PASSWORD
+              valueFrom: { secretKeyRef: { name: mediasrv-pguser-sonarr, key: password } }
+            - name: SONARR__POSTGRES_MAIN_DB
+              value: sonarr-main
+            - name: SONARR__POSTGRES_LOG_DB
+              value: sonarr-log
+            - name: SONARR__THEME
+              value: dark
           ports:
             - name: sonarr-http
               containerPort: 8989
@@ -80,23 +85,14 @@ spec:
             timeoutSeconds: 1
             periodSeconds: 5
           securityContext:
-            runAsUser: 108989
-            runAsGroup: 109030
             runAsNonRoot: true
             privileged: false
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: false
       volumes:
-        - name: sonarr-configmap
-          configMap:
-            name: sonarr-configmap
-            defaultMode: 0777
         - name: sonarr-data
-          persistentVolumeClaim:
-            claimName: sonarr-data
-        - name: sonarr-secrets
-          secret:
-            secretName: sonarr-secrets
+          emptyDir:
+            sizeLimit: 16Mi
         - name: media
           persistentVolumeClaim:
             claimName: media
