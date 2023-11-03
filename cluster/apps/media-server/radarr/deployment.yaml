@@ -27,7 +27,7 @@ spec:
         fsGroup: 109030
       containers:
         - name: radarr
-          image: "ghcr.io/onedr0p/radarr:4.3.2.6857"
+          image: "ghcr.io/onedr0p/radarr:4.7.5.7809"
           imagePullPolicy: IfNotPresent
           env:
             - name: RADARR__API_KEY
@@ -44,6 +44,8 @@ spec:
               value: radarr-main
             - name: RADARR__POSTGRES_LOG_DB
               value: radarr-log
+            - name: RADARR__THEME
+              value: dark
           ports:
             - name: radarr-http
               containerPort: 7878
@@ -87,8 +89,8 @@ spec:
             readOnlyRootFilesystem: false
       volumes:
         - name: radarr-data
-          persistentVolumeClaim:
-            claimName: radarr-data
+          emptyDir:
+            sizeLimit: 16Mi
         - name: media
           persistentVolumeClaim:
             claimName: media
