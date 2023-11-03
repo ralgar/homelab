@@ -92,7 +92,7 @@ spec:
       volumes:
         - name: sonarr-data
           emptyDir:
-            sizeLimit: 16Mi
+            sizeLimit: 1Gi
         - name: media
           persistentVolumeClaim:
             claimName: media

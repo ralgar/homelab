@@ -90,4 +90,4 @@ spec:
       volumes:
         - name: prowlarr-data
           emptyDir:
-            sizeLimit: 16Mi
+            sizeLimit: 1Gi
