@@ -33,9 +33,27 @@ variables:
 terraform:init:
   stage: prepare
   image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:1.2.6
+  rules:
+    - changes:
+        - .gitlab-ci.yml
+        - infra/**/*
   script:
     - cd ${TF_ROOT}
     - gitlab-terraform init
+
+kube-linter:
+  stage: lint
+  image:
+    name: docker.io/stackrox/kube-linter:v0.6.5-alpine
+    entrypoint: [""]
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - .gitlab-ci.yml
+        - .kube-linter.yml
+        - cluster/**/*
+  script:
+    - /kube-linter lint cluster
 
 markdownlint:
   stage: lint
@@ -43,6 +61,7 @@ markdownlint:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
+        - .gitlab-ci.yml
         - "**/*.md"
   script:
     - mdl --style all .
@@ -50,6 +69,10 @@ markdownlint:
 terraform:validate:
   stage: lint
   image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:1.2.6
+  rules:
+    - changes:
+        - .gitlab-ci.yml
+        - infra/**/*
   script:
     - cd ${TF_ROOT}
     - gitlab-terraform validate
@@ -57,6 +80,10 @@ terraform:validate:
 terraform:plan:
   stage: build
   image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:1.2.6
+  rules:
+    - changes:
+        - .gitlab-ci.yml
+        - infra/**/*
   environment:
     name: ${ENVIRONMENT}
     action: prepare
@@ -75,10 +102,16 @@ terraform:apply:
   image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:1.2.6
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - .gitlab-ci.yml
+        - infra/**/*
       when: manual
       variables:
         AUTO_STOP_IN: never
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - .gitlab-ci.yml
+        - infra/**/*
       when: never
       variables:
         AUTO_STOP_IN: 1 day
