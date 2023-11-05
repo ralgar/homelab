@@ -1,0 +1,12 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: flux-system
+resources:
+  - cert-manager.yaml
+  - csi-cinder.yaml
+  - descheduler.yaml
+  - ingress-nginx.yaml
+  - monitoring.yaml
+  - olm.yaml
+  - trust-manager.yaml

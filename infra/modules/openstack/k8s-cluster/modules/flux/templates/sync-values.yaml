@@ -1,0 +1,14 @@
+---
+gitRepository:
+  spec:
+    url: ${repository}
+    interval: 5m
+    ref:
+      branch: ${branch}
+    recurseSubmodules: false
+
+kustomization:
+  spec:
+    path: ${path}
+    interval: 5m
+    prune: true

@@ -2,10 +2,6 @@
 terraform {
   required_version = ">= 1.0"
   required_providers {
-    kubectl = {
-      source  = "gavinbunney/kubectl"
-      version = "1.14.0"
-    }
     local = {
       source  = "hashicorp/local"
     }
@@ -29,12 +25,4 @@ provider "openstack" {
   user_name           = sensitive(local.openstack_auth.username)
   password            = sensitive(local.openstack_auth.password)
   tenant_name         = "dev"
-}
-
-provider "kubectl" {
-  host                   = module.k8s_cluster.kube_config.host
-  client_certificate     = module.k8s_cluster.kube_config.client_certificate
-  client_key             = module.k8s_cluster.kube_config.client_key
-  cluster_ca_certificate = module.k8s_cluster.kube_config.cluster_ca_certificate
-  load_config_file       = false
 }

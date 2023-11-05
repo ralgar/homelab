@@ -1,0 +1,5 @@
+---
+imageAutomationController:
+  create: false
+imageReflectionController:
+  create: false

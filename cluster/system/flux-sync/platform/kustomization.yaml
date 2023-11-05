@@ -1,0 +1,9 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: flux-system
+resources:
+  - 389ds.yaml
+  - external-secrets.yaml
+  - postgres.yaml
+  - vault.yaml
