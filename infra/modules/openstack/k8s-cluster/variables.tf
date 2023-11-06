@@ -19,13 +19,13 @@ variable "bootstrap" {
   type        = object({
     enabled    = bool
     repository = string
-    branch     = string
+    ref_name   = string
     path       = string
   })
   default     = {
     enabled     = false
     repository  = null
-    branch      = null
+    ref_name    = null
     path        = null
   }
 }

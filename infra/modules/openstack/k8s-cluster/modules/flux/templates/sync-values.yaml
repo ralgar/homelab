@@ -4,7 +4,10 @@ gitRepository:
     url: ${repository}
     interval: 5m
     ref:
-      branch: ${branch}
+      name: ${ref_name}
+      # Include an empty branch string to work around an issue where
+      #  Flux defaults to refs/heads/master when no value is given.
+      branch: ""
     recurseSubmodules: false
 
 kustomization:

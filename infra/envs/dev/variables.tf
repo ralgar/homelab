@@ -4,16 +4,22 @@ variable "openstack_clouds_file" {
   default     = "../../../metal/output/clouds.yaml"
 }
 
+variable "environment" {
+  description = "Deployment environment (prod, staging, or dev)."
+  type        = string
+  default     = "dev"
+}
+
 variable "gitops_repo" {
   description = "Full path of the Git repo. Ex. 'http://domain.tld/user/repo.git'"
   type        = string
   default     = "https://gitlab.com/ralgar/homelab.git"
 }
 
-variable "gitops_branch" {
-  description = "The Git branch to sync from. Ex. 'main'"
+variable "gitops_ref_name" {
+  description = "Full Git reference name to sync from. Ex. 'refs/heads/main'"
   type        = string
-  default     = "main"
+  default     = "refs/heads/main"
 }
 
 variable "gitops_path" {

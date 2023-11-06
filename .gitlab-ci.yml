@@ -1,12 +1,24 @@
 ---
 workflow:
+  # Allow pipelines only for Merge Requests, and on push/merge to main.
+  # Do not allow duplicate pipelines.
   rules:
-    # Allow pipelines only for Merge Requests, and on push/merge to main.
-    # Do not allow duplicate pipelines.
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      variables:
+        ENVIRONMENT: dev
+        AUTO_STOP_IN: 1 day
+        TF_VAR_environment: $ENVIRONMENT
+        TF_VAR_gitops_ref_name: $CI_MERGE_REQUEST_REF_PATH
+
     - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
       when: never
+
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      variables:
+        ENVIRONMENT: prod
+        AUTO_STOP_IN: never
+        TF_VAR_environment: $ENVIRONMENT
+        TF_VAR_gitops_ref_name: refs/heads/$CI_DEFAULT_BRANCH
 
 default:
   tags:
@@ -26,9 +38,9 @@ cache:
     - infra/envs/**/.terraform/
 
 variables:
-  ENVIRONMENT: prod
   TF_ROOT: ${CI_PROJECT_DIR}/infra/envs/${ENVIRONMENT}
   TF_STATE_NAME: ${ENVIRONMENT}
+  TF_VAR_gitops_repo: ${CI_PROJECT_URL}.git
 
 terraform:init:
   stage: prepare
@@ -106,15 +118,11 @@ terraform:apply:
         - .gitlab-ci.yml
         - infra/**/*
       when: manual
-      variables:
-        AUTO_STOP_IN: never
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
         - .gitlab-ci.yml
         - infra/**/*
       when: never
-      variables:
-        AUTO_STOP_IN: 1 day
   environment:
     name: ${ENVIRONMENT}
     action: start

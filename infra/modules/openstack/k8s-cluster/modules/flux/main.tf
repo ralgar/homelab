@@ -23,7 +23,7 @@ resource "helm_release" "flux_sync" {
 
   values = [templatefile("${path.module}/templates/sync-values.yaml", {
     repository = var.repository
-    branch     = var.branch
+    ref_name   = var.ref_name
     path       = var.path
   })]
 }

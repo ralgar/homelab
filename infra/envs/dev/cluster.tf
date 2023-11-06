@@ -24,7 +24,7 @@ module "k8s_cluster" {
   bootstrap = {
     enabled    = true
     repository = var.gitops_repo
-    branch     = var.gitops_branch
+    ref_name   = var.gitops_ref_name
     path       = var.gitops_path
   }
 }

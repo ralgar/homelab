@@ -3,6 +3,8 @@ module "flux" {
   count      = var.bootstrap.enabled ? 1 : 0
 
   repository = var.bootstrap.repository
-  branch     = var.bootstrap.branch
+  ref_name   = var.bootstrap.ref_name
   path       = var.bootstrap.path
+
+  depends_on = [openstack_containerinfra_cluster_v1.cluster]
 }

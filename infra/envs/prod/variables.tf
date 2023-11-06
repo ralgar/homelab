@@ -3,6 +3,12 @@ variable "openstack_clouds_file" {
   type        = string
 }
 
+variable "environment" {
+  description = "Deployment environment (prod, staging, or dev)."
+  type        = string
+  default     = "prod"
+}
+
 // Production Server Variables
 variable "restic_password" {
   description = "Password for the Restic backup repo."

@@ -1,4 +1,6 @@
 ---
+installCRDs: true
+
 imageAutomationController:
   create: false
 imageReflectionController:
