@@ -27,3 +27,8 @@ variable "gitops_path" {
   type        = string
   default     = "./cluster/system/flux-sync"
 }
+
+variable "pgsql_backup_password" {
+  description = "Encryption password for PGSQL backups."
+  type        = string
+}

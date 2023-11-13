@@ -15,3 +15,12 @@ kustomization:
     path: ${path}
     interval: 5m
     prune: true
+    postBuild:
+      substituteFrom:
+          # Use this ConfigMap if it exists, but proceed if it doesn't.
+        - kind: ConfigMap
+          name: cluster-vars
+          optional: true
+          # Fail if this Secret does not exist.
+        - kind: Secret
+          name: cluster-secret-vars

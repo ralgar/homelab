@@ -26,3 +26,25 @@ provider "openstack" {
   password            = sensitive(local.openstack_auth.password)
   tenant_name         = var.environment
 }
+
+provider "google" {
+  project = "k8s-backups"
+  region  = "us-west1"
+  zone    = "us-west1-a"
+}
+
+provider "helm" {
+  kubernetes {
+    host                   = module.k8s_cluster.kube_config.host
+    client_certificate     = module.k8s_cluster.kube_config.client_certificate
+    client_key             = module.k8s_cluster.kube_config.client_key
+    cluster_ca_certificate = module.k8s_cluster.kube_config.cluster_ca_certificate
+  }
+}
+
+provider "kubernetes" {
+  host                   = module.k8s_cluster.kube_config.host
+  client_certificate     = module.k8s_cluster.kube_config.client_certificate
+  client_key             = module.k8s_cluster.kube_config.client_key
+  cluster_ca_certificate = module.k8s_cluster.kube_config.cluster_ca_certificate
+}

@@ -1,3 +1,9 @@
+module "gcp_bucket" {
+  source = "../../modules/gcp/bucket"
+
+  name_prefix = "homelab-backups"
+}
+
 module "k8s_network" {
   source = "../../modules/openstack/network"
 
@@ -26,5 +32,11 @@ module "k8s_cluster" {
     repository = var.gitops_repo
     ref_name   = var.gitops_ref_name
     path       = var.gitops_path
+
+    secrets = {
+      GCP_BACKUP_BUCKET_NAME  = module.gcp_bucket.name
+      GCP_BACKUP_BUCKET_CREDS = module.gcp_bucket.service_account_key  # base64
+      PGSQL_BACKUP_PASSWORD   = var.pgsql_backup_password
+    }
   }
 }

@@ -1,13 +1,13 @@
-resource "helm_release" "flux_install" {
-  repository       = "https://fluxcd-community.github.io/helm-charts"
-  chart            = "flux2"
-  version          = "2.7.0"
-  name             = "flux2"
-  namespace        = "flux-system"
-  create_namespace = true
-  atomic           = true
+resource "kubernetes_secret_v1" "flux_secrets" {
+  metadata {
+    name      = "cluster-secret-vars"
+    namespace = "flux-system"
+  }
 
-  values = [file("${path.module}/templates/install-values.yaml")]
+  type = "Opaque"
+  data = sensitive(var.secrets)
+
+  depends_on = [helm_release.flux_install]
 }
 
 resource "helm_release" "flux_sync" {
@@ -19,11 +19,11 @@ resource "helm_release" "flux_sync" {
   create_namespace = true
   atomic           = true
 
-  depends_on = [helm_release.flux_install]
-
   values = [templatefile("${path.module}/templates/sync-values.yaml", {
     repository = var.repository
     ref_name   = var.ref_name
     path       = var.path
   })]
+
+  depends_on = [kubernetes_secret_v1.flux_secrets]
 }

@@ -37,13 +37,13 @@ spec:
             - name: SONARR__API_KEY
               valueFrom: { secretKeyRef: { name: sonarr-secrets, key: apiKey } }
             - name: SONARR__POSTGRES_HOST
-              valueFrom: { secretKeyRef: { name: mediasrv-pguser-sonarr, key: host } }
+              valueFrom: { secretKeyRef: { name: mediadb-pguser-sonarr, key: host } }
             - name: SONARR__POSTGRES_PORT
-              valueFrom: { secretKeyRef: { name: mediasrv-pguser-sonarr, key: port } }
+              valueFrom: { secretKeyRef: { name: mediadb-pguser-sonarr, key: port } }
             - name: SONARR__POSTGRES_USER
-              valueFrom: { secretKeyRef: { name: mediasrv-pguser-sonarr, key: user } }
+              valueFrom: { secretKeyRef: { name: mediadb-pguser-sonarr, key: user } }
             - name: SONARR__POSTGRES_PASSWORD
-              valueFrom: { secretKeyRef: { name: mediasrv-pguser-sonarr, key: password } }
+              valueFrom: { secretKeyRef: { name: mediadb-pguser-sonarr, key: password } }
             - name: SONARR__POSTGRES_MAIN_DB
               value: sonarr-main
             - name: SONARR__POSTGRES_LOG_DB

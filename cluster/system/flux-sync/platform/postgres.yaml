@@ -16,3 +16,8 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
+  postBuild:
+    substitute:
+      GCP_BACKUP_BUCKET_NAME: ${GCP_BACKUP_BUCKET_NAME}
+      GCP_BACKUP_BUCKET_CREDS: ${GCP_BACKUP_BUCKET_CREDS}
+      PGSQL_BACKUP_PASSWORD: ${PGSQL_BACKUP_PASSWORD}

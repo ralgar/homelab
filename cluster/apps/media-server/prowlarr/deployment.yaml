@@ -37,13 +37,13 @@ spec:
             - name: PROWLARR__API_KEY
               valueFrom: { secretKeyRef: { name: prowlarr-secrets, key: prowlarr-api-key } }
             - name: PROWLARR__POSTGRES_HOST
-              valueFrom: { secretKeyRef: { name: mediasrv-pguser-prowlarr, key: host } }
+              valueFrom: { secretKeyRef: { name: mediadb-pguser-prowlarr, key: host } }
             - name: PROWLARR__POSTGRES_PORT
-              valueFrom: { secretKeyRef: { name: mediasrv-pguser-prowlarr, key: port } }
+              valueFrom: { secretKeyRef: { name: mediadb-pguser-prowlarr, key: port } }
             - name: PROWLARR__POSTGRES_USER
-              valueFrom: { secretKeyRef: { name: mediasrv-pguser-prowlarr, key: user } }
+              valueFrom: { secretKeyRef: { name: mediadb-pguser-prowlarr, key: user } }
             - name: PROWLARR__POSTGRES_PASSWORD
-              valueFrom: { secretKeyRef: { name: mediasrv-pguser-prowlarr, key: password } }
+              valueFrom: { secretKeyRef: { name: mediadb-pguser-prowlarr, key: password } }
             - name: PROWLARR__POSTGRES_MAIN_DB
               value: prowlarr-main
             - name: PROWLARR__POSTGRES_LOG_DB

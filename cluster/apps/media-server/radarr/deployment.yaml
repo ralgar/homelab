@@ -35,13 +35,13 @@ spec:
             - name: RADARR__API_KEY
               valueFrom: { secretKeyRef: { name: radarr-secrets, key: apiKey } }
             - name: RADARR__POSTGRES_HOST
-              valueFrom: { secretKeyRef: { name: mediasrv-pguser-radarr, key: host } }
+              valueFrom: { secretKeyRef: { name: mediadb-pguser-radarr, key: host } }
             - name: RADARR__POSTGRES_PORT
-              valueFrom: { secretKeyRef: { name: mediasrv-pguser-radarr, key: port } }
+              valueFrom: { secretKeyRef: { name: mediadb-pguser-radarr, key: port } }
             - name: RADARR__POSTGRES_USER
-              valueFrom: { secretKeyRef: { name: mediasrv-pguser-radarr, key: user } }
+              valueFrom: { secretKeyRef: { name: mediadb-pguser-radarr, key: user } }
             - name: RADARR__POSTGRES_PASSWORD
-              valueFrom: { secretKeyRef: { name: mediasrv-pguser-radarr, key: password } }
+              valueFrom: { secretKeyRef: { name: mediadb-pguser-radarr, key: password } }
             - name: RADARR__POSTGRES_MAIN_DB
               value: radarr-main
             - name: RADARR__POSTGRES_LOG_DB
