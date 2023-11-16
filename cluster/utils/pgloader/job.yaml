@@ -1,0 +1,80 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pgloader
+  labels:
+    app.kubernetes.io/name: pgloader
+  annotations:
+    ignore-check.kube-linter.io/no-read-only-root-fs: "Unimportant for this app."
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: pgloader
+    spec:
+      restartPolicy: Never
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: true
+      securityContext:
+        runAsUser: 105432
+        runAsGroup: 105432
+        fsGroup: 105432
+      containers:
+        - name: pgloader
+          image: "ghcr.io/ralgar/pgloader:pr-1531"
+          imagePullPolicy: IfNotPresent
+          command: ['sh', '-c', 'exec pgloader "/config/$LOADER_SCRIPT"']
+          #command: ['sleep', '3600']
+          env:
+            - name: LOADER_SCRIPT
+              value: jellyseerr.load
+            - name: DATA_SOURCE
+              value: /data/db.sqlite3
+            - name: POSTGRES_DATABASE
+              value: jellyseerr
+            - name: POSTGRES_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: mediadb-pguser-jellyseerr
+                  key: host
+            - name: POSTGRES_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: mediadb-pguser-jellyseerr
+                  key: port
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mediadb-pguser-jellyseerr
+                  key: user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mediadb-pguser-jellyseerr
+                  key: password
+          volumeMounts:
+            - name: pgloader-config
+              mountPath: /config
+            - name: pgloader-data
+              mountPath: /data
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 500Mi
+            requests:
+              cpu: 500m
+              memory: 500Mi
+          securityContext:
+            runAsNonRoot: true
+            privileged: false
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+      volumes:
+        - name: pgloader-config
+          configMap:
+            name: pgloader-config
+        - name: pgloader-data
+          persistentVolumeClaim:
+            claimName: pgloader-data

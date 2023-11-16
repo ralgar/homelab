@@ -1,0 +1,12 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pgloader-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: cinder-standard
+  resources:
+    requests:
+      storage: 1Gi

@@ -1,0 +1,20 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pgloader-config
+data:
+  jellyseerr.load: |
+    LOAD DATABASE
+        FROM {{DATA_SOURCE}}
+        INTO postgresql://{{POSTGRES_USER}}:{{POSTGRES_PASSWORD}}@{{POSTGRES_HOST}}:{{POSTGRES_PORT}}/{{POSTGRES_DATABASE}}?sslmode=allow
+
+        WITH
+            quote identifiers
+
+        CAST type datetime to timestamptz drop default
+        AFTER LOAD DO
+            $$ alter table season_request alter "createdAt" set default now() $$,
+            $$ alter table season_request alter "updatedAt" set default now() $$
+
+    ; /* Finalize script */
