@@ -5,6 +5,5 @@ namespace: media-server
 resources:
   - configmap.yaml
   - secrets.yaml
-  - storage.yaml
   - ingress.yaml
   - deployment.yaml

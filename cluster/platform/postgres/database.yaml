@@ -33,6 +33,11 @@ spec:
   image: registry.developers.crunchydata.com/crunchydata/crunchy-postgres:ubi8-14.7-0
   postgresVersion: 14
   users:
+    - name: jellyseerr
+      databases:
+        - jellyseerr
+      password:
+        type: AlphaNumeric
     - name: prowlarr
       databases:
         - prowlarr-main
