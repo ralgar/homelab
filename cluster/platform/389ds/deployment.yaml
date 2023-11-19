@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/version: "2.1"
 spec:
   replicas: 1
-  serviceName: dirsrv
+  serviceName: jellyfin
   selector:
     matchLabels:
       app.kubernetes.io/name: 389ds

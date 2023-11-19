@@ -23,6 +23,7 @@ metadata:
   namespace: media-server
 spec:
   type: ClusterIP
+  clusterIP: None  # Headless service for StatefulSet
   selector:
     app.kubernetes.io/name: jellyfin
   ports:

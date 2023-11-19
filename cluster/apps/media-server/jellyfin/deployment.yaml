@@ -1,6 +1,6 @@
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: jellyfin
   namespace: media-server
@@ -9,10 +9,8 @@ metadata:
   annotations:
     ignore-check.kube-linter.io/no-read-only-root-fs: "Unsupported for this app."
 spec:
-  revisionHistoryLimit: 3
   replicas: 1
-  strategy:
-    type: Recreate
+  serviceName: dirsrv
   selector:
     matchLabels:
       app.kubernetes.io/name: jellyfin
@@ -48,7 +46,7 @@ spec:
               memory: 250Mi
       containers:
         - name: jellyfin
-          image: "docker.io/jellyfin/jellyfin:10.8.4"
+          image: "docker.io/jellyfin/jellyfin:10.8.12"
           imagePullPolicy: IfNotPresent
           ports:
             - name: jellyfin-http
