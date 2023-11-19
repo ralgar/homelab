@@ -1,19 +1,16 @@
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
-  name: 389ds
+  name: dirsrv
   namespace: 389ds
-  annotations:
-    config.kubernetes.io/depends-on: apps/namespaces/cert-manager/Deployment/cert-manager
   labels:
     app.kubernetes.io/name: 389ds
     app.kubernetes.io/instance: 389ds
     app.kubernetes.io/version: "2.1"
 spec:
   replicas: 1
-  strategy:
-    type: Recreate
+  serviceName: dirsrv
   selector:
     matchLabels:
       app.kubernetes.io/name: 389ds
@@ -25,57 +22,86 @@ spec:
         app.kubernetes.io/instance: 389ds
     spec:
       serviceAccountName: 389ds
-      securityContext:
-        {}
+      initContainers:
+        - name: init
+          image: ghcr.io/ralgar/389ds:2.4
+          imagePullPolicy: IfNotPresent
+          command: ["/config/init.sh"]
+          env:
+            - name: DS_SUFFIX_NAME
+              value: "dc=homelab,dc=internal"
+          volumeMounts:
+            - name: 389ds-init-config
+              mountPath: /config
+            - name: 389ds-data
+              mountPath: /data
+            - name: 389ds-certs
+              mountPath: /data/tls
+              readOnly: true
+            - name: 389ds-secrets
+              mountPath: /secrets
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 1000Mi
+            requests:
+              cpu: 250m
+              memory: 1000Mi
       containers:
         - name: 389ds
-          securityContext:
-            {}
-          image: "389ds/dirsrv:2.1"
+          image: ghcr.io/ralgar/389ds:2.4
           imagePullPolicy: IfNotPresent
           ports:
             - name: ldap-tcp
               containerPort: 3389
               protocol: TCP
-            - name: ldap-udp
-              containerPort: 3389
-              protocol: UDP
             - name: ldaps-tcp
               containerPort: 3636
               protocol: TCP
-            - name: ldaps-udp
-              containerPort: 3636
-              protocol: UDP
           volumeMounts:
             - name: 389ds-data
-              mountPath: '/data/'
+              mountPath: /data
             - name: 389ds-certs
-              mountPath: '/data/tls/'
+              mountPath: /data/tls
               readOnly: true
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 1000Mi
+            requests:
+              cpu: 250m
+              memory: 1000Mi
           livenessProbe:
             exec:
-              command:
-                - "/usr/lib/dirsrv/dscontainer"
-                - "-H"
-            initialDelaySeconds: 30
+              command: ["/usr/bin/dscontainer", "-H"]
+            initialDelaySeconds: 60
             periodSeconds: 15
+            failureThreshold: 3
           readinessProbe:
             exec:
-              command:
-                - "/usr/lib/dirsrv/dscontainer"
-                - "-H"
-            initialDelaySeconds: 30
+              command: ["/usr/bin/dscontainer", "-H"]
+            initialDelaySeconds: 60
             periodSeconds: 15
+            failureThreshold: 5
           startupProbe:
             exec:
-              command:
-                - "/usr/lib/dirsrv/dscontainer"
-                - "-H"
-            failureThreshold: 30
+              command: ["/usr/bin/dscontainer", "-H"]
+            initialDelaySeconds: 15
             periodSeconds: 15
-          resources:
-            {}
+            failureThreshold: 10
+          # TODO: Set security context
+          # securityContext:
+          #   runAsUser: 103389
+          #   runAsGroup: 103389
+          #   runAsNonRoot: true
+          #   privileged: false
+          #   allowPrivilegeEscalation: false
+          #   readOnlyRootFilesystem: true
       volumes:
+        - name: 389ds-init-config
+          configMap:
+            name: 389ds-init-config
+            defaultMode: 0555
         - name: 389ds-data
           persistentVolumeClaim:
             claimName: 389ds-data
@@ -89,3 +115,6 @@ spec:
                 path: server.crt
               - key: ca.crt
                 path: ca/ca.crt
+        - name: 389ds-secrets
+          secret:
+            secretName: 389ds-secrets

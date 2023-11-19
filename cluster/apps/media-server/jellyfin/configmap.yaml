@@ -60,6 +60,8 @@ data:
       [ -f /config/plugins/configurations/LDAP-Auth.xml ] || {
         cp /configmaps/LDAP-Auth.xml \
           /config/plugins/configurations/LDAP-Auth.xml || return 1
+        sed -i "s/LDAP_BIND_PASSWORD/$(</secrets/ldap-bind-password)/" \
+          /config/plugins/configurations/LDAP-Auth.xml || return 1
       }
 
       [ -d /config/plugins/LDAP* ] || {
@@ -160,13 +162,13 @@ data:
   LDAP-Auth.xml: |
     <?xml version="1.0" encoding="utf-8"?>
     <PluginConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <LdapServer>dirsrv.389ds.svc</LdapServer>
-      <LdapPort>636</LdapPort>
+      <LdapServer>dirsrv-0.dirsrv.389ds.svc</LdapServer>
+      <LdapPort>3636</LdapPort>
       <UseSsl>true</UseSsl>
       <UseStartTls>false</UseStartTls>
       <SkipSslVerify>false</SkipSslVerify>
       <LdapBindUser>cn=jellyfin,ou=services,dc=homelab,dc=internal</LdapBindUser>
-      <LdapBindPassword>mG2FHb8ptWwegp</LdapBindPassword>
+      <LdapBindPassword>LDAP_BIND_PASSWORD</LdapBindPassword>
       <LdapBaseDn>ou=people,dc=homelab,dc=internal</LdapBaseDn>
       <LdapSearchFilter>(objectClass=nsOrgPerson)</LdapSearchFilter>
       <LdapAdminBaseDn />

@@ -6,8 +6,10 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-    - name: trust-manager
     - name: csi-cinder
+    - name: external-secrets
+    - name: trust-manager
+    - name: vault
   interval: 60m
   path: ./cluster/platform/389ds
   prune: true
