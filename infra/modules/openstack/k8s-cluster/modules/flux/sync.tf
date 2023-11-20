@@ -1,3 +1,14 @@
+resource "kubernetes_config_map_v1" "flux_configs" {
+  metadata {
+    name      = "cluster-config-vars"
+    namespace = "flux-system"
+  }
+
+  data = var.configs
+
+  depends_on = [helm_release.flux_install]
+}
+
 resource "kubernetes_secret_v1" "flux_secrets" {
   metadata {
     name      = "cluster-secret-vars"
@@ -25,5 +36,8 @@ resource "helm_release" "flux_sync" {
     path       = var.path
   })]
 
-  depends_on = [kubernetes_secret_v1.flux_secrets]
+  depends_on = [
+    kubernetes_config_map_v1.flux_configs,
+    kubernetes_secret_v1.flux_secrets,
+  ]
 }

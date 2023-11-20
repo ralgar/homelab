@@ -17,10 +17,10 @@ kustomization:
     prune: true
     postBuild:
       substituteFrom:
-          # Use this ConfigMap if it exists, but proceed if it doesn't.
+          # Fail if these do not exist.
         - kind: ConfigMap
-          name: cluster-vars
-          optional: true
-          # Fail if this Secret does not exist.
+          name: cluster-config-vars
+          optional: false
         - kind: Secret
           name: cluster-secret-vars
+          optional: false

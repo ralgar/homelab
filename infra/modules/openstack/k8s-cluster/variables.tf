@@ -21,6 +21,7 @@ variable "bootstrap" {
     repository = string
     ref_name   = string
     path       = string
+    configs    = map(string)
     secrets    = map(string)
   })
   default     = {
@@ -28,6 +29,7 @@ variable "bootstrap" {
     repository  = null
     ref_name    = null
     path        = null
+    configs     = {}
     secrets     = {}
   }
 }

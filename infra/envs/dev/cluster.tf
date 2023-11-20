@@ -33,6 +33,8 @@ module "k8s_cluster" {
     ref_name   = var.gitops_ref_name
     path       = var.gitops_path
 
+    configs = {}
+
     secrets = {
       GCP_BACKUP_BUCKET_NAME  = module.gcp_bucket.name
       GCP_BACKUP_BUCKET_CREDS = module.gcp_bucket.service_account_key  # base64
