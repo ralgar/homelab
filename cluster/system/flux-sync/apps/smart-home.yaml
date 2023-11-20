@@ -1,0 +1,20 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: smart-home
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: csi-cinder
+    - name: external-secrets
+    - name: ingress-nginx
+    - name: trust-manager
+    - name: vault
+  interval: 60m
+  path: ./cluster/apps/smart-home
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system

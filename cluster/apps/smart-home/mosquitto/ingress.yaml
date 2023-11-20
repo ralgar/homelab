@@ -1,0 +1,55 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: mqtt.homelab.internal
+  labels:
+    app.kubernetes.io/name: mosquitto
+spec:
+  commonName: mqtt.homelab.internal
+  dnsNames:
+    - mqtt.homelab.internal
+    - mqtt.smart-home.svc
+  issuerRef:
+    name: internal-issuer
+    kind: ClusterIssuer
+  secretName: mosquitto-cert
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mqtt
+spec:
+  type: ClusterIP
+  clusterIP: None
+  selector:
+    app.kubernetes.io/name: mosquitto
+  ports:
+    - name: mosquitto-http
+      port: 1883
+      protocol: TCP
+      targetPort: mosquitto-http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mosquitto
+  labels:
+    app.kubernetes.io/name: mosquitto
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - mqtt.homelab.internal
+      secretName: mosquitto-cert
+  rules:
+    - host: mqtt.homelab.internal
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: mqtt
+                port:
+                  name: mosquitto-http

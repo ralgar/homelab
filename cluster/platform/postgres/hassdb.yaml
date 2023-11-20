@@ -1,0 +1,47 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: smart-home
+---
+apiVersion: postgres-operator.crunchydata.com/v1beta1
+kind: PostgresCluster
+metadata:
+  name: hassdb
+  namespace: smart-home
+spec:
+  image: registry.developers.crunchydata.com/crunchydata/crunchy-postgres:ubi8-14.7-0
+  postgresVersion: 14
+  users:
+    - name: hass
+      databases:
+        - hass
+      password:
+        type: AlphaNumeric
+  instances:
+    - name: postgres1
+      dataVolumeClaimSpec:
+        accessModes:
+          - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: 1Gi
+  # PGO forces us to take backups currently, so we use a local
+  #  volume since we don't actually care about this data.
+  backups:
+    pgbackrest:
+      global:
+        repo1-retention-full: "30"  # Only keep 30 days
+        repo1-retention-full-type: time
+      repos:
+        - name: repo1
+          volume:
+            volumeClaimSpec:
+              accessModes:
+                - "ReadWriteOnce"
+              resources:
+                requests:
+                  storage: 1Gi
+          schedules:
+            # @ 12:00pm UTC (4:00am PST / 5:00 am PDT)
+            incremental: "0 12 1 * *"

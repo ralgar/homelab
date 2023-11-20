@@ -1,0 +1,19 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mosquitto-config
+data:
+  mosquitto.conf: |
+    # Use the default port.
+    listener 1883
+
+    # We're in a container, so log to stdout.
+    log_dest stdout
+
+    # Store temporary state to bolster reliable delivery.
+    persistence true
+    persistence_location /data/
+
+    # Password from K8s secret.
+    password_file /secrets/mosquitto.passwd
