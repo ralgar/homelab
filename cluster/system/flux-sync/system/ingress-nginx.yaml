@@ -14,3 +14,6 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
+  postBuild:
+    substitute:
+      LOAD_BALANCER_STATIC_IP: ${LOAD_BALANCER_STATIC_IP}

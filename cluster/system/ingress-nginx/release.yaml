@@ -24,8 +24,7 @@ spec:
       replicaCount: 1
       minAvailable: 1
       service:
-        annotations:
-          service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /healthz
+        loadBalancerIP: ${LOAD_BALANCER_STATIC_IP}
       metrics:
         enabled: true
         serviceMonitor:

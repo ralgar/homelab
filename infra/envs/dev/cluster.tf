@@ -33,7 +33,9 @@ module "k8s_cluster" {
     ref_name   = var.gitops_ref_name
     path       = var.gitops_path
 
-    configs = {}
+    configs = {
+      LOAD_BALANCER_STATIC_IP = "192.168.1.99"
+    }
 
     secrets = {
       GCP_BACKUP_BUCKET_NAME  = module.gcp_bucket.name
