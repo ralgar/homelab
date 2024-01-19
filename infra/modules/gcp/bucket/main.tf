@@ -8,7 +8,7 @@ resource "random_string" "bucket_id" {
 
 resource "google_storage_bucket" "default" {
   name     = "${var.name_prefix}-${random_string.bucket_id.result}"
-  location = "US"
+  location = "US-WEST1"  # Free tier must use US-WEST1, US-CENTRAL1, or US-EAST1
 
   # When destroying a bucket, destroy all contained objects.
   force_destroy = true
