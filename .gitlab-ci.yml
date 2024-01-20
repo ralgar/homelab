@@ -78,14 +78,16 @@ kube-linter:
 
 markdownlint:
   stage: lint
-  image: registry.gitlab.com/pipeline-components/markdownlint:latest
+  image:
+    name: ghcr.io/igorshubovych/markdownlint-cli:v0.38.0
+    entrypoint: [""]
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
         - .gitlab-ci.yml
         - "**/*.md"
   script:
-    - mdl --style all .
+    - markdownlint "**/*.md"
 
 terraform:validate:
   stage: lint
