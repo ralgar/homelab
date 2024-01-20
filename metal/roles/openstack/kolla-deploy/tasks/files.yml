@@ -1,0 +1,45 @@
+---
+- name: Seed '/etc/kolla/passwords.yml' if it doesn't exist
+  ansible.builtin.copy:
+    src: "{{ kolla_venv }}/share/kolla-ansible/etc_examples/kolla/passwords.yml"
+    remote_src: true
+    dest: /etc/kolla/
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: 0600
+    force: false
+  notify: generate_passwords
+
+- name: Assert '/etc/kolla/globals.yml'
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/vars/globals.yml"
+    dest: /etc/kolla/
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: 0644
+  notify: deploy
+
+- name: Assert '/etc/ansible/ansible.cfg'
+  ansible.builtin.copy:
+    src: ansible.cfg
+    dest: /etc/ansible/
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Seed '/etc/ansible/hosts' if it doesn't exist
+  ansible.builtin.copy:
+    src: "{{ kolla_venv }}/share/kolla-ansible/ansible/inventory/all-in-one"
+    remote_src: true
+    dest: /etc/ansible/hosts
+    owner: root
+    group: root
+    mode: 0644
+    force: false
+
+- name: Set the Python interpreter in '/etc/ansible/hosts'
+  ansible.builtin.lineinfile:
+    path: /etc/ansible/hosts
+    insertbefore: 'BOF'
+    regexp: '^localhost ansible_python_interpreter'
+    line: 'localhost ansible_python_interpreter=python'

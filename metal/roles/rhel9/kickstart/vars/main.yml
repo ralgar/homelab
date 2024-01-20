@@ -1,0 +1,10 @@
+---
+rocky_install_disk: "{{ 'vdb' if ci_pipeline else common.root_disk }}"
+rocky_ssh_public_key: "{{ lookup('ansible.builtin.file', common.ssh_pubkey_file) }}"
+rocky_interface_one: "{{ network_interface }}"
+rocky_interface_two: "{{ neutron_external_interface }}"
+rocky_ip_address: "{{ kolla_internal_vip_address }}"
+rocky_subnet_mask: "{{ network.public_subnet_cidr | ansible.utils.ipaddr('netmask') }}"
+rocky_gateway_ip: "{{ network.public_subnet_gateway_ip }}"
+rocky_dns_servers: "{{ network.public_dns_servers }}"
+rocky_hostname: "{{ network.hostname }}"

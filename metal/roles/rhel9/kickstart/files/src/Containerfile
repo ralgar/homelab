@@ -1,0 +1,7 @@
+FROM docker.io/fedora:latest
+
+# Install mkksiso and its dependencies
+RUN dnf install -y lorax isomd5sum make pip xorriso
+
+COPY ./init /init
+ENTRYPOINT ["/init"]

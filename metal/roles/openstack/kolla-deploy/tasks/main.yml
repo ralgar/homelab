@@ -1,0 +1,19 @@
+---
+- name: Get an IP address for the OpenStack API
+  ansible.builtin.set_fact:
+    ip_address: "{{ ansible_default_ipv4.address | default(ansible_all_ipv4_addresses[0]) }}"
+
+- name: Include main tasks
+  ansible.builtin.include_tasks: "{{ item }}"
+  loop:
+    - packages-sdk.yml
+    - packages.yml
+    - files.yml
+    - octavia.yml
+
+- name: Include CI Pipeline tasks
+  ansible.builtin.include_tasks: ci-pipeline.yml
+  when: ci_pipeline
+
+- name: Flush Handlers
+  ansible.builtin.meta: flush_handlers

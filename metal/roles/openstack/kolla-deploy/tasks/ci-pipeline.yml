@@ -1,0 +1,47 @@
+---
+- name: Assert private network interface for CI pipeline
+  ansible.builtin.lineinfile:
+    path: /etc/kolla/globals.yml
+    regexp: '^network_interface:'
+    line: 'network_interface: eth0'
+
+- name: Assert private network address for CI pipeline
+  ansible.builtin.lineinfile:
+    path: /etc/kolla/globals.yml
+    regexp: '^kolla_internal_vip_address:'
+    line: "kolla_internal_vip_address: {{ ansible_default_ipv4.address }}"
+
+- name: Assert public network interface for CI pipeline
+  ansible.builtin.lineinfile:
+    path: /etc/kolla/globals.yml
+    regexp: '^neutron_external_interface:'
+    line: 'neutron_external_interface: eth1'
+
+- name: Install system packages for CI pipeline
+  ansible.builtin.dnf:
+    name:
+      - lvm2
+
+- name: Create the LVM physical volumes
+  community.general.parted:
+    device: "{{ lvm_physical_disk }}"
+    number: 1
+    flags: [ lvm ]
+    state: present
+    part_end: 100%
+  loop:
+    - /dev/vdb
+    - /dev/vdc
+  loop_control:
+    loop_var: lvm_physical_disk
+
+- name: Create the LVM volume groups
+  community.general.lvg:
+    vg: "{{ lvm_volume_group.name }}"
+    pvs: "{{ lvm_volume_group.pvs }}"
+    pesize: 16M
+  loop:
+    - { name: cinder-premium, pvs: /dev/vdb1 }
+    - { name: cinder-standard, pvs: /dev/vdc1 }
+  loop_control:
+    loop_var: lvm_volume_group

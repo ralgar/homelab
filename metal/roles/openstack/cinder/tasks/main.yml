@@ -1,0 +1,6 @@
+---
+- name: Include tasks
+  ansible.builtin.include_tasks: "{{ item }}"
+  loop:
+    - prechecks.yml
+    - backends.yml

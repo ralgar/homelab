@@ -1,0 +1,32 @@
+#!/bin/bash
+
+function get_isos {
+    isos=()
+    for file in /input/* ; do
+        if [[ $file =~ (.*).iso$ ]] ; then
+            isos+=("$file")
+        fi
+    done
+
+    if [[ ${#isos[@]} -gt 1 ]] ; then
+        echo "ERROR: More than one ISO file is present in '/input'"
+        return 1
+    elif [[ ${#isos[@]} -lt 1 ]] ; then
+        echo "ERROR: No ISO files were found in '/input'"
+        return 1
+    fi
+}
+
+function main {
+    if get_isos ; then
+        mkksiso \
+            --ks /input/ks.cfg \
+            "${isos[0]}" \
+            "${isos[0]/input/output}" \
+            || return 1
+    else
+        return 1
+    fi
+}
+
+main || exit 1

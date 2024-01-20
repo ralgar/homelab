@@ -1,0 +1,15 @@
+# Deploys an 'all-in-one' OpenStack cluster on Rocky Linux 9
+# NOTE: This playbook will make MAJOR alterations to the system, be careful
+#       of where you run it. It must run with elevated privileges.
+---
+- name: Deploy Kolla
+  hosts: all
+  remote_user: root
+  become: true
+  vars_files:
+    - vars/globals.yml
+    - vars/main.yml
+  roles:
+    - openstack/kolla-deploy
+    - openstack/defaults
+    - openstack/cinder

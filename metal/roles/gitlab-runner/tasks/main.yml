@@ -1,0 +1,37 @@
+---
+- name: Set Ansible Python interpreter to venv
+  ansible.builtin.set_fact:
+    ansible_python_interpreter: "{{ kolla_venv }}/bin/python"
+
+- name: Check if environment variables are set
+  ansible.builtin.debug:
+    msg: "{{ gitlab_runner_var }}"
+  failed_when: lookup('ansible.builtin.env', gitlab_runner_var) == ''
+  loop:
+    - GITLAB_RUNNER_ID
+    - GITLAB_RUNNER_TOKEN
+  loop_control:
+    loop_var: gitlab_runner_var
+
+- name: Get the GID of docker group
+  ansible.builtin.group:
+    name: docker
+    state: present
+  register: docker_group
+
+- name: Create the config directory
+  ansible.builtin.file:
+    path: /etc/gitlab-runner
+    owner: 9999
+    group: 9999
+    mode: 0700
+    state: directory
+
+- name: Template the config file
+  ansible.builtin.template:
+    src: config.toml.j2
+    dest: /etc/gitlab-runner/config.toml
+    owner: 9999
+    group: 9999
+    mode: 0600
+  notify: recreate_container

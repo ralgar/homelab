@@ -1,0 +1,16 @@
+---
+- name: Remove any existing Kickstart ISO
+  ansible.builtin.file:
+    path: "{{ playbook_dir }}/output/{{ boot_iso_filename }}"
+    state: absent
+
+- name: Build Kickstart ISO
+  containers.podman.podman_container:
+    name: mkksiso
+    image: localhost/mkksiso:latest
+    state: started
+    remove: true
+    volume:
+      - "{{ role_path }}/files/input:/input"
+      - "{{ playbook_dir }}/output:/output"
+  listen: make_iso

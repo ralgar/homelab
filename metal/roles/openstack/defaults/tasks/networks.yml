@@ -1,0 +1,26 @@
+---
+- name: Create '{{ public_network_name }}' network
+  openstack.cloud.network:
+    name: "{{ public_network_name }}"
+    external: true
+    shared: true
+    provider_network_type: flat
+    provider_physical_network: physnet1
+    state: present
+    cloud: kolla-admin
+  environment:
+    OS_CLIENT_CONFIG_FILE: /etc/kolla/clouds.yaml
+
+- name: Create '{{ public_subnet_name }}' subnet
+  openstack.cloud.subnet:
+    name: "{{ public_subnet_name }}"
+    state: present
+    network_name: "{{ public_network_name }}"
+    cidr: "{{ public_subnet_cidr }}"
+    gateway_ip: "{{ public_subnet_gateway_ip }}"
+    enable_dhcp: true
+    allocation_pool_start: "{{ public_subnet_allocation_pool_start }}"
+    allocation_pool_end: "{{ public_subnet_allocation_pool_end }}"
+    cloud: kolla-admin
+  environment:
+    OS_CLIENT_CONFIG_FILE: /etc/kolla/clouds.yaml

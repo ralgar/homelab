@@ -1,0 +1,23 @@
+---
+# Name (path) of the venv, using the root user's home as the base.
+# Ex. A value of 'kolla-venv' will become '/root/kolla-venv'
+kolla_venv: "{{ common.kolla_venv }}"
+sdk_venv: "{{ common.sdk_venv }}"
+
+# Desired names of your 'public' network and subnet.
+# These will be directly attached to your LAN.
+public_network_name: "{{ network.public_network_name }}"
+public_subnet_name: "{{ network.public_subnet_name }}"
+
+# CIDR of your LAN subnet
+public_subnet_cidr: "{{ network.public_subnet_cidr }}"
+
+# IP address to assign to the gateway of the OpenStack network.
+# This is NOT your router's IP.
+public_subnet_gateway_ip: "{{ network.public_subnet_gateway_ip }}"
+
+# Range of the floating IP address pool for OpenStack instances.
+# This should be OUTSIDE of the DHCP range of your router, and
+#  NOT include the gateway IP address.
+public_subnet_allocation_pool_start: "{{ network.public_subnet_allocation_pool_start }}"
+public_subnet_allocation_pool_end: "{{ network.public_subnet_allocation_pool_end }}"

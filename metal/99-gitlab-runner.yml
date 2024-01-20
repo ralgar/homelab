@@ -1,0 +1,7 @@
+---
+- name: Deploy GitLab Runner
+  hosts: all
+  remote_user: root
+  become: false
+  roles:
+    - gitlab-runner

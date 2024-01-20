@@ -1,0 +1,13 @@
+---
+- name: Create (or recreate) the container
+  community.docker.docker_container:
+    name: gitlab-runner
+    image: docker.io/gitlab/gitlab-runner:latest
+    restart_policy: always
+    recreate: true
+    user: 9999:{{ docker_group.gid }}
+    network_mode: host
+    volumes:
+      - /etc/gitlab-runner:/.gitlab-runner
+      - /var/run/docker.sock:/var/run/docker.sock
+  listen: recreate_container

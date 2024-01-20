@@ -1,0 +1,4 @@
+---
+kolla_venv: /root/kolla-venv
+gitlab_runner_id: "{{ lookup('ansible.builtin.env', 'GITLAB_RUNNER_ID') }}"
+gitlab_runner_token: "{{ lookup('ansible.builtin.env', 'GITLAB_RUNNER_TOKEN') }}"

@@ -1,0 +1,10 @@
+---
+- name: Install Ansible dependencies
+  ansible.builtin.shell: |
+    source {{ kolla_venv }}/bin/activate
+    kolla-ansible install-deps
+
+- name: Bootstrap server for Kolla
+  ansible.builtin.shell: |
+    source {{ kolla_venv }}/bin/activate
+    kolla-ansible bootstrap-servers

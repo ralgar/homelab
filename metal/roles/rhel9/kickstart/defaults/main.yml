@@ -1,0 +1,18 @@
+---
+boot_iso_base_url: 'https://dl.rockylinux.org/vault/rocky/9.0/isos/x86_64'
+boot_iso_filename: Rocky-9.0-x86_64-boot.iso
+boot_iso_checksum: "sha256:fc6b306b9fc8d327d7545373ce88c48bd1f7e84d29548814a91e84676b7d26e4"
+boot_iso_full_url: "{{ boot_iso_base_url }}/{{ boot_iso_filename }}"
+
+ci_pipeline: false
+
+# Installation parameters
+rocky_install_disk: nvme0n1
+rocky_ssh_public_key: ""
+rocky_interface_one: eno1
+rocky_interface_two: eno2
+rocky_ip_address: 192.168.1.11
+rocky_subnet_mask: 255.255.255.0
+rocky_gateway_ip: 192.168.1.254
+rocky_dns_servers: ['1.1.1.1', '1.0.0.1']
+rocky_hostname: openstack.homelab.internal

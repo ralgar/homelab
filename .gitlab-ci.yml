@@ -53,6 +53,15 @@ terraform:init:
     - cd ${TF_ROOT}
     - gitlab-terraform init
 
+ansible-lint:
+  stage: lint
+  image: registry.gitlab.com/pipeline-components/ansible-lint:latest
+  rules:
+    - changes:
+        - metal/**/*
+  script:
+    - ansible-lint --show-relpath metal
+
 kube-linter:
   stage: lint
   image:

@@ -1,0 +1,47 @@
+---
+- name: 'Octavia : Build Amphora image'
+  ansible.builtin.shell:
+    chdir: /root/octavia/diskimage-create
+    cmd: |
+      source {{ kolla_venv }}/bin/activate
+      ./diskimage-create.sh
+
+- name: 'Octavia : Source user credentials'
+  ansible.builtin.shell:
+    cmd: source /etc/kolla/octavia-openrc.sh
+
+# Run all / only tasks that use Ansible OpenStack modules after this
+- name: Set Python interpreter to venv
+  ansible.builtin.set_fact:
+    ansible_python_interpreter: "{{ sdk_venv }}/bin/python"
+
+- name: Get Octavia password
+  ansible.builtin.shell:
+    cmd: |
+      grep OS_PASSWORD /etc/kolla/octavia-openrc.sh | awk '{
+        res=$2
+        split(res,resArr,"=")
+        print resArr[2]
+      }' | sed s/\'//g
+  register: octavia_password
+
+- name: 'Octavia : Upload the Amphora image'
+  openstack.cloud.image:
+    auth:
+      auth_url: http://{{ ip_address }}:5000
+      username: octavia
+      password: "{{ octavia_password.stdout }}"
+      project_name: service
+      user_domain_name: Default
+      project_domain_name: Default
+    name: amphora-x64-haproxy.qcow2
+    container_format: bare
+    disk_format: qcow2
+    is_public: false
+    tags:
+      - amphora
+    filename: /root/octavia/diskimage-create/amphora-x64-haproxy.qcow2
+    state: present
+    properties:
+      hw_architecture: x86_64
+      hw_rng_model: virtio

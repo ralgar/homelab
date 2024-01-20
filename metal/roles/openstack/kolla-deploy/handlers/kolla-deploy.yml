@@ -1,0 +1,15 @@
+---
+- name: Perform Kolla prechecks
+  ansible.builtin.shell: |
+    source {{ kolla_venv }}/bin/activate
+    kolla-ansible prechecks
+
+- name: Perform Kolla deployment
+  ansible.builtin.shell: |
+    source {{ kolla_venv }}/bin/activate
+    kolla-ansible deploy
+
+- name: Trigger post-deploy bootstrap handler
+  ansible.builtin.command:
+    argv: ['true']
+  notify: post_deploy

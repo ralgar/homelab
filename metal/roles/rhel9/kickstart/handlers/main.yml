@@ -1,0 +1,4 @@
+---
+- name: Include tasks
+  ansible.builtin.include_tasks: make-iso.yml
+  listen: make_iso

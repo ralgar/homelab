@@ -1,0 +1,7 @@
+---
+- name: Checking LVM volume group(s) exists for Cinder
+  ansible.builtin.command: "vgs {{ cinder_vg }}"
+  changed_when: false
+  loop: "{{ cinder_vgs }}"
+  loop_control:
+    loop_var: cinder_vg

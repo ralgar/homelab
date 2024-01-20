@@ -1,0 +1,4 @@
+---
+cinder_vgs:
+  - cinder-premium
+  - cinder-standard

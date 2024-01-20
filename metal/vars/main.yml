@@ -1,0 +1,36 @@
+---
+common:
+  # Name (path) of the venv, using the root user's home as the base.
+  # Ex. A value of 'kolla-venv' will become '/root/kolla-venv'
+  kolla_venv: /root/kolla-venv
+  sdk_venv: /root/sdk-venv
+
+  # Target disk for the root filesystem.
+  root_disk: nvme0n1
+
+  # Path to your SSH pubkey file. This will be used to access the node.
+  ssh_pubkey_file: ~/.ssh/id_ed25519.pub
+
+network:
+  # The hostname to be assigned to the AIO OpenStack node.
+  hostname: openstack.homelab.internal
+
+  # A list of two public DNS resolvers to use for the network.
+  public_dns_servers: ['1.1.1.1', '1.0.0.1']
+
+  # Desired names (within OpenStack) of your 'public' network and subnet.
+  # This network is attached to your LAN.
+  public_network_name: public
+  public_subnet_name: public
+
+  # CIDR of your LAN subnet.
+  public_subnet_cidr: 192.168.1.0/24
+
+  # The IP address of your LAN gateway (your router).
+  public_subnet_gateway_ip: 192.168.1.254
+
+  # Range of the floating IP address pool for public OpenStack network.
+  # This should be OUTSIDE of the DHCP range of your router, and should
+  #  NOT include the IP address of your gateway or your OpenStack node.
+  public_subnet_allocation_pool_start: 192.168.1.20
+  public_subnet_allocation_pool_end: 192.168.1.100

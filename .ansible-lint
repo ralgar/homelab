@@ -1,0 +1,5 @@
+# vim: ft=yaml
+---
+profile: min
+exclude_paths:
+  - vars/globals.yml  # Exclude this as it is provided by the Kolla project

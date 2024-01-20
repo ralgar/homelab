@@ -1,0 +1,22 @@
+---
+- name: Download Rocky Linux 'boot' ISO
+  ansible.builtin.get_url:
+    url: "{{ boot_iso_full_url }}"
+    dest: "{{ role_path }}/files/input"
+    checksum: "{{ boot_iso_checksum }}"
+    mode: "0644"
+  notify: make_iso
+
+- name: Template the Kickstart file
+  ansible.builtin.template:
+    src: ks.cfg.j2
+    dest: "{{ role_path }}/files/input/ks.cfg"
+    mode: "0644"
+  notify: make_iso
+
+- name: Build mkksiso container image
+  containers.podman.podman_image:
+    name: localhost/mkksiso
+    tag: latest
+    path: "{{ role_path }}/files/src"
+  notify: make_iso

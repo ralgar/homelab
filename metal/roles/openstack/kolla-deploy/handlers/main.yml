@@ -1,0 +1,34 @@
+---
+- name: Include bootstrap tasks
+  ansible.builtin.include_tasks: bootstrap.yml
+  listen: bootstrap
+
+- name: Generate Kolla passwords
+  ansible.builtin.shell: |
+    source {{ kolla_venv }}/bin/activate
+    kolla-genpwd
+  listen: generate_passwords
+
+- name: 'Octavia : Include pre-deploy tasks'
+  ansible.builtin.include_tasks: octavia/pre-deploy.yml
+  listen: octavia
+
+# TODO: Keep an eye on this workaround, it should eventually be removed.
+- name: 'Magnum : Use custom container to fix Kubernetes issues'
+  ansible.builtin.lineinfile:
+    path: "{{ kolla_venv }}/share/kolla-ansible/ansible/roles/magnum/defaults/main.yml"
+    regexp: 'image: \"\{\{ magnum_conductor_image_full \}\}\"'
+    line: '    image: "ghcr.io/ralgar/kolla/magnum-conductor:stable-zed"'
+  listen: bootstrap
+
+- name: Include precheck and deploy tasks
+  ansible.builtin.include_tasks: kolla-deploy.yml
+  listen: deploy
+
+- name: Include post-deploy tasks
+  ansible.builtin.include_tasks: post-deploy.yml
+  listen: post_deploy
+
+- name: 'Octavia : Include post-deploy tasks'
+  ansible.builtin.include_tasks: octavia/post-deploy.yml
+  listen: octavia

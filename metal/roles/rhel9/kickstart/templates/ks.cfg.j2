@@ -1,0 +1,88 @@
+#version=RHEL9
+
+# Set installation mirrors
+url --url="http://dl.rockylinux.org/pub/rocky/9/BaseOS/$basearch/os/"
+repo --name AppStream --baseurl="http://dl.rockylinux.org/pub/rocky/9/AppStream/$basearch/os/"
+
+# Terminal install (no GUI)
+text
+
+%addon com_redhat_kdump --enable --reserve-mb='auto'
+%end
+
+# System language
+keyboard us
+lang en_US.UTF-8
+
+# System timezone
+timezone America/Vancouver --utc
+
+# Root password
+rootpw --iscrypted thereisnopasswordanditslocked
+
+# Network information
+{% if ci_pipeline %}
+network  --bootproto=dhcp --device=ens3 --noipv6 --activate
+#network  --bootproto=dhcp --device=ens4 --noipv4 --noipv6 --activate
+{% else %}
+network  --bootproto=static --device={{ rocky_interface_one }} --gateway={{ rocky_gateway_ip }} --ip={{ rocky_ip_address }} --nameserver={{ rocky_dns_servers[0] }},{{ rocky_dns_servers[1] }} --netmask={{ rocky_subnet_mask }} --noipv6 --activate
+network  --bootproto=static --device={{ rocky_interface_two }} --noipv4 --noipv6 --activate
+{% endif %}
+network  --hostname={{ rocky_hostname }}
+
+# Do not run the Setup Agent on first boot
+firstboot --disable
+
+# System packages
+%packages
+@^minimal-environment
+%end
+
+#############################
+###   Disk partitioning   ###
+###############################################################################
+ignoredisk --only-use={{ rocky_install_disk }}
+
+# Clear and create partition table
+zerombr
+clearpart --all --initlabel --disklabel=gpt
+
+# Create partitions and LVM PVs
+part pv.01     --size=30000 --fstype=lvmpv    --grow
+part pv.02     --size=1024  --fstype=lvmpv    --grow       --maxsize=232830
+part biosboot  --size=1     --fstype=biosboot
+part /boot     --size=1024  --fstype=xfs      --label=boot
+part /boot/efi --size=1024  --fstype=efi
+
+# Create LVM VGs
+volgroup openstack      --pesize=4096 pv.01
+volgroup cinder-premium --pesize=4096 pv.02
+
+# Root LVM volumes
+logvol /    --fstype=xfs  --size=7450   --name=root --vgname=openstack
+logvol /var --fstype=xfs  --size=18626  --name=var  --vgname=openstack --grow
+logvol swap --fstype=swap --recommended --name=swap --vgname=openstack
+
+###################################
+###   Post-installation tasks   ###
+###############################################################################
+%post --erroronfail
+
+# Delete the root password and lock the account
+passwd -d root
+passwd -l root
+
+# Configure SSH key auth
+mkdir -m0700 /root/.ssh
+echo "{{ rocky_ssh_public_key }}" > /root/.ssh/authorized_keys
+chmod 0600 /root/.ssh/authorized_keys
+restorecon -R /root/.ssh
+
+%end
+
+# Reboot or shutdown after finishing installation
+{% if ci_pipeline %}
+shutdown
+{% else %}
+reboot
+{% endif %}

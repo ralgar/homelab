@@ -1,0 +1,42 @@
+# Create the default project environments
+---
+- name: "Create the 'prod' project"
+  openstack.cloud.project:
+    state: present
+    name: prod
+    description: Production environment
+    enabled: true
+    domain_id: Default
+    cloud: kolla-admin
+  environment:
+    OS_CLIENT_CONFIG_FILE: /etc/kolla/clouds.yaml
+
+- name: "Set quotas for the 'prod' project"
+  openstack.cloud.quota:
+    name: prod
+    cloud: kolla-admin
+    gigabytes: -1
+  environment:
+    OS_CLIENT_CONFIG_FILE: /etc/kolla/clouds.yaml
+
+- name: "Create the 'staging' project"
+  openstack.cloud.project:
+    state: present
+    name: staging
+    description: Staging environment
+    enabled: true
+    domain_id: Default
+    cloud: kolla-admin
+  environment:
+    OS_CLIENT_CONFIG_FILE: /etc/kolla/clouds.yaml
+
+- name: "Create the 'dev' project"
+  openstack.cloud.project:
+    state: present
+    name: dev
+    description: Development environment
+    enabled: true
+    domain_id: Default
+    cloud: kolla-admin
+  environment:
+    OS_CLIENT_CONFIG_FILE: /etc/kolla/clouds.yaml

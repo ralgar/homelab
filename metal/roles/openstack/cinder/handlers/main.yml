@@ -1,0 +1,12 @@
+---
+- name: Restart the containers
+  community.docker.docker_container:
+    name: "{{ cinder_container }}"
+    restart: true
+  loop:
+    - cinder_api
+    - cinder_scheduler
+    - cinder_volume
+  loop_control:
+    loop_var: cinder_container
+  listen: restart_containers
