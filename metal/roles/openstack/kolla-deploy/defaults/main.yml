@@ -1,4 +1,8 @@
 ---
+# Whether we are running in a CI pipeline or not.
+# Toggles some additional configuration tasks.
+ci_pipeline: false
+
 # Name (path) of the venv, using the root user's home as the base.
 # Ex. A value of 'kolla-venv' will become '/root/kolla-venv'
 kolla_venv: /root/kolla-venv

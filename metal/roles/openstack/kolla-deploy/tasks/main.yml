@@ -13,7 +13,7 @@
 
 - name: Include CI Pipeline tasks
   ansible.builtin.include_tasks: ci-pipeline.yml
-  when: ci_pipeline
+  when: ci_pipeline == "true"
 
 - name: Flush Handlers
   ansible.builtin.meta: flush_handlers
