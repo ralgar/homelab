@@ -7,4 +7,4 @@ resources:
   - secrets.yaml
   - storage.yaml
   - ingress.yaml
-  - deployment.yaml
+  - statefulset.yaml

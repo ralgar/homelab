@@ -162,7 +162,7 @@ data:
   LDAP-Auth.xml: |
     <?xml version="1.0" encoding="utf-8"?>
     <PluginConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <LdapServer>dirsrv-0.dirsrv.389ds.svc</LdapServer>
+      <LdapServer>dirsrv.389ds.svc</LdapServer>
       <LdapPort>3636</LdapPort>
       <UseSsl>true</UseSsl>
       <UseStartTls>false</UseStartTls>
