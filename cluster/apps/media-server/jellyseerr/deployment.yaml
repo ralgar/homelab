@@ -21,8 +21,6 @@ spec:
       labels:
         app.kubernetes.io/name: jellyseerr
     spec:
-      # serviceAccountName: default
-      # automountServiceAccountToken: true
       dnsPolicy: ClusterFirst
       enableServiceLinks: true
       securityContext:
@@ -48,54 +46,9 @@ spec:
             requests:
               cpu: 125m
               memory: 250Mi
-        - name: init-pgloader
-          image: "ghcr.io/ralgar/pgloader:pr-1531"
-          imagePullPolicy: IfNotPresent
-          command: ['sh', '-c', 'exec pgloader "/configmaps/$LOADER_SCRIPT"']
-          env:
-            - name: LOADER_SCRIPT
-              value: database.load
-            - name: DATA_SOURCE
-              value: https://github.com/ralgar/file-storage/releases/download/files/jellyseerr-v1.7.0.sqlite3
-            - name: POSTGRES_DATABASE
-              value: jellyseerr
-            - name: POSTGRES_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: mediadb-pguser-jellyseerr
-                  key: host
-            - name: POSTGRES_PORT
-              valueFrom:
-                secretKeyRef:
-                  name: mediadb-pguser-jellyseerr
-                  key: port
-            - name: POSTGRES_USER
-              valueFrom:
-                secretKeyRef:
-                  name: mediadb-pguser-jellyseerr
-                  key: user
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mediadb-pguser-jellyseerr
-                  key: password
-          volumeMounts:
-            - name: jellyseerr-config
-              mountPath: /configmaps
-            - name: jellyseerr-data
-              mountPath: /app/config
-            - name: jellyseerr-secrets
-              mountPath: /secrets
-          resources:
-            limits:
-              cpu: 1000m
-              memory: 250Mi
-            requests:
-              cpu: 125m
-              memory: 250Mi
       containers:
         - name: jellyseerr
-          image: ghcr.io/ralgar/jellyseerr-pgsql:v1.7.0-preview
+          image: docker.io/fallenbagel/jellyseerr:preview-postgres@sha256:92111c76573d75d91d0618115c9fa118e70ce1c1bce9d79ca4a02ced17805de9
           imagePullPolicy: IfNotPresent
           env:
             - name: DB_TYPE
@@ -110,6 +63,10 @@ spec:
               valueFrom: { secretKeyRef: { name: mediadb-pguser-jellyseerr, key: password } }
             - name: DB_NAME
               value: jellyseerr
+            - name: DB_USE_SSL
+              value: "true"
+            - name: DB_SSL_REJECT_UNAUTHORIZED
+              value: "false"
           ports:
             - name: jellyseerr-http
               containerPort: 5055
