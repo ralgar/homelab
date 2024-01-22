@@ -166,7 +166,7 @@ data:
       <LdapPort>3636</LdapPort>
       <UseSsl>true</UseSsl>
       <UseStartTls>false</UseStartTls>
-      <SkipSslVerify>false</SkipSslVerify>
+      <SkipSslVerify>true</SkipSslVerify>
       <LdapBindUser>cn=jellyfin,ou=services,dc=homelab,dc=internal</LdapBindUser>
       <LdapBindPassword>LDAP_BIND_PASSWORD</LdapBindPassword>
       <LdapBaseDn>ou=people,dc=homelab,dc=internal</LdapBaseDn>
