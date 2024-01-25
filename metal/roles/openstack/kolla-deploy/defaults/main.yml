@@ -1,4 +1,7 @@
 ---
+# The OpenStack release to install. Must be a stable version.
+openstack_release: "2023.2"
+
 # Whether we are running in a CI pipeline or not.
 # Toggles some additional configuration tasks.
 ci_pipeline: false
@@ -6,7 +9,6 @@ ci_pipeline: false
 # Name (path) of the venv, using the root user's home as the base.
 # Ex. A value of 'kolla-venv' will become '/root/kolla-venv'
 kolla_venv: /root/kolla-venv
-sdk_venv: /root/sdk-venv
 
 # Desired names of your 'public' network and subnet.
 # These will be directly attached to your LAN.

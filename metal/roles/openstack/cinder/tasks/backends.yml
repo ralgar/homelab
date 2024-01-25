@@ -9,13 +9,6 @@
       volume_backend_name = lvm-premium
       target_helper = lioadm
       target_protocol = iscsi
-
-      [lvm-3]
-      volume_group = cinder-storage
-      volume_driver = cinder.volume.drivers.lvm.LVMVolumeDriver
-      volume_backend_name = lvm-storage
-      target_helper = lioadm
-      target_protocol = iscsi
   loop:
     - cinder-api
     - cinder-scheduler

@@ -23,5 +23,5 @@
   ansible.builtin.git:
     repo: https://opendev.org/openstack/octavia.git
     dest: /root/octavia
-    version: stable/zed
+    version: "stable/{{ openstack_release }}"
   notify: octavia

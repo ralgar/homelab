@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# From Gilang Virga Perdana's work: https://gist.github.com/gilangvperdana/81f754924bfbb3dda6fa9f8a41450586
+
+set -ex
+
+MGMT_PORT_MAC="{{ octavia_health_mgr.ports[0].mac_address }}"
+MGMT_PORT_ID="{{ octavia_health_mgr.ports[0].id }}"
+
+if [ "$1" == "start" ]; then
+    docker exec -i openvswitch_vswitchd ovs-vsctl -- --may-exist add-port br-int o-hm0 -- set Interface o-hm0 type=internal -- set Interface o-hm0 external-ids:iface-status=active -- set Interface o-hm0 external-ids:attached-mac=$MGMT_PORT_MAC -- set Interface o-hm0 external-ids:iface-id=$MGMT_PORT_ID
+    ip link set dev o-hm0 address $MGMT_PORT_MAC
+    ip link set o-hm0 up
+    dhclient -v o-hm0 -cf /etc/dhcp/octavia/dhclient.conf
+elif [ "$1" == "stop" ]; then
+    docker exec -i openvswitch_vswitchd ovs-vsctl del-port o-hm0
+else
+    docker exec -i openvswitch_vswitchd ovs-vsctl show
+    ip a s dev o-hm0
+fi

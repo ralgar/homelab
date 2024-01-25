@@ -6,7 +6,6 @@
 - name: Include main tasks
   ansible.builtin.include_tasks: "{{ item }}"
   loop:
-    - packages-sdk.yml
     - packages.yml
     - files.yml
     - octavia.yml

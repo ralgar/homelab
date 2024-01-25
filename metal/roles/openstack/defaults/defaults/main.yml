@@ -1,4 +1,4 @@
 ---
 # Name (path) of the venv, using the root user's home as the base.
 # Ex. A value of 'kolla-venv' will become '/root/kolla-venv'
-sdk_venv: sdk-venv
+kolla_venv: /root/kolla-venv

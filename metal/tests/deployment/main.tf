@@ -1,7 +1,3 @@
-data "openstack_compute_keypair_v2" "admin" {
-  name       = "admin"
-}
-
 data "openstack_networking_network_v2" "public" {
   name     = "public"
   external = true
@@ -14,6 +10,14 @@ resource "tls_private_key" "ephemeral" {
 resource "openstack_compute_keypair_v2" "ephemeral" {
   name       = "openstack-test-pipeline-ephemeral"
   public_key = tls_private_key.ephemeral.public_key_openssh
+}
+
+resource "local_sensitive_file" "ssh_private_key" {
+  filename = "${path.root}/../output/id_ed25519_ephemeral"
+  content  = tls_private_key.ephemeral.private_key_openssh
+
+  directory_permission = "0700"
+  file_permission      = "0600"
 }
 
 resource "openstack_images_image_v2" "rocky9_cloud" {

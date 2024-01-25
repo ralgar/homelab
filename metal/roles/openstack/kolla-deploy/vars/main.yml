@@ -2,7 +2,6 @@
 # Name (path) of the venv, using the root user's home as the base.
 # Ex. A value of 'kolla-venv' will become '/root/kolla-venv'
 kolla_venv: "{{ common.kolla_venv }}"
-sdk_venv: "{{ common.sdk_venv }}"
 
 # Desired names of your 'public' network and subnet.
 # These will be directly attached to your LAN.

@@ -1,7 +1,7 @@
 variable "openstack_clouds_file" {
   description = "Path to OpenStack authentication file (clouds.yaml)"
   type        = string
-  default     = "../output/clouds.yaml"
+  default     = "../../output/clouds.yaml"
 }
 
 variable "environment" {

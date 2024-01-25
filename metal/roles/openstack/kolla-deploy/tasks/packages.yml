@@ -2,13 +2,17 @@
 - name: Install system packages for Kolla
   ansible.builtin.dnf:
     name:
+      - dbus-daemon
+      - dbus-devel
       - git
+      - glib2-devel
       - python3-devel
       - libffi-devel
       - gcc
       - openssl-devel
       - python3-libselinux
     state: present
+    update_cache: true
   become: true
 
 - name: Initialize Kolla venv with latest 'pip' and 'wheel'
@@ -16,7 +20,7 @@
     name:
       - pip
       - wheel
-    state: present
+    state: latest
     virtualenv: "{{ kolla_venv }}"
     virtualenv_command: python -m venv
 
@@ -27,11 +31,12 @@
 - name: Install Kolla venv dependencies
   ansible.builtin.pip:
     name:
-      - 'ansible>=4,<6'
+      - 'ansible-core>=2.14,<2.16'
+      - dbus-python
+      - 'openstacksdk==2.1.0'
       - selinux
-      - 'openstacksdk<0.99'
 
 - name: Install 'kolla-ansible'
   ansible.builtin.pip:
-    name: git+https://opendev.org/openstack/kolla-ansible@stable/zed
+    name: "git+https://opendev.org/openstack/kolla-ansible@stable/{{ openstack_release }}"
   notify: bootstrap

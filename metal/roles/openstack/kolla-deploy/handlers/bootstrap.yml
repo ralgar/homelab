@@ -1,5 +1,5 @@
 ---
-- name: Install Ansible dependencies
+- name: Install Ansible Galaxy dependencies
   ansible.builtin.shell: |
     source {{ kolla_venv }}/bin/activate
     kolla-ansible install-deps

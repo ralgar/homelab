@@ -2,12 +2,7 @@
 # Run all / only tasks that use Ansible OpenStack modules after this
 - name: Set Python interpreter to venv
   ansible.builtin.set_fact:
-    ansible_python_interpreter: "{{ sdk_venv }}/bin/python"
-
-- name: Install venv dependencies
-  ansible.builtin.pip:
-    name:
-      - 'openstacksdk==2.1.0'
+    ansible_python_interpreter: "{{ kolla_venv }}/bin/python"
 
 - name: Include tasks
   ansible.builtin.include_tasks: "{{ item }}"

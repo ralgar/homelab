@@ -3,7 +3,6 @@ common:
   # Name (path) of the venv, using the root user's home as the base.
   # Ex. A value of 'kolla-venv' will become '/root/kolla-venv'
   kolla_venv: /root/kolla-venv
-  sdk_venv: /root/sdk-venv
 
   # Target disk for the root filesystem.
   root_disk: nvme0n1

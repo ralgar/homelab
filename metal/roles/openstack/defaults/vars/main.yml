@@ -1,2 +1,2 @@
 ---
-sdk_venv: "{{ common.sdk_venv }}"
+kolla_venv: "{{ common.kolla_venv }}"
