@@ -1,0 +1,75 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: radarr-configmap
+  namespace: media-server
+data:
+  init-db.sh: |
+    #!/bin/bash
+
+    set -xeu
+
+    /entrypoint.sh 2>&1> /dev/null & disown
+    pid=$!
+
+    until timeout 300 curl -sf -o /dev/null \
+        "localhost:7878/api/v3/system/status?apiKey=$RADARR__API_KEY"
+    do
+        sleep 1
+    done
+
+    kill $pid
+
+  configure-db.sh: |
+    #!/bin/bash
+
+    set -xeu
+
+    cp /configmaps/config.sql /config/config.sql || exit 1
+    sed -i "s|nzbget-api-password|$(</secrets/nzbget-api-password)|" /config/config.sql || exit 1
+
+    psql \
+        -h "$POSTGRES_HOST" \
+        -p "$POSTGRES_PORT" \
+        -U "$POSTGRES_USER" \
+        -d "$POSTGRES_DB" \
+        -f /config/config.sql || exit 1
+
+    rm -f /config/config.sql || exit 1
+
+  config.sql: |
+    INSERT INTO "DownloadClients" ("Id", "Enable", "Name", "Implementation", "Settings", "ConfigContract", "Priority", "RemoveCompletedDownloads", "RemoveFailedDownloads")
+    VALUES ('1', '1', 'NZBGet', 'Nzbget', '{
+      "host": "nzbget.media-server.svc",
+      "port": 6789,
+      "useSsl": false,
+      "username": "api",
+      "password": "nzbget-api-password",
+      "tvCategory": "Movies",
+      "recentTvPriority": 0,
+      "olderTvPriority": 0,
+      "addPaused": false
+    }', 'NzbgetSettings', '1', '1', '1')
+    ON CONFLICT ("Id") DO UPDATE
+        SET "Enable" = EXCLUDED."Enable",
+            "Name" = EXCLUDED."Name",
+            "Implementation" = EXCLUDED."Implementation",
+            "Settings" = EXCLUDED."Settings",
+            "ConfigContract" = EXCLUDED."ConfigContract",
+            "Priority" = EXCLUDED."Priority",
+            "RemoveCompletedDownloads" = EXCLUDED."RemoveCompletedDownloads",
+            "RemoveFailedDownloads" = EXCLUDED."RemoveFailedDownloads";
+
+    /* Set the media root directory */
+    INSERT INTO "RootFolders" ("Id", "Path")
+    VALUES('1', '/media/library/Movies')
+    ON CONFLICT ("Id") DO UPDATE
+        SET "Path" = EXCLUDED."Path";
+
+    /* Enable renaming */
+    INSERT INTO "NamingConfig" ("Id", "MultiEpisodeStyle", "RenameMovies")
+    VALUES('1', '0', '1')
+    ON CONFLICT ("Id") DO UPDATE
+        SET "MultiEpisodeStyle" = EXCLUDED."MultiEpisodeStyle",
+            "RenameMovies" = EXCLUDED."RenameMovies";

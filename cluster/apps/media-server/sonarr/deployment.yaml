@@ -21,8 +21,6 @@ spec:
       labels:
         app.kubernetes.io/name: sonarr
     spec:
-      # serviceAccountName: default
-      # automountServiceAccountToken: true
       dnsPolicy: ClusterFirst
       enableServiceLinks: true
       securityContext:
@@ -31,6 +29,81 @@ spec:
         fsGroup: 109030
         seLinuxOptions:
           level: "s0:c123,c456"
+      initContainers:
+        - name: init-database
+          image: "ghcr.io/onedr0p/sonarr-develop:4.0.0.710"
+          imagePullPolicy: IfNotPresent
+          command: ["/configmaps/init-db.sh"]
+          env:
+            - name: SONARR__API_KEY
+              valueFrom: { secretKeyRef: { name: sonarr-secrets, key: apiKey } }
+            - name: SONARR__POSTGRES_HOST
+              valueFrom: { secretKeyRef: { name: mediadb-pguser-sonarr, key: host } }
+            - name: SONARR__POSTGRES_PORT
+              valueFrom: { secretKeyRef: { name: mediadb-pguser-sonarr, key: port } }
+            - name: SONARR__POSTGRES_USER
+              valueFrom: { secretKeyRef: { name: mediadb-pguser-sonarr, key: user } }
+            - name: SONARR__POSTGRES_PASSWORD
+              valueFrom: { secretKeyRef: { name: mediadb-pguser-sonarr, key: password } }
+            - name: SONARR__POSTGRES_MAIN_DB
+              value: sonarr-main
+            - name: SONARR__POSTGRES_LOG_DB
+              value: sonarr-log
+            - name: SONARR__THEME
+              value: dark
+          volumeMounts:
+            - name: sonarr-configmap
+              mountPath: /configmaps
+            - name: sonarr-data
+              mountPath: /config
+            - name: media
+              mountPath: /media
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 500Mi
+            requests:
+              cpu: 500m
+              memory: 500Mi
+          securityContext:
+            runAsNonRoot: true
+            privileged: false
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+        - name: configure-db
+          image: docker.io/postgres:14
+          imagePullPolicy: IfNotPresent
+          command: ["/configmaps/configure-db.sh"]
+          env:
+            - name: POSTGRES_HOST
+              valueFrom: { secretKeyRef: { name: mediadb-pguser-sonarr, key: host } }
+            - name: POSTGRES_PORT
+              valueFrom: { secretKeyRef: { name: mediadb-pguser-sonarr, key: port } }
+            - name: POSTGRES_USER
+              valueFrom: { secretKeyRef: { name: mediadb-pguser-sonarr, key: user } }
+            - name: PGPASSWORD
+              valueFrom: { secretKeyRef: { name: mediadb-pguser-sonarr, key: password } }
+            - name: POSTGRES_DB
+              value: sonarr-main
+          volumeMounts:
+            - name: sonarr-configmap
+              mountPath: /configmaps
+            - name: sonarr-data
+              mountPath: /config
+            - name: sonarr-secrets
+              mountPath: /secrets
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 500Mi
+            requests:
+              cpu: 500m
+              memory: 500Mi
+          securityContext:
+            runAsNonRoot: true
+            privileged: false
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
       containers:
         - name: sonarr
           image: "ghcr.io/onedr0p/sonarr-develop:4.0.0.710"
@@ -101,9 +174,16 @@ spec:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: false
       volumes:
+        - name: sonarr-configmap
+          configMap:
+            name: sonarr-configmap
+            defaultMode: 0777
         - name: sonarr-data
           emptyDir:
             sizeLimit: 1Gi
+        - name: sonarr-secrets
+          secret:
+            secretName: sonarr-secrets
         - name: media
           persistentVolumeClaim:
             claimName: media

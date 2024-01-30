@@ -29,6 +29,76 @@ spec:
         fsGroup: 109030
         seLinuxOptions:
           level: "s0:c123,c456"
+      initContainers:
+        - name: init-database
+          image: "ghcr.io/onedr0p/radarr:4.7.5.7809"
+          imagePullPolicy: IfNotPresent
+          command: ["/configmaps/init-db.sh"]
+          env:
+            - name: RADARR__API_KEY
+              valueFrom: { secretKeyRef: { name: radarr-secrets, key: apiKey } }
+            - name: RADARR__POSTGRES_HOST
+              valueFrom: { secretKeyRef: { name: mediadb-pguser-radarr, key: host } }
+            - name: RADARR__POSTGRES_PORT
+              valueFrom: { secretKeyRef: { name: mediadb-pguser-radarr, key: port } }
+            - name: RADARR__POSTGRES_USER
+              valueFrom: { secretKeyRef: { name: mediadb-pguser-radarr, key: user } }
+            - name: RADARR__POSTGRES_PASSWORD
+              valueFrom: { secretKeyRef: { name: mediadb-pguser-radarr, key: password } }
+            - name: RADARR__POSTGRES_MAIN_DB
+              value: radarr-main
+            - name: RADARR__POSTGRES_LOG_DB
+              value: radarr-log
+            - name: RADARR__THEME
+              value: dark
+          volumeMounts:
+            - name: radarr-configmap
+              mountPath: /configmaps
+            - name: radarr-data
+              mountPath: /config
+            - name: media
+              mountPath: /media
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 500Mi
+            requests:
+              cpu: 500m
+              memory: 500Mi
+        - name: configure-db
+          image: docker.io/postgres:14
+          imagePullPolicy: IfNotPresent
+          command: ["/configmaps/configure-db.sh"]
+          env:
+            - name: POSTGRES_HOST
+              valueFrom: { secretKeyRef: { name: mediadb-pguser-radarr, key: host } }
+            - name: POSTGRES_PORT
+              valueFrom: { secretKeyRef: { name: mediadb-pguser-radarr, key: port } }
+            - name: POSTGRES_USER
+              valueFrom: { secretKeyRef: { name: mediadb-pguser-radarr, key: user } }
+            - name: PGPASSWORD
+              valueFrom: { secretKeyRef: { name: mediadb-pguser-radarr, key: password } }
+            - name: POSTGRES_DB
+              value: radarr-main
+          volumeMounts:
+            - name: radarr-configmap
+              mountPath: /configmaps
+            - name: radarr-data
+              mountPath: /config
+            - name: radarr-secrets
+              mountPath: /secrets
+          resources:
+            limits:
+              cpu: 250m
+              memory: 250Mi
+            requests:
+              cpu: 250m
+              memory: 250Mi
+          securityContext:
+            runAsNonRoot: true
+            privileged: false
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
       containers:
         - name: radarr
           image: "ghcr.io/onedr0p/radarr:4.7.5.7809"
@@ -99,9 +169,16 @@ spec:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: false
       volumes:
+        - name: radarr-configmap
+          configMap:
+            name: radarr-configmap
+            defaultMode: 0777
         - name: radarr-data
           emptyDir:
             sizeLimit: 1Gi
+        - name: radarr-secrets
+          secret:
+            secretName: radarr-secrets
         - name: media
           persistentVolumeClaim:
             claimName: media

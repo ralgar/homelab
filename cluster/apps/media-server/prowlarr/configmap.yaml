@@ -1,0 +1,69 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prowlarr-configmap
+  namespace: media-server
+data:
+  init-db.sh: |
+    #!/bin/bash
+
+    set -xeu
+
+    /entrypoint.sh 2>&1> /dev/null & disown
+    pid=$!
+
+    until timeout 300 curl -sf -o /dev/null \
+        "localhost:9696/api/v1/system/status?apiKey=$PROWLARR__API_KEY"
+    do
+        sleep 1
+    done
+
+    kill $pid
+
+  configure-db.sh: |
+    #!/bin/bash
+
+    set -xeu
+
+    # Ensure our secrets are present
+    [ -f /secrets/radarrApiKey ] || exit 1
+    [ -f /secrets/sonarrApiKey ] || exit 1
+
+    # Substitute our secrets into our SQL file
+    cp /configmaps/config.sql /config/config.sql || exit 1
+    sed -i "s|radarr-api-key|$(</secrets/radarrApiKey)|" /config/config.sql || exit 1
+    sed -i "s|sonarr-api-key|$(</secrets/sonarrApiKey)|" /config/config.sql || exit 1
+
+    psql \
+        -h "$POSTGRES_HOST" \
+        -p "$POSTGRES_PORT" \
+        -U "$POSTGRES_USER" \
+        -d "$POSTGRES_DB" \
+        -f /config/config.sql || exit 1
+
+    rm -f /config/config.sql || exit 1
+
+  config.sql: |
+    /* Configure Radarr and Sonarr applications */
+    INSERT INTO "Applications" ("Id", "Name", "Implementation", "Settings", "ConfigContract", "SyncLevel", "Tags")
+    VALUES('1', 'Radarr', 'Radarr', '{
+      "prowlarrUrl": "http://prowlarr.media-server.svc:9696",
+      "baseUrl": "http://radarr.media-server.svc:7878",
+      "apiKey": "radarr-api-key",
+      "syncCategories": [2000, 2010, 2020, 2030, 2040, 2045, 2050, 2060, 2070, 2080]
+    }', 'RadarrSettings', '2', '[]'),
+    ('2', 'Sonarr', 'Sonarr', '{
+      "prowlarrUrl": "http://prowlarr.media-server.svc:9696",
+      "baseUrl": "http://sonarr.media-server.svc:8989",
+      "apiKey": "sonarr-api-key",
+      "syncCategories": [5000, 5010, 5020, 5030, 5040, 5045, 5050 ],
+      "animeSyncCategories": [5070]
+    }', 'SonarrSettings', '2', '[]')
+    ON CONFLICT ("Id") DO UPDATE
+        SET "Name" = EXCLUDED."Name",
+            "Implementation" = EXCLUDED."Implementation",
+            "Settings" = EXCLUDED."Settings",
+            "ConfigContract" = EXCLUDED."ConfigContract",
+            "SyncLevel" = EXCLUDED."SyncLevel",
+            "Tags" = EXCLUDED."Tags";
