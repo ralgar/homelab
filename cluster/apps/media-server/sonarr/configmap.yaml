@@ -68,8 +68,15 @@ data:
         SET "Path" = EXCLUDED."Path";
 
     /* Enable renaming */
-    INSERT INTO "NamingConfig" ("Id", "MultiEpisodeStyle", "RenameEpisodes")
-    VALUES('1', '5', '1')
+    INSERT INTO "NamingConfig" ("Id", "MultiEpisodeStyle", "RenameEpisodes", "StandardEpisodeFormat", "DailyEpisodeFormat", "SeasonFolderFormat", "SeriesFolderFormat", "AnimeEpisodeFormat", "ReplaceIllegalCharacters", "SpecialsFolderFormat")
+    VALUES('1', '5', '1', '{Series Title} - S{season:00}E{episode:00} - {Episode Title} {Quality Full}', '{Series Title} - {Air-Date} - {Episode Title} {Quality Full}', 'Season {season}', '{Series Title}', '{Series Title} - S{season:00}E{episode:00} - {Episode Title} {Quality Full}', '1', 'Specials')
     ON CONFLICT ("Id") DO UPDATE
         SET "MultiEpisodeStyle" = EXCLUDED."MultiEpisodeStyle",
-            "RenameEpisodes" = EXCLUDED."RenameEpisodes";
+            "RenameEpisodes" = EXCLUDED."RenameEpisodes",
+            "StandardEpisodeFormat" = EXCLUDED."StandardEpisodeFormat",
+            "DailyEpisodeFormat" = EXCLUDED."DailyEpisodeFormat",
+            "SeasonFolderFormat" = EXCLUDED."SeasonFolderFormat",
+            "SeriesFolderFormat" = EXCLUDED."SeriesFolderFormat",
+            "AnimeEpisodeFormat" = EXCLUDED."AnimeEpisodeFormat",
+            "ReplaceIllegalCharacters" = EXCLUDED."ReplaceIllegalCharacters",
+            "SpecialsFolderFormat" = EXCLUDED."SpecialsFolderFormat";

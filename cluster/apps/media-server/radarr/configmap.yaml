@@ -68,8 +68,12 @@ data:
         SET "Path" = EXCLUDED."Path";
 
     /* Enable renaming */
-    INSERT INTO "NamingConfig" ("Id", "MultiEpisodeStyle", "RenameMovies")
-    VALUES('1', '0', '1')
+    INSERT INTO "NamingConfig" ("Id", "MultiEpisodeStyle", "ReplaceIllegalCharacters", "StandardMovieFormat", "MovieFolderFormat", "ColonReplacementFormat", "RenameMovies")
+    VALUES('1', '0', '1', '{Movie Title} ({Release Year}) {Quality Full}', '{Movie Title} ({Release Year})', '0', '1')
     ON CONFLICT ("Id") DO UPDATE
         SET "MultiEpisodeStyle" = EXCLUDED."MultiEpisodeStyle",
+            "ReplaceIllegalCharacters" = EXCLUDED."ReplaceIllegalCharacters",
+            "StandardMovieFormat" = EXCLUDED."StandardMovieFormat",
+            "MovieFolderFormat" = EXCLUDED."MovieFolderFormat",
+            "ColonReplacementFormat" = EXCLUDED."ColonReplacementFormat",
             "RenameMovies" = EXCLUDED."RenameMovies";
