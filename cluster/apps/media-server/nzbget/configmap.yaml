@@ -8,12 +8,40 @@ data:
   init.sh: |
     #!/bin/bash
 
-    [ -f /secrets/adminPassword ] || exit 1
-    [ -f /secrets/apiPassword ] || exit 1
+    set -xeu
 
-    cp /configmaps/nzbget.conf /config/nzbget.conf || exit 1
-    sed -i "s|nzbget-admin-password|$(</secrets/adminPassword)|" /config/nzbget.conf || exit 1
-    sed -i "s|nzbget-api-password|$(</secrets/apiPassword)|" /config/nzbget.conf || exit 1
+    # Assert that secrets exist
+    [ -f /secrets/adminPassword ]
+    [ -f /secrets/apiPassword ]
+
+    install -o 106789 -g 109030 /configmaps/nzbget.conf /config/nzbget.conf
+    sed -i "s|nzbget-admin-password|$(</secrets/adminPassword)|" /config/nzbget.conf
+    sed -i "s|nzbget-api-password|$(</secrets/apiPassword)|" /config/nzbget.conf
+
+    # Assert the downloads directory structure
+    [[ -d /media/usenet ]] || {
+        mkdir -p /media/usenet/completed/Movies
+        mkdir -p /media/usenet/completed/Series
+        mkdir -p /media/usenet/intermediate
+        chgrp -R 109030 /media/usenet
+        chmod -R 770 /media/usenet
+    }
+
+    # Assert the Movies library
+    [[ -d /media/library/Movies ]] || {
+        mkdir -p /media/library/Movies
+        chgrp -R 109030 /media/library
+        chmod 770 /media/library
+        chmod 770 /media/library/Movies
+    }
+
+    # Assert the TV Shows library
+    [[ -d "/media/library/TV Shows" ]] || {
+        mkdir -p "/media/library/TV Shows"
+        chgrp -R 109030 /media/library
+        chmod 770 /media/library
+        chmod 770 "/media/library/TV Shows"
+    }
 
   nzbget.conf: |
     ##############################################################################

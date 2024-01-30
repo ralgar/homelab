@@ -29,6 +29,8 @@ spec:
         runAsUser: 108989
         runAsGroup: 109030
         fsGroup: 109030
+        seLinuxOptions:
+          level: "s0:c123,c456"
       containers:
         - name: sonarr
           image: "ghcr.io/onedr0p/sonarr-develop:4.0.0.710"

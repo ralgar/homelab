@@ -10,4 +10,4 @@ spec:
   storageClassName: cinder-standard
   resources:
     requests:
-      storage: 64Gi
+      storage: 256Gi

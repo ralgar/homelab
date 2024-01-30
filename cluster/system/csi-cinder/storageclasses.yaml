@@ -8,4 +8,5 @@ metadata:
 provisioner: cinder.csi.openstack.org
 allowVolumeExpansion: true
 parameters:
+  type: "__DEFAULT__"
   fsType: xfs

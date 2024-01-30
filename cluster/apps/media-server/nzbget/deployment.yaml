@@ -8,6 +8,7 @@ metadata:
     app.kubernetes.io/name: nzbget
   annotations:
     ignore-check.kube-linter.io/no-read-only-root-fs: "Unsupported for this app."
+    ignore-check.kube-linter.io/run-as-non-root: "Not possible for init job."
 spec:
   revisionHistoryLimit: 3
   replicas: 1
@@ -29,8 +30,10 @@ spec:
         runAsUser: 106789
         runAsGroup: 109030
         fsGroup: 109030
+        seLinuxOptions:
+          level: "s0:c123,c456"
       initContainers:
-        - name: nzbget-init
+        - name: init
           image: "archlinux:base"
           imagePullPolicy: IfNotPresent
           volumeMounts:
@@ -40,7 +43,11 @@ spec:
               mountPath: /config
             - name: nzbget-secrets
               mountPath: /secrets
+            - name: media
+              mountPath: /media
           command: ["/configmaps/init.sh"]
+          securityContext:
+            runAsUser: 0
           resources:
             limits:
               cpu: 250m

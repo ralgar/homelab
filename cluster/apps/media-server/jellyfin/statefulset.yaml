@@ -25,6 +25,8 @@ spec:
         runAsUser: 108096
         runAsGroup: 109030
         fsGroup: 109030
+        seLinuxOptions:
+          level: "s0:c123,c456"
       initContainers:
         - name: jellyfin-init
           image: "archlinux:base"

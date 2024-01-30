@@ -27,6 +27,8 @@ spec:
         runAsUser: 107878
         runAsGroup: 109030
         fsGroup: 109030
+        seLinuxOptions:
+          level: "s0:c123,c456"
       containers:
         - name: radarr
           image: "ghcr.io/onedr0p/radarr:4.7.5.7809"
