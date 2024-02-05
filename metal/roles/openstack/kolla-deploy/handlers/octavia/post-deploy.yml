@@ -46,27 +46,9 @@
       hw_architecture: x86_64
       hw_rng_model: virtio
 
-- name: 'Octavia : Get health-manager port info'
-  openstack.cloud.port_info:
-    cloud: kolla-admin
-    filters:
-      device_owner: "Octavia:health-mgr"
-  environment:
-    OS_CLIENT_CONFIG_FILE: /etc/kolla/clouds.yaml
-  register: octavia_health_mgr
-
-- name: "Octavia : Install 'octavia-interface.sh'"
-  ansible.builtin.template:
-    src: octavia-interface.sh.j2
-    dest: /usr/local/bin/octavia-interface.sh
-    owner: root
-    group: root
-    mode: 0744
-
-- name: "Octavia : Replace 'octavia-interface.service'"
-  ansible.builtin.copy:
-    src: octavia-interface.service
-    dest: /etc/systemd/system/octavia-interface.service
-    owner: root
-    group: root
-    mode: 0644
+- name: "Octavia : Fix 'octavia-interface.service'"
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/system/octavia-interface.service
+    regexp: 'sleep'
+    line: 'ExecStartPre=/usr/bin/sleep 15'
+    insertbefore: '^ExecStartPre=/sbin/ip'
