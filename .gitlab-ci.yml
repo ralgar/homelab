@@ -5,7 +5,7 @@ workflow:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       variables:
-        ENVIRONMENT: dev
+        ENVIRONMENT: prod
         AUTO_STOP_IN: 1 day
         TF_VAR_environment: $ENVIRONMENT
         TF_VAR_gitops_ref_name: $CI_MERGE_REQUEST_REF_PATH
@@ -46,7 +46,9 @@ terraform:init:
   stage: prepare
   image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:1.2.6
   rules:
-    - changes:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
         - .gitlab-ci.yml
         - infra/**/*
   script:
@@ -105,7 +107,9 @@ terraform:plan:
   stage: build
   image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:1.2.6
   rules:
-    - changes:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
         - .gitlab-ci.yml
         - infra/**/*
   environment:
@@ -121,6 +125,25 @@ terraform:plan:
     reports:
       terraform: ${TF_ROOT}/plan.json
 
+terraform:get_plan:
+  stage: build
+  image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:1.2.6
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE != "web"
+      changes:
+        - .gitlab-ci.yml
+        - infra/**/*
+  variables:
+    PROJECT_API_URL: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}"
+    TF_PLAN_PATH: "infra/envs/${ENVIRONMENT}/plan.cache"
+  script:
+    - cd ${TF_ROOT}
+    - MR="$(grep 'MR:' <<< "$CI_COMMIT_DESCRIPTION")"
+    - MR="${MR##*[/\!]}"
+    - > # Download the cached Terraform plan from the Merge Request pipeline
+      curl -Lo plan.cache
+      "${PROJECT_API_URL}/jobs/artifacts/refs/merge-requests/${MR}/head/raw/${TF_PLAN_PATH}?job=terraform:plan&job_token=${CI_JOB_TOKEN}"
+
 terraform:apply:
   stage: deploy
   image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:1.2.6
@@ -129,12 +152,6 @@ terraform:apply:
       changes:
         - .gitlab-ci.yml
         - infra/**/*
-      when: manual
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      changes:
-        - .gitlab-ci.yml
-        - infra/**/*
-      when: never
   environment:
     name: ${ENVIRONMENT}
     action: start
