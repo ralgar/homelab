@@ -96,7 +96,8 @@ terraform:validate:
   stage: lint
   image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:1.2.6
   rules:
-    - changes:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
         - .gitlab-ci.yml
         - infra/**/*
   script:
@@ -138,7 +139,7 @@ terraform:get_plan:
     TF_PLAN_PATH: "infra/envs/${ENVIRONMENT}/plan.cache"
   script:
     - cd ${TF_ROOT}
-    - MR="$(grep 'MR:' <<< "$CI_COMMIT_DESCRIPTION")"
+    - MR="$(printf "$CI_COMMIT_DESCRIPTION" | grep 'MR:')"
     - MR="${MR##*[/\!]}"
     - > # Download the cached Terraform plan from the Merge Request pipeline
       curl -Lo plan.cache
