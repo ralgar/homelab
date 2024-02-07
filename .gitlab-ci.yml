@@ -143,7 +143,7 @@ terraform:get_plan:
     - MR="${MR##*[/\!]}"
     - > # Download the cached Terraform plan from the Merge Request pipeline
       curl -vfLo plan.cache
-      "${PROJECT_API_URL}/jobs/artifacts/refs/merge-requests/${MR}/head/raw/${TF_PLAN_PATH}?job=terraform:plan&job_token=${CI_JOB_TOKEN}"
+      "${PROJECT_API_URL}/jobs/artifacts/refs/merge-requests/${MR}/head/raw/${TF_PLAN_PATH}?job=terraform:plan"
   artifacts:
     paths:
       - ${TF_ROOT}/plan.cache
