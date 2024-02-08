@@ -33,7 +33,7 @@ Before we begin deployment, we need to configure the variables files
 
 1. Make sure the highlighted values in `main.yml` are set correctly.
 
-    ```yaml title="metal/vars/main.yml" hl_lines="8 11 26 29 34 35"
+    ```yaml title="metal/vars/main.yml" hl_lines="7 10 25 28 33 34"
     common:
       # Name (path) of the venv, using the root user's home as the base.
       # Ex. A value of 'kolla-venv' will become '/root/kolla-venv'
@@ -146,9 +146,9 @@ This step will deploy a local GitLab Runner, in a Docker container, directly
 1. Go back to the *Runners* page, find the ID number of the runner, and set
    the ID environment variable on your local system.
 
-   !!! tip
-       The ID number will be in the format `#12345678`. Do NOT include the hash
-       sign when setting the variable, only the digits.
+    !!! tip
+        The ID number will be in the format `#12345678`. Do NOT include the hash
+        sign when setting the variable, only the digits.
 
     ```sh
     export GITLAB_RUNNER_ID=<your-gitlab-runner-id>
