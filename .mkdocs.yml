@@ -1,0 +1,51 @@
+site_name: Homelab Docs
+copyright: >
+  <div align="center">
+  Copyright &copy; 2024 Ryan Algar
+  </div>
+repo_url: https://gitlab.com/ralgar/homelab
+
+theme:
+  name: material
+  palette:
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+  features:
+    - content.code.copy
+
+extra:
+  generator: false
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tasklist
+  - tables
+
+nav:
+  - overview.md
+  - prerequisites.md
+  - OpenStack Host:
+    - openstack/deploy_openstack.md
+    - openstack/manage_volumes.md
+  - production.md
+  - kubernetes.md

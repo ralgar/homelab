@@ -4,6 +4,9 @@
 # Cluster testing directory
 cluster/testing/
 
+# Python venv
+venv/
+
 ############################
 ###   GENERATED FILES    ###
 ############################

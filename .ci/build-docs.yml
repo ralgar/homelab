@@ -1,0 +1,17 @@
+# Deploy to GitLab Pages using mkdocs
+---
+pages:
+  stage: deploy
+  image:
+    name: squidfunk/mkdocs-material:9
+    entrypoint: [""]
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - .gitlab-ci.yml
+        - docs/**/*
+  script:
+    - mkdocs build --config-file .mkdocs.yml --site-dir public
+  artifacts:
+    paths:
+      - public

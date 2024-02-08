@@ -36,3 +36,11 @@ destroy-cluster:
 		-target module.gcp_bucket \
 		-target module.k8s_cluster \
 		-target module.k8s_network
+
+.PHONY: docs
+docs: venv
+	source venv/bin/activate && mkdocs serve --config-file .mkdocs.yml
+
+venv:
+	python -m venv venv
+	source venv/bin/activate && pip install mkdocs mkdocs-material
