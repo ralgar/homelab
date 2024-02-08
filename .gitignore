@@ -4,8 +4,10 @@
 # Cluster testing directory
 cluster/testing/
 
-# Python venv
+# MkDocs development files
 venv/
+public/
+site/
 
 ############################
 ###   GENERATED FILES    ###

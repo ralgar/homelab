@@ -42,7 +42,7 @@ markdown_extensions:
   - tables
 
 nav:
-  - overview.md
+  - Overview: index.md
   - prerequisites.md
   - OpenStack Host:
     - openstack/deploy_openstack.md

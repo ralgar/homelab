@@ -2,14 +2,13 @@
 ---
 pages:
   stage: build
-  image: docker.io/python:latest
+  image: docker.io/squidfunk/mkdocs-material:9
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
         - .gitlab-ci.yml
         - docs/**/*
   script:
-    - pip install mkdocs-material
     - mkdocs build --config-file .mkdocs.yml --site-dir public
   artifacts:
     paths:
