@@ -6,7 +6,7 @@
 [![Latest Tag](https://img.shields.io/gitlab/v/tag/ralgar/homelab?style=flat&label=Tag&logo=semver&logoColor=white)](https://gitlab.com/ralgar/homelab/tags)
 [![OpenStack Release](https://img.shields.io/badge/OpenStack-2023.2-red?style=flat&logo=openstack&logoColor=red)](https://docs.openstack.org/kolla-ansible/2023.2/)
 [![Pipeline Status](https://img.shields.io/gitlab/pipeline-status/ralgar/homelab?branch=main&label=Pipeline&logo=gitlab&style=flat)](https://gitlab.com/ralgar/homelab/-/pipelines?page=1&scope=all&ref=main)
-[![Docs Status](https://img.shields.io/website?label=Docs&logo=gitbook&logoColor=white&style=flat&url=https%3A%2F%2Fdocs.ralgar.dev%2Fcategory/%2Fhomelab%2F)](https://docs.ralgar.dev/category/homelab/)
+[![Docs Status](https://img.shields.io/website?label=Docs&logo=gitbook&logoColor=white&style=flat&url=https%3A%2F%2Fhomelab.ralgar.dev)](https://homelab.ralgar.dev/)
 [![Software License](https://img.shields.io/badge/License-BSD_2--clause-red?style=flat&logo=freebsd&logoColor=red)](https://choosealicense.com/licenses/bsd-2-clause/)
 [![GitLab Stars](https://img.shields.io/gitlab/stars/ralgar/homelab?color=gold&label=Stars&logo=gitlab&style=flat)](https://gitlab.com/ralgar/homelab)
 

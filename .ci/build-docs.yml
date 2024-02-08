@@ -2,11 +2,14 @@
 ---
 pages:
   stage: build
-  image: docker.io/squidfunk/mkdocs-material:9
+  image:
+    name: docker.io/squidfunk/mkdocs-material:9
+    entrypoint: [""]
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
         - .gitlab-ci.yml
+        - .ci/build-docs.yml
         - docs/**/*
   script:
     - mkdocs build --config-file .mkdocs.yml --site-dir public

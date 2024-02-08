@@ -22,6 +22,7 @@ theme:
         name: Switch to dark mode
   features:
     - content.code.copy
+    - navigation.instant
 
 extra:
   generator: false
