@@ -23,6 +23,7 @@ theme:
   features:
     - content.code.copy
     - navigation.instant
+    - navigation.sections
 
 extra:
   generator: false
@@ -44,9 +45,16 @@ markdown_extensions:
 
 nav:
   - Overview: index.md
-  - prerequisites.md
-  - OpenStack Host:
-    - openstack/deploy_openstack.md
-    - openstack/manage_volumes.md
-  - production.md
-  - kubernetes.md
+  - features.md
+  - Getting Started:
+    - getting-started/prerequisites.md
+    - getting-started/deploy-openstack.md
+    - getting-started/cicd-configuration.md
+  - Deployment Environments:
+    - Production (FCOS Server): environments/production.md
+    - Development (K8s Cluster): environments/kubernetes.md
+  - Managing OpenStack:
+    - Cinder:
+      - Import/Export Volumes: managing-openstack/cinder/import-export-volumes.md
+  - Reference:
+    - reference/license.md

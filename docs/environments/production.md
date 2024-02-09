@@ -7,41 +7,38 @@ The Production environment is a single instance that runs on Fedora CoreOS.
 
 ## Deployment
 
-### CI/CD configuration
+Now that we've completed all of the prerequisite steps, actually deploying the
+ production environment is very simple.
 
-In your GitLab project, go to **Settings >> CI/CD**, and expand the
- **Variables** section.
+### Triggering the Pipeline
 
-1. Create a variable *file* named `OS_CLOUDS`, with the contents of your
-   `metal/output/clouds.yaml` file that you generated when configuring
-   OpenStack.
+First, we need to manually trigger the initial pipeline run.
 
-1. Create a variable *file* named `TF_VARS_FILE`, with the following contents.
-
-    ```hcl title="TF_VARS_FILE"
-    restic_password = "<your-restic-repository-password>"
-
-    // See https://rclone.org/drive for setup documentation.
-    // NOTE: All double quotes within the token JSON string must be escaped.
-    gdrive_oauth = {
-      client_id = "<your-gdrive-client-id>"
-      client_secret = "<your-gdrive-client-secret>"
-      token = "<your-gdrive-oauth-token>"
-      root_folder_id = "<your-gdrive-root-folder-id>"
-    }
-    ```
-
-### Run the pipeline
-
-1. In your GitLab project, go to **Build >> Pipelines**, and **Run pipeline**.
+1. In your GitLab project, go to **Build >> Pipelines**, and choose
+   **Run pipeline**.
 
 1. Select either the `main` branch (recommended), or the latest tagged version.
 
-1. Choose **Run pipeline** again to begin the deployment.
+1. Choose **Run pipeline** again to begin the process.
+
+### Review the Terraform Plan
+
+As you watch the pipeline graph progress, you will notice that it stops before
+ the final job, called `terraform:apply`. The initial pipeline run stops at
+ this stage so that you have a change to review the Terraform plan.
+
+To view the plan, click on the `terraform:plan` job to see its log.
+
+If you are satisfied with the plan, head back to the pipeline graph, and click
+ the *Play* button next to the `terraform:apply` job. The deployment can take
+ several minutes to complete.
+
+If all goes well, you will see a green checkmark appear like the other jobs.
+ This indicates that you have successfully deployed the production environment!
 
 ---
 
-## Configure the services
+## Configure the Applications
 
 After the initial deployment, you will need to manually configure each of the
  services for the first time. Alternatively, if you already have a backup, you

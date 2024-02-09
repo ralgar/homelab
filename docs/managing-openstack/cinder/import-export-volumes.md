@@ -1,4 +1,4 @@
-# Managing Cinder Volumes
+# Cinder: Import/Export Volumes
 
 If you are redeploying OpenStack, or migrating from another platform, you may
  have existing LVM volumes that you wish to import. To achieve this, you can
@@ -34,7 +34,7 @@ If you do not have any existing LVM volumes to import, then you can ignore this.
     cinder manage openstack.homelab.internal lvol1 --name my-cinder-volume
     ```
 
-## Exporting a volume
+## Export a volume
 
 Should you need to, you can also export a Cinder volume. This can be useful if
  you ever need to reconfigure Cinder.
