@@ -20,7 +20,7 @@ module "k8s_cluster" {
 
   // Node Settings
   ha_control_plane  = false
-  base_worker_count = 2
+  base_worker_count = 1
 
   // Networking
   internal_network = module.k8s_network.network
@@ -35,6 +35,8 @@ module "k8s_cluster" {
 
     configs = {
       LOAD_BALANCER_STATIC_IP = "192.168.1.99"
+      MEDIA_VOLUME_ID         = openstack_blockstorage_volume_v3.media.id
+      MEDIA_VOLUME_SIZE       = "${openstack_blockstorage_volume_v3.media.size}Gi"
     }
 
     secrets = {

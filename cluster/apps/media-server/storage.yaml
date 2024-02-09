@@ -1,13 +1,36 @@
 ---
 apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: media
+spec:
+  accessModes:
+    - ReadWriteMany
+  capacity:
+    storage: ${MEDIA_VOLUME_SIZE}
+  claimRef:
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    name: media
+    namespace: media-server
+  csi:
+    driver: cinder.csi.openstack.org
+    fsType: xfs
+    volumeHandle: ${MEDIA_VOLUME_ID}
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: cinder-standard
+  volumeMode: Filesystem
+---
+apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: media
   namespace: media-server
 spec:
+  volumeName: media
   accessModes:
     - ReadWriteMany
   storageClassName: cinder-standard
   resources:
     requests:
-      storage: 256Gi
+      storage: ${MEDIA_VOLUME_SIZE}
