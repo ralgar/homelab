@@ -6,10 +6,12 @@
   hosts: all
   remote_user: root
   become: true
+  gather_facts: false  # We do this in `wait_for_connection` role
   vars_files:
     - vars/globals.yml
     - vars/main.yml
   roles:
+    - common/wait_for_connection
     - openstack/kolla-deploy
     - openstack/defaults
     - openstack/cinder

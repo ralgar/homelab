@@ -341,7 +341,8 @@ enable_cinder_backend_lvm: "yes"
 #enable_cloudkitty: "no"
 #enable_collectd: "no"
 #enable_cyborg: "no"
-#enable_designate: "no"
+enable_designate: "yes"
+neutron_dns_domain: "homelab.internal."
 #enable_destroy_images: "no"
 #enable_etcd: "no"
 #enable_fluentd: "yes"
@@ -601,8 +602,8 @@ cinder_volume_group: "cinder-standard"
 ###################
 # Valid options are [ bind9 ]
 #designate_backend: "bind9"
-#designate_ns_record:
-#  - "ns1.example.org"
+designate_ns_record:
+  - "ns1.homelab.internal"
 # Valid options are [ '', redis ]
 #designate_coordination_backend: "{{ 'redis' if enable_redis|bool else '' }}"
 

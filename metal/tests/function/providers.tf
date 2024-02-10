@@ -2,21 +2,9 @@
 terraform {
 required_version = ">= 1.0"
   required_providers {
-    ansible = {
-      source  = "ansible/ansible"
-      version = "~> 1.1.0"
-    }
-    local     = {
-      source  = "hashicorp/local"
-      version = "2.4.1"
-    }
     openstack = {
       source  = "terraform-provider-openstack/openstack"
       version = "~> 1.53.0"
-    }
-    tls = {
-      source  = "hashicorp/tls"
-      version = "~> 4.0.5"
     }
   }
 }

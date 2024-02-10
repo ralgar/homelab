@@ -1,0 +1,7 @@
+---
+- name: Wait for target to become reachable
+  wait_for_connection:
+    timeout: "{{ timeout }}"
+
+- name: Gather facts for the first time
+  setup:

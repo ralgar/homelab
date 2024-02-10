@@ -1,9 +1,3 @@
-resource "time_sleep" "wait_for_instance" {
-  depends_on = [openstack_compute_instance_v2.openstack]
-
-  create_duration = "30s"
-}
-
 resource "ansible_playbook" "deploy" {
   playbook   = "${path.root}/../../10-deploy-openstack.yml"
   name       = "openstack"
@@ -21,8 +15,6 @@ resource "ansible_playbook" "deploy" {
 
   # Workaround for provider bug. Also useful for playbook debugging.
   ignore_playbook_failure = true
-
-  depends_on = [time_sleep.wait_for_instance]
 }
 
 output "ansible_stdout" {

@@ -7,7 +7,7 @@
 - name: Fetch 'clouds.yaml' as an output
   ansible.builtin.fetch:
     src: /etc/kolla/clouds.yaml
-    dest: "{{ playbook_dir }}/output/"
+    dest: "{% if ci_pipeline == 'true' %}{{ playbook_dir }}/tests/output/{% else %}{{ playbook_dir }}/output/{% endif %}"
     flat: true
 
 - name: Set Nova to resume guest state after host reboot
