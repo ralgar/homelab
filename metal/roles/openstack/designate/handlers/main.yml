@@ -1,0 +1,6 @@
+---
+- name: Restart the containers
+  community.docker.docker_container:
+    name: designate_backend_bind9
+    restart: true
+  listen: designate_restart_bind9
