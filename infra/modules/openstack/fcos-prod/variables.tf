@@ -4,6 +4,14 @@ variable "network" {}
 variable "data_volume" {}
 variable "media_volume" {}
 
+variable "environment" {
+  type = string
+}
+
+variable "root_domain" {
+  type = string
+}
+
 variable "restic_password" {
   description = "Password for the Restic backup repo."
   type        = string

@@ -21,6 +21,8 @@ In your GitLab project, go to **Settings >> CI/CD**, and expand the
 1. Create a variable *file* named `TF_VARS_FILE`, with the following contents.
 
     ```hcl title="TF_VARS_FILE"
+    root_domain = "<your-root-domain>"
+
     restic_password = "<your-restic-repository-password>"
 
     // See https://rclone.org/drive for setup documentation.
