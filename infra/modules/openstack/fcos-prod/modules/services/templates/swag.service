@@ -25,9 +25,8 @@ ExecStart=/usr/bin/podman run -d --rm --replace \
     -e DNSPLUGIN=cloudflare \
     -e STAGING=${staging} \
     -v /srv/swag:/config:Z \
-    --network host \
-    -p 80:80 \
-    -p 443:443 \
+    -p 8080:80 \
+    -p 8443:443 \
     docker.io/linuxserver/swag:latest
 
 ExecStop=/usr/bin/podman stop --ignore -t 10 --cidfile=%t/%n.ctr-id
