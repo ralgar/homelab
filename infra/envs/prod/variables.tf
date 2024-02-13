@@ -9,12 +9,6 @@ variable "environment" {
   default     = "prod"
 }
 
-variable "root_domain" {
-  description = "A root domain for your services (ex: mydomain.com)."
-  type        = string
-  default     = "homelab.internal"
-}
-
 // Production Server Variables
 variable "restic_password" {
   description = "Password for the Restic backup repo."

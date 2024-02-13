@@ -19,11 +19,10 @@ ExecStart=/usr/bin/podman run -d --rm --replace \
     --cap-add=NET_ADMIN \
     -e PUID=8443 \
     -e PGID=8443 \
-    -e URL=${root_domain} \
+    -e URL=omnicosm.net \
     -e SUBDOMAINS=wildcard \
     -e VALIDATION=dns \
     -e DNSPLUGIN=cloudflare \
-    -e STAGING=${staging} \
     -v /srv/swag:/config:Z \
     -p 8080:80 \
     -p 8443:443 \

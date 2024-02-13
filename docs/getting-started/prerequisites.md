@@ -57,7 +57,6 @@ You'll also need the following:
 
 - A GitLab account
 - A Google account (for off-site backups)
-- A Cloudflare account and ownership of a root domain
 
 ---
 
