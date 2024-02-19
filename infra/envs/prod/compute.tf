@@ -1,5 +1,5 @@
-module "production" {
-  source = "../../modules/openstack/fcos-prod"
+module "fcos" {
+  source = "../../modules/openstack/fcos-mediasrv"
 
   image   = openstack_images_image_v2.coreos_38
   keypair = data.openstack_compute_keypair_v2.admin

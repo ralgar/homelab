@@ -5,8 +5,8 @@ workflow:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       variables:
-        ENVIRONMENT: prod
-        AUTO_STOP_IN: 1 day
+        ENVIRONMENT: staging
+        AUTO_STOP_IN: 6 hours
         TF_VAR_environment: $ENVIRONMENT
         TF_VAR_gitops_ref_name: $CI_MERGE_REQUEST_REF_PATH
 
@@ -38,7 +38,7 @@ cache:
     - infra/envs/**/.terraform/
 
 variables:
-  TF_ROOT: ${CI_PROJECT_DIR}/infra/envs/${ENVIRONMENT}
+  TF_ROOT: ${CI_PROJECT_DIR}/infra/envs/prod
   TF_STATE_NAME: ${ENVIRONMENT}
   TF_VAR_gitops_repo: ${CI_PROJECT_URL}.git
 
@@ -120,6 +120,9 @@ terraform:plan:
       changes:
         - .gitlab-ci.yml
         - infra/**/*
+  variables:
+    ENVIRONMENT: prod  # We always want to plan against prod
+    TF_VAR_environment: ${ENVIRONMENT}
   environment:
     name: ${ENVIRONMENT}
     action: prepare
@@ -174,6 +177,21 @@ terraform:apply:
     - cd ${TF_ROOT}
     - gitlab-terraform apply
 
+terraform:apply:staging:
+  extends: terraform:apply
+  dependencies: []
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - .gitlab-ci.yml
+        - infra/**/*
+      when: manual
+      allow_failure: true  # true for non-blocking manual job
+  script:
+    - cd ${TF_ROOT}
+    - gitlab-terraform plan -var openstack_clouds_file=${OS_CLOUDS} -var-file=${TF_VARS_FILE}
+    - gitlab-terraform apply
+
 terraform:destroy:
   stage: cleanup
   image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:1.2.6
@@ -181,7 +199,8 @@ terraform:destroy:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: never
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      when: never
+      when: manual
+      allow_failure: true  # true for non-blocking manual job
   environment:
     name: ${ENVIRONMENT}
     action: stop

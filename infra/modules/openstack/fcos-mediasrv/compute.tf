@@ -1,5 +1,5 @@
 resource "openstack_compute_instance_v2" "fcos" {
-  name                = "Production FCOS"
+  name                = "FCOS Media Server"
   image_id            = var.image.id
   flavor_name         = "m1.large"
   key_pair            = var.keypair.name
@@ -37,5 +37,5 @@ resource "openstack_compute_instance_v2" "fcos" {
     fixed_ip_v4 = "192.168.1.100"
   }
 
-  security_groups = [ "default", openstack_networking_secgroup_v2.prod.name ]
+  security_groups = [ "default", openstack_networking_secgroup_v2.fcos.name ]
 }

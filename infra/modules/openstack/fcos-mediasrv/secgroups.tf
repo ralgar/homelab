@@ -1,10 +1,10 @@
-resource "openstack_networking_secgroup_v2" "prod" {
-  name        = "prod-mediasrv"
-  description = "Production media server"
+resource "openstack_networking_secgroup_v2" "fcos" {
+  name        = "fcos-mediasrv"
+  description = "FCOS media server"
 }
 
 resource "openstack_networking_secgroup_rule_v2" "ssh" {
-  security_group_id = "${openstack_networking_secgroup_v2.prod.id}"
+  security_group_id = "${openstack_networking_secgroup_v2.fcos.id}"
   description       = "SSH"
   direction         = "ingress"
   ethertype         = "IPv4"
@@ -15,7 +15,7 @@ resource "openstack_networking_secgroup_rule_v2" "ssh" {
 }
 
 resource "openstack_networking_secgroup_rule_v2" "https" {
-  security_group_id = "${openstack_networking_secgroup_v2.prod.id}"
+  security_group_id = "${openstack_networking_secgroup_v2.fcos.id}"
   description       = "HTTPS"
   direction         = "ingress"
   ethertype         = "IPv4"
@@ -26,7 +26,7 @@ resource "openstack_networking_secgroup_rule_v2" "https" {
 }
 
 resource "openstack_networking_secgroup_rule_v2" "jellyfin" {
-  security_group_id = "${openstack_networking_secgroup_v2.prod.id}"
+  security_group_id = "${openstack_networking_secgroup_v2.fcos.id}"
   description       = "Jellyfin"
   direction         = "ingress"
   ethertype         = "IPv4"
@@ -37,7 +37,7 @@ resource "openstack_networking_secgroup_rule_v2" "jellyfin" {
 }
 
 resource "openstack_networking_secgroup_rule_v2" "hass" {
-  security_group_id = "${openstack_networking_secgroup_v2.prod.id}"
+  security_group_id = "${openstack_networking_secgroup_v2.fcos.id}"
   description       = "Home Assistant"
   direction         = "ingress"
   ethertype         = "IPv4"
@@ -48,7 +48,7 @@ resource "openstack_networking_secgroup_rule_v2" "hass" {
 }
 
 resource "openstack_networking_secgroup_rule_v2" "mqtt" {
-  security_group_id = "${openstack_networking_secgroup_v2.prod.id}"
+  security_group_id = "${openstack_networking_secgroup_v2.fcos.id}"
   description       = "MQTT"
   direction         = "ingress"
   ethertype         = "IPv4"
@@ -59,7 +59,7 @@ resource "openstack_networking_secgroup_rule_v2" "mqtt" {
 }
 
 resource "openstack_networking_secgroup_rule_v2" "radarr" {
-  security_group_id = "${openstack_networking_secgroup_v2.prod.id}"
+  security_group_id = "${openstack_networking_secgroup_v2.fcos.id}"
   description       = "Radarr"
   direction         = "ingress"
   ethertype         = "IPv4"
@@ -70,7 +70,7 @@ resource "openstack_networking_secgroup_rule_v2" "radarr" {
 }
 
 resource "openstack_networking_secgroup_rule_v2" "sonarr" {
-  security_group_id = "${openstack_networking_secgroup_v2.prod.id}"
+  security_group_id = "${openstack_networking_secgroup_v2.fcos.id}"
   description       = "Sonarr"
   direction         = "ingress"
   ethertype         = "IPv4"
@@ -81,7 +81,7 @@ resource "openstack_networking_secgroup_rule_v2" "sonarr" {
 }
 
 resource "openstack_networking_secgroup_rule_v2" "prowlarr" {
-  security_group_id = "${openstack_networking_secgroup_v2.prod.id}"
+  security_group_id = "${openstack_networking_secgroup_v2.fcos.id}"
   description       = "Prowlarr"
   direction         = "ingress"
   ethertype         = "IPv4"
@@ -92,7 +92,7 @@ resource "openstack_networking_secgroup_rule_v2" "prowlarr" {
 }
 
 resource "openstack_networking_secgroup_rule_v2" "nzbget" {
-  security_group_id = "${openstack_networking_secgroup_v2.prod.id}"
+  security_group_id = "${openstack_networking_secgroup_v2.fcos.id}"
   description       = "NZBGet"
   direction         = "ingress"
   ethertype         = "IPv4"
