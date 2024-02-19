@@ -1,6 +1,7 @@
 output "files" {
   value = [
     data.ignition_file.backup_script.rendered,
+    data.ignition_file.etc_environment.rendered,
     data.ignition_file.etc_profiled_restic.rendered,
     data.ignition_file.rclone_config.rendered,
     data.ignition_file.restic_password.rendered,
