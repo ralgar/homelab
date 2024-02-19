@@ -7,5 +7,4 @@ After=network-online.target packages.service
 Type=oneshot
 Restart=no
 
-EnvironmentFile=/etc/profile.d/restic.sh
 ExecStart=/usr/local/bin/backup.sh

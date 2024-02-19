@@ -16,6 +16,15 @@ data "ignition_file" "backup_script" {
   }
 }
 
+data "ignition_file" "etc_environment" {
+  path      = "/etc/environment"
+  mode      = 420
+  overwrite = true
+  content {
+    content = file("${path.module}/files/environment")
+  }
+}
+
 data "ignition_file" "etc_profiled_restic" {
   path      = "/etc/profile.d/restic.sh"
   mode      = 420
