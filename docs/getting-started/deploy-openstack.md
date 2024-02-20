@@ -162,3 +162,12 @@ This step will deploy a local GitLab Runner, in a Docker container, directly
 
 1. Refresh the *Runners* page in GitLab, and make sure your new runner has
    connected.
+
+## Local DNS Configuration
+
+Your new OpenStack cloud comes with the Designate DNS service, which has been
+ configured to behave as a forwarding DNS server. This allows resolution of
+ local domains, while still forwarding external requests to public DNS servers.
+
+In order to use your internal DNS, set your router's (or individual device's)
+ primary DNS server to the IP address of your OpenStack node.

@@ -1,8 +1,8 @@
 [Unit]
 Description=Jellyseerr Container
 Documentation=man:podman-generate-systemd(1)
-Wants=network-online.target
-After=network-online.target
+Wants=podman-networks.service
+After=podman-networks.service
 RequiresMountsFor=%t/containers
 
 [Service]
@@ -19,7 +19,7 @@ ExecStart=/usr/bin/podman run -d --rm --replace \
     --user 9025:9030 \
     -v /srv/jellyseerr:/app/config:Z \
     -e TZ="America/Vancouver" \
-    -p 5055:5055 \
+    --network proxy \
     docker.io/fallenbagel/jellyseerr:latest
 
 ExecStop=/usr/bin/podman stop --ignore -t 10 --cidfile=%t/%n.ctr-id

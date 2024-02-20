@@ -1,8 +1,8 @@
 [Unit]
 Description=SWAG (NGINX) Container
 Documentation=man:podman-generate-systemd(1)
-Wants=network-online.target
-After=network-online.target
+Wants=podman-networks.service
+After=podman-networks.service
 RequiresMountsFor=%t/containers
 
 [Service]
@@ -19,13 +19,15 @@ ExecStart=/usr/bin/podman run -d --rm --replace \
     --cap-add=NET_ADMIN \
     -e PUID=8443 \
     -e PGID=8443 \
-    -e URL=omnicosm.net \
+    -e URL=${root_domain} \
     -e SUBDOMAINS=wildcard \
     -e VALIDATION=dns \
     -e DNSPLUGIN=cloudflare \
+    -e STAGING=${staging} \
     -v /srv/swag:/config:Z \
-    -p 8080:80 \
-    -p 8443:443 \
+    --network proxy \
+    -p 80:80 \
+    -p 443:443 \
     docker.io/linuxserver/swag:latest
 
 ExecStop=/usr/bin/podman stop --ignore -t 10 --cidfile=%t/%n.ctr-id

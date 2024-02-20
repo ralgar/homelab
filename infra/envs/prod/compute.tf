@@ -12,4 +12,8 @@ module "fcos" {
   // Backups configuration
   restic_password = var.restic_password
   gdrive_oauth    = var.gdrive_oauth
+
+  // Services configuration
+  environment = var.environment
+  root_domain = var.root_domain
 }

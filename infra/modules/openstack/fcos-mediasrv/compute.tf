@@ -34,7 +34,6 @@ resource "openstack_compute_instance_v2" "fcos" {
 
   network {
     uuid = var.network.id
-    fixed_ip_v4 = "192.168.1.100"
   }
 
   security_groups = [ "default", openstack_networking_secgroup_v2.fcos.name ]

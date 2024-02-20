@@ -1,8 +1,8 @@
 [Unit]
 Description=Mosquitto Container
 Documentation=man:podman-generate-systemd(1)
-Wants=network-online.target
-After=network-online.target
+Wants=podman-networks.service
+After=podman-networks.service
 RequiresMountsFor=%t/containers
 
 [Service]
@@ -17,7 +17,8 @@ ExecStart=/usr/bin/podman run -d --rm --replace \
     --label io.containers.autoupdate=registry \
     --name mosquitto \
     -v /srv/mosquitto:/mosquitto:Z \
-    --net host \
+    --network proxy \
+    -p 1883:1883 \
     docker.io/eclipse-mosquitto:2.0
 
 ExecStop=/usr/bin/podman stop --ignore -t 10 --cidfile=%t/%n.ctr-id

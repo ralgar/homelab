@@ -1,7 +1,6 @@
 #!/bin/bash
 
 containers_list=(
-    "cloudflared.service"
     "hass.service"
     "jellyfin.service"
     "jellyseerr.service"

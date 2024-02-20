@@ -1,8 +1,8 @@
 [Unit]
 Description=NZBGet Container
 Documentation=man:podman-generate-systemd(1)
-Wants=network-online.target
-After=network-online.target
+Wants=podman-networks.service
+After=podman-networks.service
 RequiresMountsFor=%t/containers
 
 [Service]
@@ -22,7 +22,7 @@ ExecStart=/usr/bin/podman run -d --rm --replace \
     -e PUID=9030 \
     -e PGID=9030 \
     -e UMASK="0007" \
-    -p 6789:6789 \
+    --network proxy \
     docker.io/linuxserver/nzbget:latest
 
 ExecStop=/usr/bin/podman stop --ignore -t 10 --cidfile=%t/%n.ctr-id

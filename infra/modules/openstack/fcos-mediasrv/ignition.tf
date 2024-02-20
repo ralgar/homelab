@@ -3,7 +3,11 @@ module "accounts" {
   keypair = var.keypair
 }
 module "config" { source = "./modules/config" }
-module "services" { source = "./modules/services" }
+module "services" {
+  source      = "./modules/services"
+  environment = var.environment
+  root_domain = var.root_domain
+}
 module "storage"  { source = "./modules/storage" }
 
 module "backups" {
