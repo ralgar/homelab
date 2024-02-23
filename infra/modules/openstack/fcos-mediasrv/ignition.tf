@@ -6,7 +6,7 @@ module "config" { source = "./modules/config" }
 module "services" {
   source      = "./modules/services"
   environment = var.environment
-  root_domain = var.root_domain
+  domain      = var.domain
 }
 module "storage"  { source = "./modules/storage" }
 

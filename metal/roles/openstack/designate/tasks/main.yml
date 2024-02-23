@@ -1,7 +1,7 @@
 ---
 - name: Set Python interpreter to venv
   ansible.builtin.set_fact:
-    ansible_python_interpreter: "{{ kolla_venv }}/bin/python"
+    ansible_python_interpreter: "{{ designate_kolla_venv }}/bin/python"
 
 - name: Add upstream server configuration in 'named.conf'
   ansible.builtin.blockinfile:
@@ -24,3 +24,15 @@
     regexp: 'recursion'
     line: '        recursion yes;'
   notify: designate_restart_bind9
+
+- name: Create the default zone
+  openstack.cloud.dns_zone:
+    name: "{{ designate_default_zone }}."
+    description: Default zone
+    email: "placeholder@{{ designate_default_zone }}"
+    type: primary
+    ttl: 3600
+    state: present
+    cloud: kolla-admin
+  environment:
+    OS_CLIENT_CONFIG_FILE: /etc/kolla/clouds.yaml

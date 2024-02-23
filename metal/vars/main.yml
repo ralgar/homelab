@@ -11,8 +11,11 @@ common:
   ssh_pubkey_file: ~/.ssh/id_ed25519.pub
 
 network:
+  # A root domain that you own.
+  root_domain: homelab.internal
+
   # The hostname to be assigned to the AIO OpenStack node.
-  hostname: openstack.homelab.internal
+  hostname: "openstack.{{ network.root_domain }}"
 
   # A list of two public DNS resolvers to use for the network.
   public_dns_servers: ['1.1.1.1', '1.0.0.1']

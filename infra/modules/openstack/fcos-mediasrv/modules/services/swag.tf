@@ -9,7 +9,8 @@ data "ignition_directory" "swag" {
 data "ignition_systemd_unit" "swag" {
   name    = "swag.service"
   content = templatefile("${path.module}/templates/swag.service", {
-    root_domain = var.root_domain
+    domain      = var.domain
+    environment = var.environment
     staging     = var.environment == "staging" ? "true" : "false"
   })
 }

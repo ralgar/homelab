@@ -1,27 +1,31 @@
-resource "openstack_dns_zone_v2" "local" {
-  name        = "${var.root_domain}."
-  email       = "admin@${var.root_domain}"
-  description = "Local zone"
-  ttl         = 3000
-  type        = "PRIMARY"
+// We need to create records in the 'prod' project, as it owns the zone.
+data "openstack_identity_project_v3" "prod" {
+  name = "prod"
 }
 
-resource "openstack_dns_recordset_v2" "root" {
-  zone_id     = openstack_dns_zone_v2.local.id
-  description = "Local root record"
-
-  name        = openstack_dns_zone_v2.local.name
-  type        = "A"
-  records     = [module.fcos.ipv4_address]
-  ttl         = 3000
+data "openstack_dns_zone_v2" "default" {
+  project_id  = data.openstack_identity_project_v3.prod.id
+  description = "Default zone"
 }
 
-resource "openstack_dns_recordset_v2" "wildcard" {
-  zone_id     = openstack_dns_zone_v2.local.id
-  description = "Local wildcard record"
+resource "openstack_dns_recordset_v2" "environment_root" {
+  project_id  = data.openstack_identity_project_v3.prod.id
+  zone_id     = data.openstack_dns_zone_v2.default.id
+  description = "Local environment root domain"
 
-  name        = "*.${openstack_dns_recordset_v2.root.name}"
+  name    = "${var.environment}.${data.openstack_dns_zone_v2.default.name}"
+  type    = "A"
+  records = [module.fcos.ipv4_address]
+  ttl     = 3000
+}
+
+resource "openstack_dns_recordset_v2" "environment_wildcard" {
+  project_id  = data.openstack_identity_project_v3.prod.id
+  zone_id     = data.openstack_dns_zone_v2.default.id
+  description = "Local environment wildcard subdomain"
+
+  name        = "*.${openstack_dns_recordset_v2.environment_root.name}"
   type        = "CNAME"
-  records     = [openstack_dns_recordset_v2.root.name]
+  records     = [openstack_dns_recordset_v2.environment_root.name]
   ttl         = 3000
 }

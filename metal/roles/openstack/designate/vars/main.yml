@@ -1,0 +1,4 @@
+---
+designate_kolla_venv: "{{ common.kolla_venv }}"
+designate_default_zone: "{{ network.root_domain }}"
+designate_upstream_servers: "{{ network.public_dns_servers }}"
