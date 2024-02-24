@@ -34,5 +34,7 @@
     ttl: 3600
     state: present
     cloud: kolla-admin
+    auth:
+      project_name: prod
   environment:
     OS_CLIENT_CONFIG_FILE: /etc/kolla/clouds.yaml

@@ -12,15 +12,8 @@ resource "ansible_playbook" "deploy" {
 
     ci_pipeline = "true"
   }
-
-  # Workaround for provider bug. Also useful for playbook debugging.
-  ignore_playbook_failure = true
 }
 
 output "ansible_stdout" {
   value = ansible_playbook.deploy.ansible_playbook_stdout
-}
-
-output "ansible_stderr" {
-  value = ansible_playbook.deploy.ansible_playbook_stderr
 }
