@@ -199,6 +199,9 @@ terraform:destroy:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: never
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - .gitlab-ci.yml
+        - infra/**/*
       when: manual
       allow_failure: true  # true for non-blocking manual job
   environment:
