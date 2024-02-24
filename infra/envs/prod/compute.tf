@@ -15,5 +15,5 @@ module "fcos" {
 
   // Services configuration
   environment = var.environment
-  domain      = trimsuffix(data.openstack_dns_zone_v2.default.name, ".")
+  domain      = trimsuffix(openstack_dns_zone_v2.environment.name, ".")
 }

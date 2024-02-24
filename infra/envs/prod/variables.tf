@@ -3,6 +3,11 @@ variable "openstack_clouds_file" {
   type        = string
 }
 
+variable "domain" {
+  description = "A public domain that you own (ex: mydomain.com)"
+  type        = string
+}
+
 variable "environment" {
   description = "Deployment environment (prod, staging, or dev)."
   type        = string

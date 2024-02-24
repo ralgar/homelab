@@ -11,10 +11,10 @@ common:
   ssh_pubkey_file: ~/.ssh/id_ed25519.pub
 
 network:
-  # A public domain that you own. Used for DNS and generating certificates.
+  # A domain to use for the internal OpenStack infrastructure.
   domain: homelab.internal
 
-  # The hostname/subdomain to be assigned to the AIO OpenStack node.
+  # A hostname/subdomain to assign to the AIO OpenStack node.
   hostname: openstack
 
   # A list of two public DNS resolvers to use for the network.

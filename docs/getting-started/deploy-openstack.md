@@ -33,7 +33,7 @@ Before we begin deployment, we need to configure the variables files
 
 1. Make sure the highlighted values in `main.yml` are set correctly.
 
-    ```yaml title="metal/vars/main.yml" hl_lines="7 10 25 28 33 34"
+    ```yaml title="metal/vars/main.yml" hl_lines="7 10 28 31 36 37"
     common:
       # Name (path) of the venv, using the root user's home as the base.
       # Ex. A value of 'kolla-venv' will become '/root/kolla-venv'
@@ -46,8 +46,11 @@ Before we begin deployment, we need to configure the variables files
       ssh_pubkey_file: ~/.ssh/id_ed25519.pub
 
     network:
-      # The hostname to be assigned to the AIO OpenStack node.
-      hostname: openstack.homelab.internal
+      # A domain to use for the internal OpenStack infrastructure.
+      domain: homelab.internal
+
+      # A hostname/subdomain to assign to the AIO OpenStack node.
+      hostname: openstack
 
       # A list of two public DNS resolvers to use for the network.
       public_dns_servers: ['1.1.1.1', '1.0.0.1']

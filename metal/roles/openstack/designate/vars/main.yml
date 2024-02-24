@@ -1,4 +1,5 @@
 ---
 designate_kolla_venv: "{{ common.kolla_venv }}"
 designate_default_zone: "{{ network.domain }}"
+designate_openstack_node_hostname: "{{ network.hostname }}"
 designate_upstream_servers: "{{ network.public_dns_servers }}"

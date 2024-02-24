@@ -1,4 +1,5 @@
 ---
 designate_kolla_venv: /root/kolla-venv
-designate_default_zone: homelab.internal.
+designate_default_zone: homelab.internal
+designate_openstack_node_hostname: openstack
 designate_upstream_servers: ['1.1.1.1', '1.0.0.1']
