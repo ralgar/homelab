@@ -1,5 +1,5 @@
 ---
-- name: Create '{{ public_network_name }}' network
+- name: "Create '{{ public_network_name }}' network"
   openstack.cloud.network:
     name: "{{ public_network_name }}"
     external: true
@@ -11,7 +11,7 @@
   environment:
     OS_CLIENT_CONFIG_FILE: /etc/kolla/clouds.yaml
 
-- name: Create '{{ public_subnet_name }}' subnet
+- name: "Create '{{ public_subnet_name }}' subnet"
   openstack.cloud.subnet:
     name: "{{ public_subnet_name }}"
     state: present
