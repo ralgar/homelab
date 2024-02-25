@@ -1,21 +1,4 @@
 ---
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: jellyfin.homelab.internal
-  namespace: media-server
-  labels:
-    app.kubernetes.io/name: jellyfin
-spec:
-  commonName: jellyfin.homelab.internal
-  dnsNames:
-    - jellyfin.homelab.internal
-    - jellyfin.jellyfin.svc
-  issuerRef:
-    name: internal-issuer
-    kind: ClusterIssuer
-  secretName: jellyfin-cert
----
 apiVersion: v1
 kind: Service
 metadata:
@@ -32,6 +15,22 @@ spec:
       protocol: TCP
       targetPort: jellyfin-http
 ---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: jellyfin-cert
+  namespace: media-server
+  labels:
+    app.kubernetes.io/name: jellyfin
+spec:
+  commonName: jellyfin
+  dnsNames:
+    - stream.${DOMAIN}
+  issuerRef:
+    name: internal-issuer
+    kind: ClusterIssuer
+  secretName: jellyfin-cert
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -39,14 +38,16 @@ metadata:
   namespace: media-server
   labels:
     app.kubernetes.io/name: jellyfin
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: &fqdn stream.${DOMAIN}
 spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - jellyfin.homelab.internal
+        - *fqdn
       secretName: jellyfin-cert
   rules:
-    - host: jellyfin.homelab.internal
+    - host: *fqdn
       http:
         paths:
           - path: /

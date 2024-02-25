@@ -20,5 +20,6 @@ spec:
     name: flux-system
   postBuild:
     substitute:
+      DOMAIN: ${DOMAIN}
       MEDIA_VOLUME_ID: ${MEDIA_VOLUME_ID}
       MEDIA_VOLUME_SIZE: ${MEDIA_VOLUME_SIZE}

@@ -24,7 +24,8 @@ spec:
       replicaCount: 1
       minAvailable: 1
       service:
-        loadBalancerIP: ${LOAD_BALANCER_STATIC_IP}
+        annotations:
+          external-dns.alpha.kubernetes.io/hostname: ${DOMAIN}
       metrics:
         enabled: true
         serviceMonitor:

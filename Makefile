@@ -15,10 +15,7 @@ plan-dev:
 .PHONY: cluster
 cluster:
 	cd $(TF_DEV) && terraform apply -auto-approve \
-		-var="gitops_ref_name=refs/heads/$(CURRENT_REF)" \
-		-target module.gcp_bucket \
-		-target module.k8s_cluster \
-		-target module.k8s_network
+		-var="gitops_ref_name=refs/heads/$(CURRENT_REF)"
 
 .PHONY: taint-gitops
 gitops-redeploy:

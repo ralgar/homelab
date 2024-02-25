@@ -4,6 +4,12 @@ variable "openstack_clouds_file" {
   default     = "../../../metal/output/clouds.yaml"
 }
 
+variable "domain" {
+  description = "A public domain that you own (ex: mydomain.com)"
+  type        = string
+  default     = "cluster.internal"
+}
+
 variable "environment" {
   description = "Deployment environment (prod, staging, or dev)."
   type        = string

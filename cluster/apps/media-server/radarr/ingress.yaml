@@ -1,21 +1,4 @@
 ---
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: radarr.homelab.internal
-  namespace: media-server
-  labels:
-    app.kubernetes.io/name: radarr
-spec:
-  commonName: radarr.homelab.internal
-  dnsNames:
-    - radarr.homelab.internal
-    - radarr.media-server.svc
-  issuerRef:
-    name: internal-issuer
-    kind: ClusterIssuer
-  secretName: radarr-cert
----
 apiVersion: v1
 kind: Service
 metadata:
@@ -31,6 +14,22 @@ spec:
       protocol: TCP
       targetPort: radarr-http
 ---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: radarr-cert
+  namespace: media-server
+  labels:
+    app.kubernetes.io/name: radarr
+spec:
+  commonName: radarr
+  dnsNames:
+    - radarr.${DOMAIN}
+  issuerRef:
+    name: internal-issuer
+    kind: ClusterIssuer
+  secretName: radarr-cert
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -38,14 +37,16 @@ metadata:
   namespace: media-server
   labels:
     app.kubernetes.io/name: radarr
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: &fqdn radarr.${DOMAIN}
 spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - radarr.homelab.internal
+        - *fqdn
       secretName: radarr-cert
   rules:
-    - host: radarr.homelab.internal
+    - host: *fqdn
       http:
         paths:
           - path: /

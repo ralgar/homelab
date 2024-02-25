@@ -6,6 +6,7 @@ resources:
   - cert-manager.yaml
   - csi-cinder.yaml
   - descheduler.yaml
+  - external-dns.yaml
   - ingress-nginx.yaml
   - monitoring.yaml
   - olm.yaml

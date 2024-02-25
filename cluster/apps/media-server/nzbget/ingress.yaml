@@ -1,21 +1,4 @@
 ---
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: nzbget.homelab.internal
-  namespace: media-server
-  labels:
-    app.kubernetes.io/name: nzbget
-spec:
-  commonName: nzbget.homelab.internal
-  dnsNames:
-    - nzbget.homelab.internal
-    - nzbget.nzbget.svc
-  issuerRef:
-    name: internal-issuer
-    kind: ClusterIssuer
-  secretName: nzbget-cert
----
 apiVersion: v1
 kind: Service
 metadata:
@@ -31,6 +14,22 @@ spec:
       protocol: TCP
       targetPort: nzbget-http
 ---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: nzbget-cert
+  namespace: media-server
+  labels:
+    app.kubernetes.io/name: nzbget
+spec:
+  commonName: nzbget
+  dnsNames:
+    - nzbget.${DOMAIN}
+  issuerRef:
+    name: internal-issuer
+    kind: ClusterIssuer
+  secretName: nzbget-cert
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -38,14 +37,16 @@ metadata:
   namespace: media-server
   labels:
     app.kubernetes.io/name: nzbget
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: &fqdn nzbget.${DOMAIN}
 spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - nzbget.homelab.internal
+        - *fqdn
       secretName: nzbget-cert
   rules:
-    - host: nzbget.homelab.internal
+    - host: *fqdn
       http:
         paths:
           - path: /

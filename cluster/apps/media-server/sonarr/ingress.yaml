@@ -1,21 +1,4 @@
 ---
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: sonarr.homelab.internal
-  namespace: media-server
-  labels:
-    app.kubernetes.io/name: sonarr
-spec:
-  commonName: sonarr.homelab.internal
-  dnsNames:
-    - sonarr.homelab.internal
-    - sonarr.sonarr.svc
-  issuerRef:
-    name: internal-issuer
-    kind: ClusterIssuer
-  secretName: sonarr-cert
----
 apiVersion: v1
 kind: Service
 metadata:
@@ -31,6 +14,22 @@ spec:
       protocol: TCP
       targetPort: sonarr-http
 ---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: sonarr-cert
+  namespace: media-server
+  labels:
+    app.kubernetes.io/name: sonarr
+spec:
+  commonName: sonarr
+  dnsNames:
+    - sonarr.${DOMAIN}
+  issuerRef:
+    name: internal-issuer
+    kind: ClusterIssuer
+  secretName: sonarr-cert
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -38,14 +37,16 @@ metadata:
   namespace: media-server
   labels:
     app.kubernetes.io/name: sonarr
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: &fqdn sonarr.${DOMAIN}
 spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - sonarr.homelab.internal
+        - *fqdn
       secretName: sonarr-cert
   rules:
-    - host: sonarr.homelab.internal
+    - host: *fqdn
       http:
         paths:
           - path: /

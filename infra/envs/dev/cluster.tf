@@ -34,7 +34,7 @@ module "k8s_cluster" {
     path       = var.gitops_path
 
     configs = {
-      LOAD_BALANCER_STATIC_IP = "192.168.1.99"
+      DOMAIN                  = trimsuffix(openstack_dns_zone_v2.environment.name, ".")
       MEDIA_VOLUME_ID         = openstack_blockstorage_volume_v3.media.id
       MEDIA_VOLUME_SIZE       = "${openstack_blockstorage_volume_v3.media.size}Gi"
     }
@@ -43,6 +43,8 @@ module "k8s_cluster" {
       GCP_BACKUP_BUCKET_NAME  = module.gcp_bucket.name
       GCP_BACKUP_BUCKET_CREDS = module.gcp_bucket.service_account_key  # base64
       PGSQL_BACKUP_PASSWORD   = var.pgsql_backup_password
+      DESIGNATE_AUTH_ID       = openstack_identity_application_credential_v3.designate.id
+      DESIGNATE_AUTH_SECRET   = openstack_identity_application_credential_v3.designate.secret
     }
   }
 }

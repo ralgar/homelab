@@ -1,21 +1,4 @@
 ---
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: prowlarr.homelab.internal
-  namespace: media-server
-  labels:
-    app.kubernetes.io/name: prowlarr
-spec:
-  commonName: prowlarr.homelab.internal
-  dnsNames:
-    - prowlarr.homelab.internal
-    - prowlarr.media-server.svc
-  issuerRef:
-    name: internal-issuer
-    kind: ClusterIssuer
-  secretName: prowlarr-cert
----
 apiVersion: v1
 kind: Service
 metadata:
@@ -31,6 +14,22 @@ spec:
       protocol: TCP
       targetPort: prowlarr-http
 ---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: prowlarr-cert
+  namespace: media-server
+  labels:
+    app.kubernetes.io/name: prowlarr
+spec:
+  commonName: prowlarr
+  dnsNames:
+    - prowlarr.${DOMAIN}
+  issuerRef:
+    name: internal-issuer
+    kind: ClusterIssuer
+  secretName: prowlarr-cert
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -38,14 +37,16 @@ metadata:
   namespace: media-server
   labels:
     app.kubernetes.io/name: prowlarr
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: &fqdn prowlarr.${DOMAIN}
 spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - prowlarr.homelab.internal
+        - *fqdn
       secretName: prowlarr-cert
   rules:
-    - host: prowlarr.homelab.internal
+    - host: *fqdn
       http:
         paths:
           - path: /

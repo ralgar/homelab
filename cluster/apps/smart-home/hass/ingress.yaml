@@ -1,20 +1,4 @@
 ---
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: hass.homelab.internal
-  labels:
-    app.kubernetes.io/name: hass
-spec:
-  commonName: hass.homelab.internal
-  dnsNames:
-    - hass.homelab.internal
-    - hass.smart-home.svc
-  issuerRef:
-    name: internal-issuer
-    kind: ClusterIssuer
-  secretName: hass-cert
----
 apiVersion: v1
 kind: Service
 metadata:
@@ -30,20 +14,37 @@ spec:
       protocol: TCP
       targetPort: hass-http
 ---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: hass-cert
+  labels:
+    app.kubernetes.io/name: hass
+spec:
+  commonName: hass
+  dnsNames:
+    - hass.${DOMAIN}
+  issuerRef:
+    name: internal-issuer
+    kind: ClusterIssuer
+  secretName: hass-cert
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: hass
   labels:
     app.kubernetes.io/name: hass
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: &fqdn hass.${DOMAIN}
 spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - hass.homelab.internal
+        - *fqdn
       secretName: hass-cert
   rules:
-    - host: hass.homelab.internal
+    - host: *fqdn
       http:
         paths:
           - path: /
