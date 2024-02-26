@@ -5,9 +5,8 @@ metadata:
   name: descheduler
   namespace: flux-system
 spec:
-  # TODO: Integrate with Prometheus alerting
-  # dependsOn:
-  #   - name: kube-prometheus-stack
+  dependsOn:
+    - name: kube-prometheus-stack
   interval: 60m
   path: ./cluster/system/descheduler
   prune: true

@@ -1,38 +1,34 @@
-TF_DEV  := ./infra/envs/dev
-TF_PROD := ./infra/envs/prod
+TF_ROOT  := ./infra/envs/dev
 
-CURRENT_REF := $(shell git symbolic-ref --short HEAD)
+CURRENT_REF := $(shell git symbolic-ref HEAD)
 
-prod:
-	cd $(TF_PROD) && terraform init -upgrade
-	cd $(TF_PROD) && terraform apply
+.PHONY: plan
+plan:
+	cd $(TF_ROOT) && terraform plan -var="gitops_ref_name=$(CURRENT_REF)"
 
-.PHONY: plan-dev
-plan-dev:
-	cd $(TF_DEV) && terraform plan \
-		-var="gitops_ref_name=refs/heads/$(CURRENT_REF)"
+.PHONY: apply
+apply:
+	cd $(TF_ROOT) && terraform apply -auto-approve -var="gitops_ref_name=$(CURRENT_REF)"
 
-.PHONY: cluster
-cluster:
-	cd $(TF_DEV) && terraform apply -auto-approve \
-		-var="gitops_ref_name=refs/heads/$(CURRENT_REF)"
-
-.PHONY: taint-gitops
-gitops-redeploy:
-	cd $(TF_DEV) && terraform destroy -auto-approve \
-		-target "module.k8s_cluster.module.flux[0].helm_release.flux_sync" \
-		-var="gitops_ref_name=refs/heads/$(CURRENT_REF)"
-	sleep 60
-	cd $(TF_DEV) && terraform apply -auto-approve \
-		-target "module.k8s_cluster.module.flux[0].helm_release.flux_sync" \
-		-var="gitops_ref_name=refs/heads/$(CURRENT_REF)"
-
-destroy-cluster:
-	cd $(TF_DEV) && terraform state rm 'module.k8s_cluster.module.flux[0]'
-	cd $(TF_DEV) && terraform destroy -auto-approve \
+.PHONY: destroy
+destroy: gitops-destroy
+	cd $(TF_ROOT) && terraform state rm 'module.k8s_cluster.module.flux[0]' || true
+	cd $(TF_ROOT) && terraform destroy -auto-approve \
 		-target module.gcp_bucket \
 		-target module.k8s_cluster \
 		-target module.k8s_network
+
+.PHONY: gitops-redeploy
+gitops-redeploy: gitops-destroy
+	cd $(TF_ROOT) && terraform apply -auto-approve \
+		-target "module.k8s_cluster.module.flux[0].helm_release.flux_sync" \
+		-var="gitops_ref_name=$(CURRENT_REF)"
+
+.PHONY: gitops-destroy
+gitops-destroy:
+	cd $(TF_ROOT) && terraform destroy -auto-approve \
+		-target "module.k8s_cluster.module.flux[0].helm_release.flux_sync"
+	sleep 60
 
 .PHONY: docs
 docs: venv
