@@ -24,6 +24,23 @@ spec:
         runAsUser: 108123
         runAsGroup: 108123
         fsGroup: 108123
+      initContainers:
+        - name: init
+          image: docker.io/bash:5.2
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: hass-config
+              mountPath: /configmaps
+            - name: hass-data
+              mountPath: /config
+          command: ["/configmaps/init.sh"]
+          resources:
+            limits:
+              cpu: 250m
+              memory: 250Mi
+            requests:
+              cpu: 125m
+              memory: 250Mi
       containers:
         - name: hass
           image: ghcr.io/onedr0p/home-assistant:2023.11.2
@@ -41,9 +58,6 @@ spec:
           volumeMounts:
             - name: hass-data
               mountPath: /config
-            - name: hass-config
-              subPath: configuration.yaml
-              mountPath: /config/configuration.yaml
           resources:
             limits:
               cpu: 2000m
@@ -82,6 +96,7 @@ spec:
         - name: hass-config
           configMap:
             name: hass-config
+            defaultMode: 0770
         - name: hass-data
           persistentVolumeClaim:
             claimName: hass-data

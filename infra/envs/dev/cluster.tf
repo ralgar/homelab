@@ -40,9 +40,10 @@ module "k8s_cluster" {
     }
 
     secrets = {
+      GCP_BACKUP_PROJECT_ID   = module.gcp_bucket.project_id
       GCP_BACKUP_BUCKET_NAME  = module.gcp_bucket.name
       GCP_BACKUP_BUCKET_CREDS = module.gcp_bucket.service_account_key  # base64
-      PGSQL_BACKUP_PASSWORD   = var.pgsql_backup_password
+      BACKUP_REPO_PASSWORD    = var.backup_repo_password
       DESIGNATE_AUTH_ID       = openstack_identity_application_credential_v3.designate.id
       DESIGNATE_AUTH_SECRET   = openstack_identity_application_credential_v3.designate.secret
     }

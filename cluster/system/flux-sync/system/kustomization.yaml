@@ -11,3 +11,4 @@ resources:
   - monitoring.yaml
   - olm.yaml
   - trust-manager.yaml
+  - volsync.yaml

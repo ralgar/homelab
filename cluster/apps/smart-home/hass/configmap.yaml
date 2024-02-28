@@ -4,6 +4,14 @@ kind: ConfigMap
 metadata:
   name: hass-config
 data:
+  init.sh: |
+    #!/usr/bin/env bash
+
+    set -xeu
+
+    cp /configmaps/configuration.yaml /config/configuration.yaml || exit 1
+    chmod 664 /config/configuration.yaml || exit 1
+
   configuration.yaml: |
     ---
     # Include the packages directory/subdirectories
@@ -46,9 +54,9 @@ data:
 
     # CONFIGURE LOGGING
     logger:
-      default: warning
+      default: info
       logs:
-        homeassistant.components.http.ban: warning
+        homeassistant.components.http.ban: info
 
     # CONFIGURE DATABASE
     recorder:

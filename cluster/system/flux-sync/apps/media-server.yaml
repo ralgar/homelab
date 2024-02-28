@@ -11,6 +11,7 @@ spec:
     - name: ingress-nginx
     - name: trust-manager
     - name: vault
+    - name: volsync
   interval: 60m
   path: ./cluster/apps/media-server
   prune: true
@@ -23,3 +24,7 @@ spec:
       DOMAIN: ${DOMAIN}
       MEDIA_VOLUME_ID: ${MEDIA_VOLUME_ID}
       MEDIA_VOLUME_SIZE: ${MEDIA_VOLUME_SIZE}
+      GCP_BACKUP_PROJECT_ID: ${GCP_BACKUP_PROJECT_ID}
+      GCP_BACKUP_BUCKET_NAME: ${GCP_BACKUP_BUCKET_NAME}
+      GCP_BACKUP_BUCKET_CREDS: ${GCP_BACKUP_BUCKET_CREDS}
+      BACKUP_REPO_PASSWORD: ${BACKUP_REPO_PASSWORD}

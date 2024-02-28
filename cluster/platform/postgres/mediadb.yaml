@@ -22,7 +22,7 @@ type: Opaque
 stringData:
   gcs.conf: |
     [global]
-    repo1-cipher-pass = "${PGSQL_BACKUP_PASSWORD}"
+    repo1-cipher-pass = "${BACKUP_REPO_PASSWORD}"
 ---
 apiVersion: postgres-operator.crunchydata.com/v1beta1
 kind: PostgresCluster

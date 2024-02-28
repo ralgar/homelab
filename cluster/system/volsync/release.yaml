@@ -1,0 +1,21 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: volsync
+spec:
+  interval: 5m
+  chart:
+    spec:
+      version: "0.8.x"
+      chart: volsync
+      sourceRef:
+        kind: HelmRepository
+        name: backube
+      interval: 60m
+  install:
+    crds: Create
+  upgrade:
+    crds: CreateReplace
+  # https://github.com/backube/volsync/blob/main/helm/volsync/values.yaml
+  values: {}

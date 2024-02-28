@@ -24,6 +24,8 @@
   openstack.cloud.quota:
     name: prod
     cloud: kolla-admin
+    volumes: 25
+    snapshots: 25
     gigabytes: -1
   environment:
     OS_CLIENT_CONFIG_FILE: /etc/kolla/clouds.yaml
@@ -52,6 +54,8 @@
   openstack.cloud.quota:
     name: staging
     cloud: kolla-admin
+    volumes: 25
+    snapshots: 25
     gigabytes: -1
   environment:
     OS_CLIENT_CONFIG_FILE: /etc/kolla/clouds.yaml
@@ -73,5 +77,14 @@
     role: admin
     project: dev
     cloud: kolla-admin
+  environment:
+    OS_CLIENT_CONFIG_FILE: /etc/kolla/clouds.yaml
+
+- name: "Set quotas for the 'dev' project"
+  openstack.cloud.quota:
+    name: dev
+    cloud: kolla-admin
+    volumes: 25
+    snapshots: 25
   environment:
     OS_CLIENT_CONFIG_FILE: /etc/kolla/clouds.yaml
