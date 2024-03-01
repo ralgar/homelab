@@ -1,0 +1,20 @@
+---
+- name: Get stats of a file
+  ansible.builtin.stat:
+    path: /root/octavia/diskimage-create/amphora-x64-haproxy.qcow2
+  register: octavia_image
+
+- name: Trigger the Octavia image build
+  assert:
+    that: true
+    quiet: true
+  changed_when: true
+  when: octavia_image.stat.exists == false
+  notify: octavia_image_build
+
+- name: "Octavia : Fix 'octavia-interface.service'"
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/system/octavia-interface.service
+    regexp: 'sleep'
+    line: 'ExecStartPre=/usr/bin/sleep 15'
+    insertbefore: '^ExecStartPre=/sbin/ip'

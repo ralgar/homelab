@@ -1,0 +1,8 @@
+---
+- name: Set Nova to resume guest state after host reboot
+  ansible.builtin.lineinfile:
+    path: /etc/kolla/nova-compute/nova.conf
+    insertafter: '^\[DEFAULT\]'
+    regexp: '^resume_guests_state_on_host_boot'
+    line: 'resume_guests_state_on_host_boot = True'
+  notify: restart_nova_compute

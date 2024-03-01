@@ -1,5 +1,0 @@
----
-- name: 'Octavia : Generate certificates'
-  ansible.builtin.shell: |
-    source {{ kolla_venv }}/bin/activate
-    kolla-ansible octavia-certificates

@@ -12,7 +12,9 @@
     - vars/main.yml
   roles:
     - common/wait_for_connection
-    - openstack/kolla-deploy
+    - openstack/bootstrap_host
+    - openstack/deploy_kolla
     - openstack/defaults
+    - openstack/nova
     - openstack/cinder
     - openstack/designate

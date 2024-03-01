@@ -1,0 +1,4 @@
+---
+- name: 'Octavia : Source user credentials'
+  ansible.builtin.include_tasks: image.yml
+  listen: octavia_image_build

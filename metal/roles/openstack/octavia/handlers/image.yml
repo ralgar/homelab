@@ -1,11 +1,4 @@
 ---
-- name: 'Octavia : Build Amphora image'
-  ansible.builtin.shell:
-    chdir: /root/octavia/diskimage-create
-    cmd: |
-      source {{ kolla_venv }}/bin/activate
-      ./diskimage-create.sh
-
 - name: 'Octavia : Source user credentials'
   ansible.builtin.shell:
     cmd: source /etc/kolla/octavia-openrc.sh
@@ -45,10 +38,3 @@
     properties:
       hw_architecture: x86_64
       hw_rng_model: virtio
-
-- name: "Octavia : Fix 'octavia-interface.service'"
-  ansible.builtin.lineinfile:
-    path: /etc/systemd/system/octavia-interface.service
-    regexp: 'sleep'
-    line: 'ExecStartPre=/usr/bin/sleep 15'
-    insertbefore: '^ExecStartPre=/sbin/ip'

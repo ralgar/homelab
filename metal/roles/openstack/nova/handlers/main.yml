@@ -1,0 +1,6 @@
+---
+- name: Restart the 'nova_compute' container
+  community.docker.docker_container:
+    name: nova_compute
+    restart: true
+  listen: restart_nova_compute
