@@ -1,17 +1,17 @@
-resource "openstack_dns_zone_v2" "homelab_internal" {
-  name        = "homelab.internal."
-  email       = "admin@homelab.internal"
+resource "openstack_dns_zone_v2" "test_internal" {
+  name        = "test.internal."
+  email       = "admin@test.internal"
   description = "An example zone"
-  ttl         = 3000
+  ttl         = 3600
   type        = "PRIMARY"
 }
 
 resource "openstack_dns_recordset_v2" "test" {
-  zone_id     = openstack_dns_zone_v2.homelab_internal.id
-  description = "A test record set"
+  zone_id     = openstack_dns_zone_v2.test_internal.id
+  description = "CirrOS Test VM"
 
-  name        = "test.${openstack_dns_zone_v2.homelab_internal.name}"
+  name        = "cirros.${openstack_dns_zone_v2.test_internal.name}"
   type        = "A"
-  records     = ["192.168.1.100"]
-  ttl         = 3000
+  records     = [openstack_compute_instance_v2.cirros.access_ip_v4]
+  ttl         = 3600
 }

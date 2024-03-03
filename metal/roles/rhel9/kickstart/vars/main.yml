@@ -1,5 +1,5 @@
 ---
-rocky_install_disk: "{{ 'vdb' if ci_pipeline else common.root_disk }}"
+rocky_install_disk: "{{ 'vdb' if ci_pipeline else storage.root_device }}"
 rocky_ssh_public_key: "{{ lookup('ansible.builtin.file', common.ssh_pubkey_file) }}"
 rocky_interface_one: "{{ network_interface }}"
 rocky_interface_two: "{{ neutron_external_interface }}"

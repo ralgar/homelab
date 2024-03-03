@@ -14,10 +14,3 @@
     source {{ kolla_venv }}/bin/activate
     kolla-ansible octavia-certificates
   listen: octavia
-
-# Prechecks are the final step
-- name: Perform Kolla prechecks
-  ansible.builtin.shell: |
-    source {{ kolla_venv }}/bin/activate
-    kolla-ansible prechecks
-  listen: prechecks

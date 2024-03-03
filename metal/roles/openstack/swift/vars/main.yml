@@ -1,0 +1,2 @@
+---
+swift_devices: "{{ ['vdd', 'vdd', 'vdf'] if ci_pipeline else storage.swift.devices }}"

@@ -1,0 +1,24 @@
+---
+- name: Create the Account Ring
+  community.docker.docker_container:
+    name: swift-ring-builder
+    image: docker.io/kolla/centos-source-swift-base:4.0.0
+    entrypoint: ['swift-ring-builder']
+    command: ['/mnt/account.builder', 'create', '10', '3', '1']
+    auto_remove: true
+    volumes:
+      - /etc/kolla/config/swift:/mnt
+
+- name: Add devices to the Account Ring
+  community.docker.docker_container:
+    name: swift-ring-builder
+    image: docker.io/kolla/centos-source-swift-base:4.0.0
+    entrypoint: ['swift-ring-builder']
+    command: ['/mnt/account.builder', 'add', "r1z1-{{ ansible_default_ipv4.address }}:6001/d{{ swift_device_index }}", '1']
+    auto_remove: true
+    volumes:
+      - /etc/kolla/config/swift:/mnt
+  loop: "{{ swift_devices }}"
+  loop_control:
+    loop_var: swift_device
+    index_var: swift_device_index

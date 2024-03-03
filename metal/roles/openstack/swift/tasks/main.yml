@@ -1,0 +1,27 @@
+---
+- name: Partition the block devices
+  community.general.parted:
+    device: "/dev/{{ swift_device }}"
+    label: gpt
+    number: 1
+    name: KOLLA_SWIFT_DATA
+    state: present
+  loop: "{{ swift_devices }}"
+  loop_control:
+    loop_var: swift_device
+  notify: generate_rings
+
+- name: Create the filesystems
+  community.general.filesystem:
+    fstype: xfs
+    dev: "/dev/{{ swift_device }}1"
+    opts: "-L d{{ swift_device_index }}"
+    state: present
+  loop: "{{ swift_devices }}"
+  loop_control:
+    loop_var: swift_device
+    index_var: swift_device_index
+  notify: generate_rings
+
+- name: Flush Handlers
+  ansible.builtin.meta: flush_handlers

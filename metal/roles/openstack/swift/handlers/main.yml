@@ -1,0 +1,25 @@
+---
+- name: Include ring generation tasks
+  include_tasks: "{{ item }}"
+  loop:
+    - object_ring.yml
+    - account_ring.yml
+    - container_ring.yml
+  listen: generate_rings
+
+- name: Rebalance the ring files
+  community.docker.docker_container:
+    name: swift-ring-builder
+    image: docker.io/kolla/centos-source-swift-base:4.0.0
+    entrypoint: ['swift-ring-builder']
+    command: ["/mnt/{{ swift_ring }}.builder", 'rebalance']
+    auto_remove: true
+    volumes:
+      - /etc/kolla/config/swift:/mnt
+  loop:
+    - object
+    - account
+    - container
+  loop_control:
+    loop_var: swift_ring
+  listen: generate_rings

@@ -13,6 +13,7 @@
   roles:
     - common/wait_for_connection
     - openstack/bootstrap_host
+    - openstack/swift
     - openstack/deploy_kolla
     - openstack/defaults
     - openstack/nova

@@ -33,17 +33,22 @@ Before we begin deployment, we need to configure the variables files
 
 1. Make sure the highlighted values in `main.yml` are set correctly.
 
-    ```yaml title="metal/vars/main.yml" hl_lines="7 10 28 31 36 37"
+    ```yaml title="metal/vars/main.yml" hl_lines="7 11 15 33 36 41 42"
     common:
       # Name (path) of the venv, using the root user's home as the base.
       # Ex. A value of 'kolla-venv' will become '/root/kolla-venv'
       venv: kolla-venv
 
-      # Target disk for the root filesystem.
-      root_disk: nvme0n1
-
       # Path to your SSH pubkey file. This will be used to access the node.
       ssh_pubkey_file: ~/.ssh/id_ed25519.pub
+
+    storage:
+      # Target block device for the root filesystem.
+      root_device: nvme0n1
+
+      swift:
+        # Target block device(s) for Swift.
+        devices: ['sda', 'sdb', 'sdd', 'sde']
 
     network:
       # A domain to use for the internal OpenStack infrastructure.

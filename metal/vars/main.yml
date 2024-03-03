@@ -4,11 +4,16 @@ common:
   # Ex. A value of 'kolla-venv' will become '/root/kolla-venv'
   kolla_venv: /root/kolla-venv
 
-  # Target disk for the root filesystem.
-  root_disk: nvme0n1
-
   # Path to your SSH pubkey file. This will be used to access the node.
   ssh_pubkey_file: ~/.ssh/id_ed25519.pub
+
+storage:
+  # Target block device for the root filesystem.
+  root_device: nvme0n1
+
+  swift:
+    # Target block device(s) for Swift.
+    devices: ['sda', 'sdb', 'sdd', 'sde']
 
 network:
   # A domain to use for the internal OpenStack infrastructure.
