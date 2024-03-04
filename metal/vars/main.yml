@@ -13,7 +13,11 @@ storage:
 
   swift:
     # Target block device(s) for Swift.
-    devices: ['sda', 'sdb', 'sdd', 'sde']
+    devices:
+      - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002d7240bf3ecf84b7
+      - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002d7240f041b207bc
+      - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002d72410a433d4109
+      - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002d72413745f2e841
 
 network:
   # A domain to use for the internal OpenStack infrastructure.

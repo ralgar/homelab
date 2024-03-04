@@ -31,9 +31,9 @@ Before we begin deployment, we need to configure the variables files
     neutron_external_interface: "eno2"
     ```
 
-1. Make sure the highlighted values in `main.yml` are set correctly.
+1. Make sure the highlighted keys in `main.yml` are set correctly.
 
-    ```yaml title="metal/vars/main.yml" hl_lines="7 11 15 33 36 41 42"
+    ```yaml title="metal/vars/main.yml" hl_lines="7 11 15 37 40 45 46"
     common:
       # Name (path) of the venv, using the root user's home as the base.
       # Ex. A value of 'kolla-venv' will become '/root/kolla-venv'
@@ -48,7 +48,11 @@ Before we begin deployment, we need to configure the variables files
 
       swift:
         # Target block device(s) for Swift.
-        devices: ['sda', 'sdb', 'sdd', 'sde']
+        devices:
+          - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002d7240bf3ecf84b7
+          - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002d7240f041b207bc
+          - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002d72410a433d4109
+          - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002d72413745f2e841
 
     network:
       # A domain to use for the internal OpenStack infrastructure.

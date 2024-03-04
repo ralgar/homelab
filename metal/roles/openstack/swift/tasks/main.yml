@@ -1,7 +1,7 @@
 ---
 - name: Partition the block devices
   community.general.parted:
-    device: "/dev/{{ swift_device }}"
+    device: "{{ swift_device }}"
     label: gpt
     number: 1
     name: KOLLA_SWIFT_DATA
@@ -9,17 +9,18 @@
   loop: "{{ swift_devices }}"
   loop_control:
     loop_var: swift_device
+  register: swift_partitions
   notify: generate_rings
 
 - name: Create the filesystems
   community.general.filesystem:
     fstype: xfs
-    dev: "/dev/{{ swift_device }}1"
+    dev: "{{ swift_partition.disk.dev }}1"
     opts: "-L d{{ swift_device_index }}"
     state: present
-  loop: "{{ swift_devices }}"
+  loop: "{{ swift_partitions.results }}"
   loop_control:
-    loop_var: swift_device
+    loop_var: swift_partition
     index_var: swift_device_index
   notify: generate_rings
 

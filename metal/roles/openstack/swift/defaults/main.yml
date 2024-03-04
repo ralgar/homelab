@@ -1,2 +1,3 @@
 ---
+ci_pipeline: false
 swift_kolla_venv: /root/kolla-venv
