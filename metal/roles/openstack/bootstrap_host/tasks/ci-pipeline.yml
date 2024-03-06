@@ -17,31 +17,16 @@
     regexp: '^neutron_external_interface:'
     line: 'neutron_external_interface: eth1'
 
-- name: Install system packages for CI pipeline
-  ansible.builtin.dnf:
-    name:
-      - lvm2
-
-- name: Create the LVM physical volumes
+- name: Create the 'cinder-premium' LVM physical volume
   community.general.parted:
-    device: "{{ lvm_physical_disk }}"
+    device: /dev/vdb
     number: 1
     flags: [ lvm ]
     state: present
     part_end: 100%
-  loop:
-    - /dev/vdb
-    - /dev/vdc
-  loop_control:
-    loop_var: lvm_physical_disk
 
-- name: Create the LVM volume groups
+- name: Create the 'cinder-premium' LVM volume group
   community.general.lvg:
-    vg: "{{ lvm_volume_group.name }}"
-    pvs: "{{ lvm_volume_group.pvs }}"
+    vg: cinder-premium
+    pvs: /dev/vdb1
     pesize: 16M
-  loop:
-    - { name: cinder-premium, pvs: /dev/vdb1 }
-    - { name: cinder-standard, pvs: /dev/vdc1 }
-  loop_control:
-    loop_var: lvm_volume_group

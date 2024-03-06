@@ -1,6 +1,9 @@
 ---
-- name: Restart the 'nova_compute' container
+- name: Restart all containers with a 'nova.conf' file
   community.docker.docker_container:
-    name: nova_compute
+    name: "{{ nova_component | regex_replace('-', '_') }}"
     restart: true
-  listen: restart_nova_compute
+  loop: "{{ nova_conf_components }}"
+  loop_control:
+    loop_var: nova_component
+  listen: updated_nova_conf

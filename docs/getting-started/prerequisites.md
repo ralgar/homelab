@@ -40,14 +40,15 @@ This project is built and tested against an old Dell T420 tower server, which
  avoids the significant investment of a rack-mounted setup. Perfect for almost
  any homelab!
 
-### Minimum Specs
+### Recommended Specs
 
 You can use any hardware you like, however, provided it meets the following
- minimum specs:
+ recommended specs:
 
-| CPU        | Memory    | Storage                       | Network      |
-|------------|-----------|-------------------------------|--------------|
-| 24 threads | 64 GB RAM | 1x 1 TB NVMe + 1x HDD array   | 2x 1 GbE NIC |
+|                 | CPU        | Memory     | Storage          | Network      |
+|-----------------|------------|------------|------------------|--------------|
+| **Minimum**     | 16 threads | 64 GB RAM  | 1x NVMe + 2x HDD | 2x 1 GbE NIC |
+| **Recommended** | 24 threads | 128 GB RAM | 1x NVMe + 4x HDD | 2x 1 GbE NIC |
 
 ---
 

@@ -41,27 +41,27 @@ firstboot --disable
 #############################
 ###   Disk partitioning   ###
 ###############################################################################
-ignoredisk --only-use={{ rocky_install_disk }}
+ignoredisk --only-use={{ rocky_install_disk | regex_replace('^/dev/', '') }}
 
 # Clear and create partition table
 zerombr
 clearpart --all --initlabel --disklabel=gpt
 
 # Create partitions and LVM PVs
-part pv.01     --size=30000 --fstype=lvmpv    --grow
-part pv.02     --size=1024  --fstype=lvmpv    --grow       --maxsize=232830
 part biosboot  --size=1     --fstype=biosboot
-part /boot     --size=1024  --fstype=xfs      --label=boot
-part /boot/efi --size=1024  --fstype=efi
+part /boot     --size=1000  --fstype=xfs      --label=boot
+part /boot/efi --size=1000  --fstype=efi
+part pv.01     --size=40000 --fstype=lvmpv
+part pv.02     --size=1000  --fstype=lvmpv    --grow
 
 # Create LVM VGs
-volgroup openstack      --pesize=4096 pv.01
-volgroup cinder-premium --pesize=4096 pv.02
+volgroup openstack      --pesize=4000 pv.01
+volgroup cinder-premium --pesize=4000 pv.02
 
 # Root LVM volumes
-logvol /    --fstype=xfs  --size=7450   --name=root --vgname=openstack
-logvol /var --fstype=xfs  --size=18626  --name=var  --vgname=openstack --grow
-logvol swap --fstype=swap --recommended --name=swap --vgname=openstack
+logvol swap --fstype=swap --size=4000  --name=swap --vgname=openstack
+logvol /    --fstype=xfs  --size=8000  --name=root --vgname=openstack
+logvol /var --fstype=xfs  --size=20000 --name=var  --vgname=openstack --grow
 
 ###################################
 ###   Post-installation tasks   ###

@@ -33,7 +33,11 @@ Before we begin deployment, we need to configure the variables files
 
 1. Make sure the highlighted keys in `main.yml` are set correctly.
 
-    ```yaml title="metal/vars/main.yml" hl_lines="7 11 15 37 40 45 46"
+    !!!tip
+        It is strongly recommended to use consistent identifiers to define
+        your block devices, such as the WWN identifiers from `/dev/disk/by-id`.
+
+    ```yaml title="metal/vars/main.yml" hl_lines="7 11 15 20 42 45 50 51"
     common:
       # Name (path) of the venv, using the root user's home as the base.
       # Ex. A value of 'kolla-venv' will become '/root/kolla-venv'
@@ -43,8 +47,13 @@ Before we begin deployment, we need to configure the variables files
       ssh_pubkey_file: ~/.ssh/id_ed25519.pub
 
     storage:
-      # Target block device for the root filesystem.
-      root_device: nvme0n1
+      # Target block device for the Openstack host's root filesystem.
+      root_device: /dev/disk/by-id/nvme-WD_BLACK_SN770_1TB_23020Q804222
+
+      cinder:
+        # Target block device(s) for Cinder "standard" (HDD) tier.
+        devices:
+          - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002bd0bf3c11919471
 
       swift:
         # Target block device(s) for Swift.

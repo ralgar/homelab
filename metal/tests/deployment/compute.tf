@@ -7,7 +7,6 @@ resource "openstack_compute_flavor_v2" "openstack" {
 
 resource "openstack_compute_instance_v2" "openstack" {
   name      = "openstack-test"
-  image_id  = openstack_images_image_v2.rocky9_cloud.id
   flavor_id = openstack_compute_flavor_v2.openstack.id
   key_pair  = openstack_compute_keypair_v2.ephemeral.name
 

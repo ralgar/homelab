@@ -1,0 +1,2 @@
+---
+cinder_kolla_venv: "{{ common.kolla_venv }}"

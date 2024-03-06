@@ -10,8 +10,8 @@
   environment:
     OS_CLIENT_CONFIG_FILE: /etc/kolla/clouds.yaml
   loop:
-    - { name: m1.tiny,   vcpus: 1, ram: 512,   disk: 1   }  # noqa: yaml[braces]
-    - { name: m1.small,  vcpus: 1, ram: 2048,  disk: 20  }  # noqa: yaml[braces]
-    - { name: m1.medium, vcpus: 2, ram: 4096,  disk: 40  }  # noqa: yaml[braces]
-    - { name: m1.large,  vcpus: 4, ram: 8192,  disk: 80  }  # noqa: yaml[braces]
-    - { name: m1.xlarge, vcpus: 8, ram: 16384, disk: 160 }  # noqa: yaml[braces]
+    - { name: m1.tiny,   vcpus: 1, ram: 512,   disk: 0 }  # noqa: yaml[braces]
+    - { name: m1.small,  vcpus: 1, ram: 2048,  disk: 0 }  # noqa: yaml[braces]
+    - { name: m1.medium, vcpus: 2, ram: 4096,  disk: 0 }  # noqa: yaml[braces]
+    - { name: m1.large,  vcpus: 4, ram: 8192,  disk: 0 }  # noqa: yaml[braces]
+    - { name: m1.xlarge, vcpus: 8, ram: 16384, disk: 0 }  # noqa: yaml[braces]

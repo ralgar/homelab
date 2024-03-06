@@ -6,6 +6,7 @@
       - dbus-devel
       - git
       - glib2-devel
+      - lvm2
       - python3-devel
       - libffi-devel
       - gcc

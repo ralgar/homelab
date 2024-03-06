@@ -8,7 +8,16 @@ resource "openstack_compute_instance_v2" "cirros" {
     source_type           = "image"
     destination_type      = "volume"
     volume_size           = 8
+    volume_type           = "PREMIUM"
     boot_index            = 0
+    delete_on_termination = true
+  }
+
+    block_device {
+    source_type           = "blank"
+    destination_type      = "volume"
+    volume_size           = 1
+    boot_index            = -1
     delete_on_termination = true
   }
 

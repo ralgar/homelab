@@ -1,6 +1,38 @@
 ---
+- name: Set Ansible Python interpreter to Kolla venv
+  ansible.builtin.set_fact:
+    ansible_python_interpreter: "{{ cinder_kolla_venv }}/bin/python"
+
 - name: Include tasks
   ansible.builtin.include_tasks: "{{ item }}"
   loop:
     - prechecks.yml
     - backends.yml
+
+- name: Flush Handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Enable multiattach for '__DEFAULT__' volume type
+  openstack.cloud.volume_type:
+    name: __DEFAULT__
+    description: Standard Volume Type (HDD)
+    extra_specs:
+      multiattach: "<is> True"
+    is_public: True
+    state: present
+    cloud: kolla-admin
+  environment:
+    OS_CLIENT_CONFIG_FILE: /etc/kolla/clouds.yaml
+
+- name: Create 'PREMIUM' volume type
+  openstack.cloud.volume_type:
+    name: PREMIUM
+    extra_specs:
+      volume_backend_name: lvm-2
+      multiattach: "<is> True"
+    description: Premium Volume Type (SSD)
+    is_public: True
+    state: present
+    cloud: kolla-admin
+  environment:
+    OS_CLIENT_CONFIG_FILE: /etc/kolla/clouds.yaml

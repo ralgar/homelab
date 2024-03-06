@@ -1,0 +1,21 @@
+---
+- name: "Storage : Create the 'cinder-standard' LVM physical volume(s)"
+  community.general.parted:
+    device: "{{ lvm_physical_device }}"
+    label: gpt
+    number: 1
+    part_end: 100%
+    state: present
+  loop: "{{ cinder_standard_devices }}"
+  loop_control:
+    loop_var: lvm_physical_device
+  register: lvm_pvs
+
+- name: "Storage : Create the 'cinder-standard' LVM volume group"
+  community.general.lvg:
+    vg: cinder-standard
+    pvs: "{{ lvm_pv.disk.dev }}{{ lvm_pv.partitions[0].num }}"
+    pesize: 16M
+  loop: "{{ lvm_pvs.results }}"
+  loop_control:
+    loop_var: lvm_pv

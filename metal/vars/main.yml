@@ -8,8 +8,13 @@ common:
   ssh_pubkey_file: ~/.ssh/id_ed25519.pub
 
 storage:
-  # Target block device for the root filesystem.
-  root_device: nvme0n1
+  # Target block device for the Openstack host's root filesystem.
+  root_device: /dev/disk/by-id/nvme-WD_BLACK_SN770_1TB_23020Q804222
+
+  cinder:
+    # Target block device(s) for Cinder "standard" (HDD) tier.
+    devices:
+      - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002bd0bf3c11919471
 
   swift:
     # Target block device(s) for Swift.

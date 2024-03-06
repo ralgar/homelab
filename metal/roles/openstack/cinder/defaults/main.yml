@@ -1,4 +1,5 @@
 ---
+cinder_kolla_venv: /root/kolla-venv
 cinder_vgs:
   - cinder-premium
   - cinder-standard
