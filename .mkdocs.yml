@@ -51,8 +51,8 @@ nav:
     - getting-started/deploy-openstack.md
     - getting-started/cicd-configuration.md
   - Deployment Environments:
-    - Production (FCOS Server): environments/production.md
-    - Development (K8s Cluster): environments/kubernetes.md
+    - environments/production.md
+    - environments/development.md
   - Managing OpenStack:
     - Cinder:
       - Import/Export Volumes: managing-openstack/cinder/import-export-volumes.md

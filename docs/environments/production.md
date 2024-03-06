@@ -1,4 +1,4 @@
-# Production Server
+# Production (FCOS Server)
 
 The Production environment is a single instance that runs on Fedora CoreOS.
  It's designed to be simple, secure, and low maintenance.
@@ -17,7 +17,14 @@ First, we need to manually trigger the initial pipeline run.
 1. In your GitLab project, go to **Build >> Pipelines**, and choose
    **Run pipeline**.
 
-1. Select either the `main` branch (recommended), or the latest tagged version.
+1. Select either the `main` branch, or the latest tagged version.
+
+    !!!note
+        While the main branch is the source of truth for this project, it may
+        sometimes be in an undesirable state to fork from. Git tags are
+        provided to denote stable points in the project's history, and are
+        guaranteed to be suitable as a starting point. If you use a tag, don't
+        forget you'll also need to force push it to your `main` branch!
 
 1. Choose **Run pipeline** again to begin the process.
 

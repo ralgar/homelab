@@ -101,13 +101,19 @@ Before we begin deployment, we need to configure the variables files
     ansible-playbook 00-make-kickstart-iso.yml
     ```
 
-1. Write the ISO file to a USB drive (or use PXE boot), and boot from it.
+1. Write the ISO file to a USB drive (or use PXE boot).
 
     ```sh
     dd if=<iso-file> of=/dev/<usb-drive> bs=4M conv=fsync oflag=direct status=progress
     ```
 
-1. Wait for the automated installer to complete (the system will reboot).
+1. Boot the ISO, and wait for the automated installer to finish (the system
+   will reboot).
+
+    !!!bug
+        At the GRUB boot menu, you will need to press **e** to edit the kernel
+        command line, and append `inst.ks=hd:LABEL=Rocky-9-0-x86_64-dvd:/ks.cfg`
+        after `quiet`. Then, press **Ctrl-x** to continue.
 
 1. SSH into your new node, and configure an additonal LVM Volume Group named
    `cinder-standard` on your disk or RAID array.
