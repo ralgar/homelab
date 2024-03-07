@@ -1,6 +1,5 @@
 resource "openstack_compute_instance_v2" "fcos" {
   name                = "FCOS Media Server"
-  image_id            = var.image.id
   flavor_name         = "m1.large"
   key_pair            = var.keypair.name
   user_data           = data.ignition_config.final.rendered
@@ -9,7 +8,9 @@ resource "openstack_compute_instance_v2" "fcos" {
   block_device {
     uuid                  = var.image.id
     source_type           = "image"
-    destination_type      = "local"
+    destination_type      = "volume"
+    volume_type           = "PREMIUM"
+    volume_size           = 80
     boot_index            = 0
     delete_on_termination = true
   }
