@@ -24,5 +24,30 @@
     index_var: swift_device_index
   notify: generate_rings
 
+- name: Stat the ring files
+  ansible.builtin.stat:
+    path: "/etc/kolla/config/swift/{{ ring_file }}"
+  loop:
+    - account.builder
+    - account.ring.gz
+    - container.builder
+    - container.ring.gz
+    - object.builder
+    - object.ring.gz
+  loop_control:
+    loop_var: ring_file
+  register: ring_files
+
+- name: Assert that ring files are present
+  ansible.builtin.assert:
+    that: ring_file.stat.exists
+    quiet: true
+  changed_when: not ring_file.stat.exists
+  failed_when: false
+  loop: "{{ ring_files.results }}"
+  loop_control:
+    loop_var: ring_file
+  notify: generate_rings
+
 - name: Flush Handlers
   ansible.builtin.meta: flush_handlers

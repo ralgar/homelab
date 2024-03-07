@@ -55,8 +55,8 @@ part pv.01     --size=40000 --fstype=lvmpv
 part pv.02     --size=1000  --fstype=lvmpv    --grow
 
 # Create LVM VGs
-volgroup openstack      --pesize=4000 pv.01
-volgroup cinder-premium --pesize=4000 pv.02
+volgroup openstack      --pesize=4096 pv.01
+volgroup cinder-premium --pesize=4096 pv.02
 
 # Root LVM volumes
 logvol swap --fstype=swap --size=4000  --name=swap --vgname=openstack

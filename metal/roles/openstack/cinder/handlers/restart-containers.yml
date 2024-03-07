@@ -1,0 +1,17 @@
+---
+- name: Restart the containers
+  community.docker.docker_container:
+    name: "{{ cinder_container }}"
+    restart: true
+  loop:
+    - cinder_volume
+    - cinder_scheduler
+    - cinder_api
+  loop_control:
+    loop_var: cinder_container
+
+- name: Wait for the API to come online
+  ansible.builtin.wait_for:
+    host: "{{ ansible_default_ipv4.address }}"
+    port: 8776
+    delay: 15
