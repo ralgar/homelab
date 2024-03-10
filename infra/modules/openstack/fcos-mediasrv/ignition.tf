@@ -12,6 +12,7 @@ module "storage"  { source = "./modules/storage" }
 
 module "backups" {
   source          = "./modules/backups"
+  environment     = var.environment
   restic_password = var.restic_password
   gdrive_oauth    = var.gdrive_oauth
 }

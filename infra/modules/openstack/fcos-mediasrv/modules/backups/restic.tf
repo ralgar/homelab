@@ -43,4 +43,5 @@ data "ignition_systemd_unit" "restic_service" {
 data "ignition_systemd_unit" "restic_timer" {
   name    = "restic.timer"
   content = file("${path.module}/files/restic.timer")
+  enabled = var.environment == "prod" ? true : false
 }

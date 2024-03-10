@@ -1,3 +1,7 @@
+variable "environment" {
+  type = string
+}
+
 variable "restic_password" {
   description = "Password for the Restic backup repo."
   type        = string
