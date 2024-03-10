@@ -6,3 +6,6 @@ default: true
 MD007:
   # Spaces for indent
   indent: 4
+
+MD033:
+  allowed_elements: ["br"]

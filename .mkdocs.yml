@@ -56,5 +56,6 @@ nav:
   - Managing OpenStack:
     - Cinder:
       - Import/Export Volumes: managing-openstack/cinder/import-export-volumes.md
+      - Troubleshooting: managing-openstack/cinder/troubleshooting.md
   - Reference:
     - reference/license.md
