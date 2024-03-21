@@ -13,20 +13,23 @@ containers_list=(
 )
 
 # Restic prune settings
-KEEP_DAILY=14
-KEEP_WEEKLY=16
-KEEP_MONTHLY=18
+KEEP_DAILY=7
+KEEP_WEEKLY=5
+KEEP_MONTHLY=12
+
+# Manually define HOME if unset (may be running as systemd service)
+[[ -z $HOME ]] && export HOME=/root
 
 function containers
 {
-    local error
+    local status=0
 
     case $1 in
         start)
             for container in "${containers_list[@]}" ; do
                 if ! systemctl start "$container" ; then
                     echo "ERROR: Failed to start $container"
-                    error=1
+                    status=1
                 fi
             done
             ;;
@@ -34,7 +37,7 @@ function containers
             for container in "${containers_list[@]}" ; do
                 if ! systemctl stop "$container" ; then
                     echo "ERROR: Failed to stop $container"
-                    error=1
+                    status=1
                 fi
             done
             ;;
@@ -44,12 +47,12 @@ function containers
             ;;
     esac
 
-    [[ $error ]] && return 1
+    return $status
 }
 
 function create_backup
 {
-    local error
+    local status=0
 
     # Create the backup. If it fails we return immediately since we
     #  do not want to prune old backups while creation is failing.
@@ -65,21 +68,21 @@ function create_backup
         --keep-monthly "$KEEP_MONTHLY"
     then
         echo "ERROR: Repository prune operation failed!"
-        error=1
+        status=1
     fi
 
     # Check repository data structures
     if ! restic check ; then
         echo "ERROR: Repository integrity check failed!"
-        error=1
+        status=1
     fi
 
-    [[ $error ]] && return 1
+    return $status
 }
 
 function main
 {
-    local error
+    local status=0
 
     # We must be root as we require access to directories with very
     #  restrictive permissions owned by multiple different UIDs.
@@ -91,18 +94,19 @@ function main
     # Restic configuration variables are set in /etc/environment.
     source /etc/environment || return 1
 
-    # Initialize the repo if needed.
-    if ! restic snapshots &> /dev/null ; then
+    # Initialize the repo if uninitialized.
+    if ! restic cat config &> /dev/null ; then
         restic init || return 1
     fi
 
     # Some of the containers rely on SQLite, so we stop them before
     #  creating the backup, and then start them again after.
-    containers stop || error=1
-    create_backup || error=1
-    containers start || error=1
+    containers stop || status=1
+    create_backup || status=1
+    containers start || status=1
 
-    [[ $error ]] && return 1
+    return $status
 }
 
-main || exit 1
+main
+exit $?
