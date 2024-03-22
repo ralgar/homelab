@@ -16,7 +16,7 @@ ExecStart=/usr/bin/podman run -d --rm --replace \
     --cidfile=%t/%n.ctr-id --cgroups=no-conmon --sdnotify=conmon \
     --label io.containers.autoupdate=registry \
     --name mosquitto \
-    -v /srv/mosquitto:/mosquitto:Z \
+    -v /srv/mosquitto:/mosquitto/config:Z \
     --network proxy \
     -p 1883:1883 \
     docker.io/eclipse-mosquitto:2.0

@@ -6,6 +6,14 @@ data "ignition_directory" "nzbget" {
   overwrite = false
 }
 
+data "ignition_directory" "usenet" {
+  path      = "/mnt/usenet"
+  uid       = 9030
+  gid       = 9030
+  mode      = 504
+  overwrite = false
+}
+
 data "ignition_systemd_unit" "nzbget" {
   name    = "nzbget.service"
   content = file("${path.module}/files/nzbget.service")

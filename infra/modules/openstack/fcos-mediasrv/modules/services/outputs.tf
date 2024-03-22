@@ -3,12 +3,14 @@ output "directories" {
     data.ignition_directory.hass.rendered,
     data.ignition_directory.jellyfin.rendered,
     data.ignition_directory.jellyseerr.rendered,
+    data.ignition_directory.library.rendered,
     data.ignition_directory.mosquitto.rendered,
     data.ignition_directory.nzbget.rendered,
     data.ignition_directory.prowlarr.rendered,
     data.ignition_directory.radarr.rendered,
     data.ignition_directory.sonarr.rendered,
     data.ignition_directory.swag.rendered,
+    data.ignition_directory.usenet.rendered,
   ]
 }
 
