@@ -2,12 +2,18 @@ module "accounts" {
   source  = "./modules/accounts"
   keypair = var.keypair
 }
-module "config" { source = "./modules/config" }
+
+module "config" {
+  source      = "./modules/config"
+  domain      = var.domain
+}
+
 module "services" {
   source      = "./modules/services"
   environment = var.environment
   domain      = var.domain
 }
+
 module "storage"  { source = "./modules/storage" }
 
 module "backups" {
