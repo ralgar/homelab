@@ -11,6 +11,8 @@ Restart=on-failure
 TimeoutStartSec=300
 TimeoutStopSec=70
 
+ExecStartPre=/bin/touch /srv/mosquitto/mosquitto.conf
+
 ExecStartPre=/bin/rm -f %t/%n.ctr-id
 ExecStart=/usr/bin/podman run -d --rm --replace \
     --cidfile=%t/%n.ctr-id --cgroups=no-conmon --sdnotify=conmon \

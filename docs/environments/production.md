@@ -123,9 +123,16 @@ To configure **Mosquitto**:
 
 ## Backup and Restore
 
-The backup and restore system uses [Restic](https://restic.net), and a shell
- script, to perform automatic, incremental backups of configuration data and
- service databases.
+The backup and restore system uses [Restic](https://restic.net), and the
+ `backupctl` command, to perform automatic, incremental backups of config
+ data and databases.
+
+!!! note
+    Run `backupctl --help` for more information about the `backupctl` command.
+
+!!! note
+    Performing a backup or restore operation will cause temporary downtime
+    of the applications.
 
 !!! note
     Due to cloud storage costs, we are not taking backups of the media volume.
@@ -133,8 +140,8 @@ The backup and restore system uses [Restic](https://restic.net), and a shell
 ### Creating a backup
 
 There is generally no need to manually create backups, they are performed
- automatically every night at 4:00am. If you do need to take a manual backup
- for any reason, you can simply start the systemd service.
+ automatically every night at 4:00am. If you do need to take a manual backup,
+ you can either start the systemd service or use the `backupctl` command.
 
 1. SSH into the instance.
 
@@ -142,16 +149,22 @@ There is generally no need to manually create backups, they are performed
     ssh core@<server-ip-address>
     ```
 
-1. Start the service.
+1. Create a backup by starting the service, or using the `backupctl` command.
 
     ```sh
     sudo systemctl start restic.service
     ```
 
+    OR
+
+    ```sh
+    sudo backupctl create
+    ```
+
 ### Restore from backup
 
 If you have an existing backup created using this system, you can easily
- restore it to a fresh production server using a few simple commands.
+ restore it to a fresh production server using the `backupctl` command.
 
 1. SSH into the instance.
 
@@ -159,7 +172,7 @@ If you have an existing backup created using this system, you can easily
     ssh core@<server-ip-address>
     ```
 
-1. List the snapshots available for restore.
+1. (Optional) List the snapshots available for restore.
 
     ```sh
     sudo restic snapshots
@@ -169,8 +182,8 @@ If you have an existing backup created using this system, you can easily
 
     ```sh
     # Restore the latest snapshot
-    sudo restic restore latest --target /
+    sudo backupctl restore latest
 
     # Restore a specific snapshot using its SHA-1 ID tag
-    sudo restic restore <sha-1-id> --target /
+    sudo backupctl restore <sha-1-id>
     ```

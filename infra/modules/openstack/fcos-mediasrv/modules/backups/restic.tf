@@ -9,10 +9,10 @@ data "ignition_file" "restic_password" {
 }
 
 data "ignition_file" "backup_script" {
-  path = "/usr/local/bin/backup.sh"
+  path = "/usr/local/bin/backupctl"
   mode = 493
   content {
-    content = file("${path.module}/files/backup.sh")
+    content = file("${path.module}/files/backupctl.sh")
   }
 }
 
