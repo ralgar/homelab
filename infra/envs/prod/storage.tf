@@ -11,7 +11,7 @@ resource "openstack_blockstorage_volume_v3" "media" {
   name        = "media"
   description = "Media server storage volume."
   volume_type = "__DEFAULT__"
-  size        = 4000
+  size        = 6000
 
   enable_online_resize = true
 }
