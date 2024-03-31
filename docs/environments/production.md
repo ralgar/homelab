@@ -81,15 +81,19 @@ Configuring Jellyseerr is fairly straightforward, just follow the interactive
 ### Media Backend
 
 There are four services that make up the backend of the media server stack -
- **Prowlarr**, **Radarr**, **Sonarr**, and **NZBGet**. These services work
+ **Prowlarr**, **Radarr**, **Sonarr**, and **SABnzbd**. These services work
  in unison to search and acquire media from the internet sources that you
  configure.
+
+#### Prowlarr, Radarr, and Sonarr
 
 Excellent documentation on **Prowlarr**, **Radarr**, and **Sonarr** can be
  found on the [Servarr Wiki](https://wiki.servarr.com).
 
-Excellent documentation for **NZBGet** can be found on the
- [NZBGet Docs](https://nzbget.net/documentation) page.
+#### SABnzbd
+
+Excellent documentation for **SABnzbd** can be found on the
+ [SABnzbd Wiki](https://sabnzbd.org/wiki).
 
 ### Home Automation
 

@@ -115,18 +115,11 @@ Before we begin deployment, we need to configure the variables files
         command line, and append `inst.ks=hd:LABEL=Rocky-9-0-x86_64-dvd:/ks.cfg`
         after `quiet`. Then, press **Ctrl-x** to continue.
 
-1. SSH into your new node, and configure an additonal LVM Volume Group named
-   `cinder-standard` on your disk or RAID array.
+1. After it has finished rebooting, SSH into your new node to confirm that
+   it's ready.
 
-    ```sh title="Create Cinder volume group"
-    # Partition a virtual device / physical disk.
-    gdisk /dev/<path-to-vdev>
-
-    # Create a Physical Volume on the partition.
-    pvcreate /dev/<path-to-vdev>1
-
-    # Create a Volume Group with the Physical Volume.
-    vgcreate cinder-standard /dev/<path-to-vdev>1
+    ```sh
+    ssh root@<node-ip-address>
     ```
 
 ---
