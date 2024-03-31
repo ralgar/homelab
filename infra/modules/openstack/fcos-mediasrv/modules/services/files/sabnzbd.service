@@ -1,5 +1,5 @@
 [Unit]
-Description=NZBGet Container
+Description=SABnzbd Container
 Documentation=man:podman-generate-systemd(1)
 Wants=podman-networks.service
 After=podman-networks.service
@@ -15,15 +15,15 @@ ExecStartPre=/bin/rm -f %t/%n.ctr-id
 ExecStart=/usr/bin/podman run -d --rm --replace \
 	--cidfile=%t/%n.ctr-id --cgroups=no-conmon --sdnotify=conmon \
     --label io.containers.autoupdate=registry \
-    --name nzbget \
-    -v /srv/nzbget:/config:Z \
+    --name sabnzbd \
+    -v /srv/sabnzbd:/config:Z \
     -v /mnt/usenet:/media/usenet:z \
     -e TZ="America/Vancouver" \
     -e PUID=9030 \
     -e PGID=9030 \
     -e UMASK="0007" \
     --network proxy \
-    docker.io/linuxserver/nzbget:latest
+    docker.io/linuxserver/sabnzbd:latest
 
 ExecStop=/usr/bin/podman stop --ignore -t 10 --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore -t 10 --cidfile=%t/%n.ctr-id

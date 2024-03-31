@@ -1,5 +1,5 @@
-data "ignition_directory" "nzbget" {
-  path      = "/srv/nzbget"
+data "ignition_directory" "sabnzbd" {
+  path      = "/srv/sabnzbd"
   uid       = 9030
   gid       = 9030
   mode      = 448
@@ -14,7 +14,7 @@ data "ignition_directory" "usenet" {
   overwrite = false
 }
 
-data "ignition_systemd_unit" "nzbget" {
-  name    = "nzbget.service"
-  content = file("${path.module}/files/nzbget.service")
+data "ignition_systemd_unit" "sabnzbd" {
+  name    = "sabnzbd.service"
+  content = file("${path.module}/files/sabnzbd.service")
 }
