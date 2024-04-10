@@ -1,0 +1,7 @@
+---
+- name: "Swift : Fix 'auth_uri' for s3token"
+  ansible.builtin.lineinfile:
+    path: /etc/kolla/swift-proxy-server/proxy-server.conf
+    insertafter: '^[filters:s3token]$'
+    regexp: '^auth_uri ='
+    line: "auth_uri = http://{{ ansible_default_ipv4.address }}:5000/v3"

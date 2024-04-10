@@ -15,6 +15,7 @@
     - openstack/bootstrap_host
     - openstack/swift
     - openstack/deploy_kolla
+    - openstack/fixes
     - openstack/defaults
     - openstack/nova
     - openstack/cinder
