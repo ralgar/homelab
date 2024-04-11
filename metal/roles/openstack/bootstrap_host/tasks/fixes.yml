@@ -1,0 +1,10 @@
+---
+- name: "Magnum : Use custom containers to workaround regression"
+  ansible.builtin.blockinfile:
+    path: "{{ kolla_venv }}/share/kolla-ansible/ansible/roles/magnum/vars/main.yml"
+    insertafter: EOF
+    prepend_newline: true
+    block: |
+      magnum_tag: 17.0.1
+      magnum_api_image: ghcr.io/ralgar/kolla/magnum-api
+      magnum_conductor_image: ghcr.io/ralgar/kolla/magnum-conductor

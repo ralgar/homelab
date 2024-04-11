@@ -10,6 +10,7 @@
     - storage.yml
     - files.yml
     - octavia.yml
+    - fixes.yml
 
 - name: Include CI Pipeline tasks
   ansible.builtin.include_tasks: ci-pipeline.yml
