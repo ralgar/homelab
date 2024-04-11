@@ -27,7 +27,7 @@ data:
     set -xeu
 
     cp /configmaps/config.sql /config/config.sql || exit 1
-    sed -i "s|nzbget-api-password|$(</secrets/nzbget-api-password)|" /config/config.sql || exit 1
+    sed -i "s|sabnzbd-api-password|$(</secrets/sabnzbd-api-password)|" /config/config.sql || exit 1
 
     psql \
         -h "$POSTGRES_HOST" \
@@ -40,17 +40,16 @@ data:
 
   config.sql: |
     INSERT INTO "DownloadClients" ("Id", "Enable", "Name", "Implementation", "Settings", "ConfigContract", "Priority", "RemoveCompletedDownloads", "RemoveFailedDownloads")
-    VALUES ('1', '1', 'NZBGet', 'Nzbget', '{
-      "host": "nzbget.media-server.svc",
-      "port": 6789,
+    VALUES ('1', '1', 'SABnzbd', 'Sabnzbd', '{
+      "host": "sabnzbd.media-server.svc",
+      "port": 8080,
       "useSsl": false,
-      "username": "api",
-      "password": "nzbget-api-password",
-      "tvCategory": "Series",
+      "apiKey": "sabnzbd-api-password",
+      "tvCategory": "series",
       "recentTvPriority": 0,
       "olderTvPriority": 0,
       "addPaused": false
-    }', 'NzbgetSettings', '1', '1', '1')
+    }', 'SabnzbdSettings', '1', '1', '1')
     ON CONFLICT ("Id") DO UPDATE
         SET "Enable" = EXCLUDED."Enable",
             "Name" = EXCLUDED."Name",

@@ -2,49 +2,49 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: nzbget
+  name: sabnzbd
   namespace: media-server
 spec:
   type: ClusterIP
   selector:
-    app.kubernetes.io/name: nzbget
+    app.kubernetes.io/name: sabnzbd
   ports:
-    - name: nzbget-http
-      port: 6789
+    - name: sabnzbd-http
+      port: 8080
       protocol: TCP
-      targetPort: nzbget-http
+      targetPort: sabnzbd-http
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: nzbget-cert
+  name: sabnzbd-cert
   namespace: media-server
   labels:
-    app.kubernetes.io/name: nzbget
+    app.kubernetes.io/name: sabnzbd
 spec:
-  commonName: nzbget
+  commonName: sabnzbd
   dnsNames:
-    - nzbget.${DOMAIN}
+    - sabnzbd.${DOMAIN}
   issuerRef:
     name: internal-issuer
     kind: ClusterIssuer
-  secretName: nzbget-cert
+  secretName: sabnzbd-cert
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: nzbget
+  name: sabnzbd
   namespace: media-server
   labels:
-    app.kubernetes.io/name: nzbget
+    app.kubernetes.io/name: sabnzbd
   annotations:
-    external-dns.alpha.kubernetes.io/hostname: &fqdn nzbget.${DOMAIN}
+    external-dns.alpha.kubernetes.io/hostname: &fqdn sabnzbd.${DOMAIN}
 spec:
   ingressClassName: nginx
   tls:
     - hosts:
         - *fqdn
-      secretName: nzbget-cert
+      secretName: sabnzbd-cert
   rules:
     - host: *fqdn
       http:
@@ -53,6 +53,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: nzbget
+                name: sabnzbd
                 port:
-                  name: nzbget-http
+                  name: sabnzbd-http
