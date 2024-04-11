@@ -20,3 +20,4 @@
     - openstack/nova
     - openstack/cinder
     - openstack/designate
+    - openstack/octavia

@@ -29,7 +29,6 @@
     name: PREMIUM
     extra_specs:
       volume_backend_name: lvm-2
-      multiattach: "<is> True"
     description: Premium Volume Type (SSD)
     is_public: True
     state: present

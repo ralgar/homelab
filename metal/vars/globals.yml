@@ -835,12 +835,12 @@ designate_ns_record:
 # - ephemeral (optional)
 # - swap (optional)
 # - extra_specs (optional)
-#octavia_amp_flavor:
-#  name: "amphora"
-#  is_public: no
-#  vcpus: 1
-#  ram: 1024
-#  disk: 5
+octavia_amp_flavor:
+  name: "amphora"
+  is_public: no
+  vcpus: 1
+  ram: 1024
+  disk: 0
 
 # Octavia security groups. lb-mgmt-sec-grp is for amphorae.
 #octavia_amp_security_groups:

@@ -1,5 +1,9 @@
 ---
-- name: Get stats of a file
+- name: Set Python interpreter to Kolla venv
+  ansible.builtin.set_fact:
+    ansible_python_interpreter: "{{ kolla_venv }}/bin/python"
+
+- name: Stat the image file
   ansible.builtin.stat:
     path: /root/octavia/diskimage-create/amphora-x64-haproxy.qcow2
   register: octavia_image
@@ -12,9 +16,31 @@
   when: octavia_image.stat.exists == false
   notify: octavia_image_build
 
-- name: "Octavia : Fix 'octavia-interface.service'"
+- name: "Fix 'octavia-interface.service'"
   ansible.builtin.lineinfile:
     path: /etc/systemd/system/octavia-interface.service
     regexp: 'sleep'
     line: 'ExecStartPre=/usr/bin/sleep 15'
     insertbefore: '^ExecStartPre=/sbin/ip'
+
+- name: "Enable Cinder volume driver"
+  ansible.builtin.lineinfile:
+    path: /etc/kolla/octavia-worker/octavia.conf
+    insertafter: '^[controller_worker]$'
+    regexp: '^volume_driver ='
+    line: "volume_driver = volume_cinder_driver"
+  notify: restart_octavia_worker
+
+- name: "Configure Cinder volume driver"
+  ansible.builtin.blockinfile:
+    path: /etc/kolla/octavia-worker/octavia.conf
+    insertafter: "^$"
+    append_newline: true
+    block: |
+      [cinder]
+      region_name = RegionOne
+      endpoint_type = internal
+      ca_certificates_file =
+      volume_type = PREMIUM
+      volume_size = 5
+  notify: restart_octavia_worker

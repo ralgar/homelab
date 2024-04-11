@@ -1,12 +1,14 @@
 ---
+- name: 'Octavia : Build Amphora image'
+  ansible.builtin.shell:
+    chdir: /root/octavia/diskimage-create
+    cmd: |
+      source {{ kolla_venv }}/bin/activate
+      ./diskimage-create.sh
+
 - name: 'Octavia : Source user credentials'
   ansible.builtin.shell:
     cmd: source /etc/kolla/octavia-openrc.sh
-
-# Run only tasks that use Ansible OpenStack modules after this
-- name: Set Python interpreter to venv
-  ansible.builtin.set_fact:
-    ansible_python_interpreter: "{{ kolla_venv }}/bin/python"
 
 - name: 'Octavia : Get user password'
   ansible.builtin.shell:
@@ -21,7 +23,7 @@
 - name: 'Octavia : Upload the Amphora image'
   openstack.cloud.image:
     auth:
-      auth_url: http://{{ ip_address }}:5000
+      auth_url: http://{{ ansible_default_ipv4.address }}:5000
       username: octavia
       password: "{{ octavia_password.stdout }}"
       project_name: service
