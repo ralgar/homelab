@@ -19,6 +19,10 @@ resource "openstack_containerinfra_clustertemplate_v1" "default" {
   external_network_id = var.external_network.id
 
   labels = {
+    // Node Local Storage Options
+    boot_volume_size   = 60
+    boot_volume_type   = "PREMIUM"
+
     // Kubernetes Core Components
     kube_tag                      = "v1.26.8-rancher1"
     flannel_tag                   = "v0.15.1"   // Pulling from outdated repo
