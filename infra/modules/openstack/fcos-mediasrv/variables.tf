@@ -1,3 +1,4 @@
+variable "dns_zone" {}
 variable "image" {}
 variable "keypair" {}
 variable "network" {}

@@ -1,40 +1,30 @@
-module "accounts" {
-  source  = "./modules/accounts"
+module "base" {
+  source  = "../../ignition/base"
   keypair = var.keypair
+  domain  = var.dns_zone.name
 }
-
-module "config" {
-  source      = "./modules/config"
-  domain      = var.domain
-}
-
-module "services" {
-  source      = "./modules/services"
-  environment = var.environment
-  domain      = var.domain
-}
-
-module "storage"  { source = "./modules/storage" }
 
 module "backups" {
-  source          = "./modules/backups"
+  source          = "../../ignition/backups"
   environment     = var.environment
   restic_password = var.restic_password
   gdrive_oauth    = var.gdrive_oauth
 }
 
+module "mediasrv" {
+  source      = "../../ignition/mediasrv"
+  environment = var.environment
+  domain      = var.domain
+}
+
 data "ignition_config" "final" {
-  filesystems = module.storage.filesystems
-  directories = module.services.directories
-  files       = concat(
-    module.backups.files,
-    module.config.files
-  )
-  links       = module.config.links
-  systemd     = concat(
-    module.backups.systemd,
-    module.storage.systemd,
-    module.services.systemd
-  )
-  users       = module.accounts.users
+  merge {
+    source = "data:text/plain;charset=utf-8;base64,${module.base.ignition_config}"
+  }
+  merge {
+    source = "data:text/plain;charset=utf-8;base64,${module.backups.ignition_config}"
+  }
+  merge {
+    source = "data:text/plain;charset=utf-8;base64,${module.mediasrv.ignition_config}"
+  }
 }

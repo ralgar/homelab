@@ -3,7 +3,10 @@ module "fcos" {
 
   image   = openstack_images_image_v2.coreos_38
   keypair = data.openstack_compute_keypair_v2.admin
+
+  // Network configuration
   network = data.openstack_networking_network_v2.public
+  dns_zone = openstack_dns_zone_v2.environment
 
   // Storage volumes
   data_volume  = openstack_blockstorage_volume_v3.container_data
