@@ -12,7 +12,8 @@ pages:
         - .ci/build-docs.yml
         - docs/**/*
   script:
-    - mkdocs build --config-file docs/mkdocs.yml --site-dir public
+    - cd docs
+    - mkdocs build --site-dir ../public
   artifacts:
     paths:
       - public
