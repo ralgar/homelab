@@ -4,6 +4,7 @@ copyright: >
   Copyright &copy; 2024 Ryan Algar
   </div>
 repo_url: https://gitlab.com/ralgar/homelab
+docs_dir: ./
 
 theme:
   name: material

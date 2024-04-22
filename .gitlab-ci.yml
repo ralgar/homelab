@@ -43,7 +43,7 @@ variables:
   TF_VAR_gitops_repo: ${CI_PROJECT_URL}.git
 
 include:
-  - local: '/.ci/build-docs.yml'
+  - local: '/.gitlab/templates/build-docs.yml'
 
 terraform:init:
   stage: prepare

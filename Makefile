@@ -32,7 +32,7 @@ gitops-destroy:
 
 .PHONY: docs
 docs: venv
-	source venv/bin/activate && mkdocs serve --config-file .mkdocs.yml
+	source venv/bin/activate && mkdocs serve --config-file docs/mkdocs.yml
 
 venv:
 	python -m venv venv
