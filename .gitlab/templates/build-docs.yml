@@ -9,11 +9,10 @@ pages:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
         - .gitlab-ci.yml
-        - .ci/build-docs.yml
+        - .gitlab/templates/build-docs.yml
         - docs/**/*
   script:
-    - cd docs
-    - mkdocs build --site-dir ../public
+    - mkdocs build --config-file docs/mkdocs.yml --site-dir ../public
   artifacts:
     paths:
       - public

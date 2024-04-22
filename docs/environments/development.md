@@ -1,4 +1,4 @@
-# Development (K8s Cluster)
+# Development (K8s)
 
 The included Kubernetes cluster is currently in development (beta status), and
  resides in the development environment. It will be migrated into production

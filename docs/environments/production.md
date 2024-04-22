@@ -1,4 +1,4 @@
-# Production (FCOS Server)
+# Production
 
 The Production environment is a single instance that runs on Fedora CoreOS.
  It's designed to be simple, secure, and low maintenance.
