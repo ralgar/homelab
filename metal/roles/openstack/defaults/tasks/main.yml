@@ -10,3 +10,19 @@
     - networks.yml
     - flavors.yml
     - projects.yml
+
+- name: Check if the default CoreOS image exists in Glance
+  openstack.cloud.image_info:
+    image: "{{ openstack_fcos_image_name }}"
+    filters:
+      os_distro: fedora-coreos
+      os_version: "{{ openstack_fcos_image_version | string }}"
+      visibility: public
+    cloud: kolla-admin
+  environment:
+    OS_CLIENT_CONFIG_FILE: /etc/kolla/clouds.yaml
+  register: coreos_images
+
+- name: Include image tasks
+  ansible.builtin.include_tasks: images.yml
+  when: coreos_images.images | length == 0

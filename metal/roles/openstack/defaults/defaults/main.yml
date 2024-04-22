@@ -9,3 +9,9 @@ public_subnet_cidr: 192.168.1.0/24
 public_subnet_gateway_ip: 192.168.1.254
 public_subnet_allocation_pool_start: 192.168.1.20
 public_subnet_allocation_pool_end: 192.168.1.100
+
+openstack_fcos_image_name: Fedora CoreOS 39 (2024.03.22)
+openstack_fcos_image_version: '39'
+openstack_fcos_image_url: https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/39.20240322.3.1/x86_64/fedora-coreos-39.20240322.3.1-openstack.x86_64.qcow2.xz
+openstack_fcos_image_temp_filename: fedora_coreos.qcow2
+openstack_fcos_image_decompressed_checksum: 897cae492e24877f1d0b28db3c6f0514e70a258870be3891ff099898d3b5451f

@@ -1,4 +1,3 @@
-variable "image" {}
 variable "keypair" {}
 variable "internal_network" {}
 variable "internal_subnet" {}

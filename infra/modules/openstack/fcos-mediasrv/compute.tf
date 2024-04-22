@@ -1,3 +1,13 @@
+data "openstack_images_image_v2" "fcos" {
+  visibility  = "public"
+  most_recent = true
+
+  properties = {
+    os_distro  = "fedora-coreos"
+    os_version = "${var.fcos_version}"
+  }
+}
+
 resource "openstack_compute_instance_v2" "fcos" {
   name                = "FCOS Media Server"
   flavor_name         = "m1.large"
@@ -6,7 +16,7 @@ resource "openstack_compute_instance_v2" "fcos" {
   stop_before_destroy = true
 
   block_device {
-    uuid                  = var.image.id
+    uuid                  = data.openstack_images_image_v2.fcos.id
     source_type           = "image"
     destination_type      = "volume"
     volume_type           = "PREMIUM"

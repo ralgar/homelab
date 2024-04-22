@@ -13,10 +13,7 @@ apply:
 .PHONY: destroy
 destroy: gitops-destroy
 	cd $(TF_ROOT) && terraform state rm 'module.k8s_cluster.module.flux[0]' || true
-	cd $(TF_ROOT) && terraform destroy -auto-approve \
-		-target module.gcp_bucket \
-		-target module.k8s_cluster \
-		-target module.k8s_network
+	cd $(TF_ROOT) && terraform destroy -auto-approve
 
 .PHONY: gitops-redeploy
 gitops-redeploy: gitops-destroy

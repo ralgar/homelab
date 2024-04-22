@@ -1,9 +1,18 @@
 // Kubernetes Cluster template
 // See https://docs.openstack.org/magnum/latest/user/index.html#kubernetes
+data "openstack_images_image_v2" "fcos" {
+  visibility  = "public"
+  most_recent = true
+
+  properties = {
+    os_distro  = "fedora-coreos"
+    os_version = "39"
+  }
+}
 
 resource "openstack_containerinfra_clustertemplate_v1" "default" {
   name                  = "Kubernetes v1.26.8"
-  image                 = var.image.id
+  image                 = data.openstack_images_image_v2.fcos.id
   coe                   = "kubernetes"
   flavor                = "m1.xlarge"
   master_flavor         = "m1.medium"

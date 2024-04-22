@@ -15,8 +15,7 @@ module "k8s_network" {
 module "k8s_cluster" {
   source = "../../modules/openstack/k8s-cluster"
 
-  image            = openstack_images_image_v2.coreos_38
-  keypair          = data.openstack_compute_keypair_v2.admin
+  keypair = data.openstack_compute_keypair_v2.admin
 
   // Node Settings
   ha_control_plane  = false

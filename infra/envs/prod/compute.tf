@@ -1,7 +1,7 @@
 module "fcos" {
-  source = "../../modules/openstack/fcos-mediasrv"
+  source       = "../../modules/openstack/fcos-mediasrv"
+  fcos_version = 39
 
-  image   = openstack_images_image_v2.coreos_38
   keypair = data.openstack_compute_keypair_v2.admin
 
   // Network configuration

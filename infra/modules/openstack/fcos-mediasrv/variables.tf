@@ -1,5 +1,8 @@
 variable "dns_zone" {}
-variable "image" {}
+variable "fcos_version" {
+  description = "Desired major version of the instance image"
+  type        = number
+}
 variable "keypair" {}
 variable "network" {}
 variable "data_volume" {}
