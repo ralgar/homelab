@@ -34,17 +34,21 @@ provider "google" {
 }
 
 provider "helm" {
+  alias = "cluster1"
+
   kubernetes {
-    host                   = module.k8s_cluster.kube_config.host
-    client_certificate     = module.k8s_cluster.kube_config.client_certificate
-    client_key             = module.k8s_cluster.kube_config.client_key
-    cluster_ca_certificate = module.k8s_cluster.kube_config.cluster_ca_certificate
+    host                   = openstack_containerinfra_cluster_v1.cluster1.kubeconfig.host
+    client_certificate     = openstack_containerinfra_cluster_v1.cluster1.kubeconfig.client_certificate
+    client_key             = openstack_containerinfra_cluster_v1.cluster1.kubeconfig.client_key
+    cluster_ca_certificate = openstack_containerinfra_cluster_v1.cluster1.kubeconfig.cluster_ca_certificate
   }
 }
 
 provider "kubernetes" {
-  host                   = module.k8s_cluster.kube_config.host
-  client_certificate     = module.k8s_cluster.kube_config.client_certificate
-  client_key             = module.k8s_cluster.kube_config.client_key
-  cluster_ca_certificate = module.k8s_cluster.kube_config.cluster_ca_certificate
+  alias = "cluster1"
+
+  host                   = openstack_containerinfra_cluster_v1.cluster1.kubeconfig.host
+  client_certificate     = openstack_containerinfra_cluster_v1.cluster1.kubeconfig.client_certificate
+  client_key             = openstack_containerinfra_cluster_v1.cluster1.kubeconfig.client_key
+  cluster_ca_certificate = openstack_containerinfra_cluster_v1.cluster1.kubeconfig.cluster_ca_certificate
 }

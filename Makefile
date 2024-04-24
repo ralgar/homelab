@@ -6,6 +6,10 @@ CURRENT_REF := $(shell git symbolic-ref HEAD)
 plan:
 	cd $(TF_ROOT) && terraform plan -var="gitops_ref_name=$(CURRENT_REF)"
 
+.PHONY: init
+init:
+	cd $(TF_ROOT) && terraform init
+
 .PHONY: apply
 apply:
 	cd $(TF_ROOT) && terraform apply -auto-approve -var="gitops_ref_name=$(CURRENT_REF)"

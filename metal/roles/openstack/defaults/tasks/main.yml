@@ -26,3 +26,6 @@
 - name: Include image tasks
   ansible.builtin.include_tasks: images.yml
   when: coreos_images.images | length == 0
+
+- name: Include COE template tasks
+  ansible.builtin.include_tasks: coe_templates.yml

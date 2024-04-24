@@ -6,3 +6,9 @@ resource "openstack_blockstorage_volume_v3" "media" {
 
   enable_online_resize = true
 }
+
+module "gcp_bucket" {
+  source = "../../modules/gcp/bucket"
+
+  name_prefix = "homelab-backups"
+}
