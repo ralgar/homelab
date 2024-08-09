@@ -9,6 +9,5 @@ resources:
   - external-dns.yaml
   - ingress-nginx.yaml
   - monitoring.yaml
-  - olm.yaml
   - trust-manager.yaml
   - volsync.yaml

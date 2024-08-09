@@ -4,6 +4,7 @@ kind: Kustomization
 namespace: media-server
 resources:
   - namespace.yaml
+  - database.yaml
   - storage.yaml
   - jellyfin/
   - jellyseerr/

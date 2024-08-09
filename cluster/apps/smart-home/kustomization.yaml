@@ -4,5 +4,6 @@ kind: Kustomization
 namespace: smart-home
 resources:
   - namespace.yaml
+  - database.yaml
   - hass/
   - mosquitto/

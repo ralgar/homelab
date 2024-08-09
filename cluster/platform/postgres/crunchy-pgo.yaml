@@ -1,0 +1,25 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: OCIRepository
+metadata:
+  name: crunchy-pgo
+spec:
+  interval: 120m
+  layerSelector:
+    mediaType: "application/vnd.cncf.helm.chart.content.v1.tar+gzip"
+    operation: copy
+  url: oci://registry.developers.crunchydata.com/crunchydata/pgo
+  ref:
+    semver: "5.6.x"
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: crunchy-pgo
+spec:
+  interval: 5m
+  chartRef:
+    kind: OCIRepository
+    name: crunchy-pgo
+    namespace: postgres-operator
+  values: {}

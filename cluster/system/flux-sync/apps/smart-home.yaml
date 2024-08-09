@@ -9,6 +9,7 @@ spec:
     - name: csi-cinder
     - name: external-secrets
     - name: ingress-nginx
+    - name: postgres
     - name: trust-manager
     - name: vault
     - name: volsync

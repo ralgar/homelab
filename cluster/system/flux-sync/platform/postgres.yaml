@@ -7,8 +7,6 @@ metadata:
 spec:
   dependsOn:
     - name: csi-cinder
-    - name: operators
-    - name: vault
   interval: 60m
   path: ./cluster/platform/postgres
   prune: true
@@ -16,8 +14,3 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
-  postBuild:
-    substitute:
-      GCP_BACKUP_BUCKET_NAME: ${GCP_BACKUP_BUCKET_NAME}
-      GCP_BACKUP_BUCKET_CREDS: ${GCP_BACKUP_BUCKET_CREDS}
-      BACKUP_REPO_PASSWORD: ${BACKUP_REPO_PASSWORD}

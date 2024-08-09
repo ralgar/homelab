@@ -1,0 +1,100 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-backup-bucket-credentials
+type: Opaque
+data:
+  gcs-key.json: ${GCP_BACKUP_BUCKET_CREDS}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-backup-encryption-password
+type: Opaque
+stringData:
+  gcs.conf: |
+    [global]
+    repo1-cipher-pass = "${BACKUP_REPO_PASSWORD}"
+---
+apiVersion: postgres-operator.crunchydata.com/v1beta1
+kind: PostgresCluster
+metadata:
+  name: mediadb
+  namespace: media-server
+spec:
+  image: registry.developers.crunchydata.com/crunchydata/crunchy-postgres:ubi8-14.7-0
+  postgresVersion: 14
+  users:
+    - name: jellyseerr
+      databases:
+        - jellyseerr
+      password:
+        type: AlphaNumeric
+    - name: prowlarr
+      databases:
+        - prowlarr-main
+        - prowlarr-log
+      options: "SUPERUSER"
+      password:
+        type: AlphaNumeric
+    - name: radarr
+      databases:
+        - radarr-main
+        - radarr-log
+      password:
+        type: AlphaNumeric
+    - name: sonarr
+      databases:
+        - sonarr-main
+        - sonarr-log
+      password:
+        type: AlphaNumeric
+  instances:
+    - name: postgres1
+      dataVolumeClaimSpec:
+        accessModes:
+          - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: 1Gi
+  # patroni:
+  #   dynamicConfiguration:
+  #     postgresql:
+  #       pg_hba:
+  #         - "hostnossl all all all md5"  # Disable TLS
+  # dataSource:
+  #   pgbackrest:
+  #     stanza: db
+  #     configuration:
+  #       - secret:
+  #           name: gcp-backup-bucket-creds
+  #     global:
+  #       repo1-path: /pgbackrest/postgres-operator/mediadb/repo1
+  #     repo:
+  #       name: repo1
+  #       gcs:
+  #         bucket: homelab-backups-s9j3jk42
+  backups:
+    pgbackrest:
+      image: registry.developers.crunchydata.com/crunchydata/crunchy-pgbackrest:ubi8-2.41-4
+      configuration:
+        - secret:
+            name: postgres-backup-bucket-credentials
+        - secret:
+            name: postgres-backup-encryption-password
+      global:
+        repo1-gcs-key: /etc/pgbackrest/conf.d/gcs-key.json
+        repo1-path: /pgbackrest/postgres-operator/mediadb/repo1
+        repo1-cipher-type: aes-256-cbc
+        repo1-retention-full: "185"  # Keep 6 full months of backups
+        repo1-retention-full-type: time
+      repos:
+        - name: repo1
+          gcs:
+            bucket: ${GCP_BACKUP_BUCKET_NAME}
+          schedules:
+            # Daily incremental backups, with a full backup every month.
+            #  @ 12:00pm UTC (4:00am PST / 5:00 am PDT)
+            incremental: "0 12 1 * *"
+            full: "0 12 2-31 * *"
