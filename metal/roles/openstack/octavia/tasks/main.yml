@@ -3,18 +3,17 @@
   ansible.builtin.set_fact:
     ansible_python_interpreter: "{{ kolla_venv }}/bin/python"
 
-- name: Stat the image file
-  ansible.builtin.stat:
-    path: /root/octavia/diskimage-create/amphora-x64-haproxy.qcow2
-  register: octavia_image
+- name: Check if an Amphora image already exists in Glance
+  openstack.cloud.image_info:
+    name: amphora-x64-haproxy
+    cloud: kolla-admin
+  environment:
+    OS_CLIENT_CONFIG_FILE: /etc/kolla/clouds.yaml
+  register: amphora_images
 
-- name: Trigger the Octavia image build
-  assert:
-    that: true
-    quiet: true
-  changed_when: true
-  when: octavia_image.stat.exists == false
-  notify: octavia_image_build
+- name: Include Amphora image tasks
+  ansible.builtin.include_tasks: amphora-image.yml
+  when: amphora_images.images | length == 0
 
 - name: "Fix 'octavia-interface.service'"
   ansible.builtin.lineinfile:
@@ -26,7 +25,7 @@
 - name: "Enable Cinder volume driver"
   ansible.builtin.lineinfile:
     path: /etc/kolla/octavia-worker/octavia.conf
-    insertafter: '^[controller_worker]$'
+    insertafter: '^compute_driver'
     regexp: '^volume_driver ='
     line: "volume_driver = volume_cinder_driver"
   notify: restart_octavia_worker
@@ -34,8 +33,8 @@
 - name: "Configure Cinder volume driver"
   ansible.builtin.blockinfile:
     path: /etc/kolla/octavia-worker/octavia.conf
-    insertafter: "^$"
-    append_newline: true
+    insertafter: "EOF"
+    prepend_newline: true
     block: |
       [cinder]
       region_name = RegionOne

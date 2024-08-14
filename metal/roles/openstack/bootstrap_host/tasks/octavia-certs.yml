@@ -1,0 +1,12 @@
+---
+- name: Checking certificate files exist for octavia
+  stat:
+    path: "/etc/kolla/config/octavia/{{ item }}"
+  register: result
+  changed_when: not result.stat.exists
+  with_items:
+    - client.cert-and-key.pem
+    - client_ca.cert.pem
+    - server_ca.cert.pem
+    - server_ca.key.pem
+  notify: octavia_certificates

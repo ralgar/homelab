@@ -13,4 +13,4 @@
   ansible.builtin.shell: |
     source {{ kolla_venv }}/bin/activate
     kolla-ansible octavia-certificates
-  listen: octavia
+  listen: octavia_certificates

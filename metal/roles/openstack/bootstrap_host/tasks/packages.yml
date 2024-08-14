@@ -4,6 +4,7 @@
     name:
       - dbus-daemon
       - dbus-devel
+      - dhcp-client  # For Octavia
       - git
       - glib2-devel
       - lvm2

@@ -9,8 +9,8 @@
     - packages.yml
     - storage.yml
     - files.yml
-    - octavia.yml
     - fixes.yml
+    - octavia-certs.yml
 
 - name: Include CI Pipeline tasks
   ansible.builtin.include_tasks: ci-pipeline.yml

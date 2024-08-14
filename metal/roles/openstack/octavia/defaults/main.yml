@@ -1,2 +1,4 @@
 ---
 kolla_venv: /root/kolla-venv
+
+octavia_amphora_image_url: https://tarballs.opendev.org/openstack/octavia/test-images/test-only-amphora-x64-haproxy-ubuntu-jammy.qcow2

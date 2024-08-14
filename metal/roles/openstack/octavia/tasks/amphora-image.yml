@@ -1,10 +1,9 @@
 ---
-- name: 'Octavia : Build Amphora image'
-  ansible.builtin.shell:
-    chdir: /root/octavia/diskimage-create
-    cmd: |
-      source {{ kolla_venv }}/bin/activate
-      ./diskimage-create.sh
+- name: Download pre-built Amphora image
+  ansible.builtin.get_url:
+    url: "{{ octavia_amphora_image_url }}"
+    dest: /root/amphora-x64-haproxy.qcow2
+    mode: 0640
 
 - name: 'Octavia : Source user credentials'
   ansible.builtin.shell:
@@ -29,14 +28,19 @@
       project_name: service
       user_domain_name: Default
       project_domain_name: Default
-    name: amphora-x64-haproxy.qcow2
+    name: amphora-x64-haproxy
     container_format: bare
     disk_format: qcow2
-    is_public: false
+    visibility: private
     tags:
       - amphora
-    filename: /root/octavia/diskimage-create/amphora-x64-haproxy.qcow2
+    filename: /root/amphora-x64-haproxy.qcow2
     state: present
     properties:
       hw_architecture: x86_64
       hw_rng_model: virtio
+
+- name: Remove pre-built image file
+  ansible.builtin.file:
+    path: /root/amphora-x64-haproxy.qcow2
+    state: absent
