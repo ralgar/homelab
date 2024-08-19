@@ -7,9 +7,9 @@ metadata:
 spec:
   dependsOn:
     - name: csi-cinder
+    - name: databases
     - name: external-secrets
     - name: ingress-nginx
-    - name: postgres
     - name: trust-manager
     - name: vault
     - name: volsync

@@ -1,8 +1,14 @@
 ---
 apiVersion: v1
+kind: Namespace
+metadata:
+  name: smart-home
+---
+apiVersion: v1
 kind: Secret
 metadata:
   name: postgres-backup-bucket-credentials
+  namespace: smart-home
 type: Opaque
 data:
   gcs-key.json: ${GCP_BACKUP_BUCKET_CREDS}
@@ -11,6 +17,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: postgres-backup-encryption-password
+  namespace: smart-home
 type: Opaque
 stringData:
   gcs.conf: |
@@ -21,6 +28,7 @@ apiVersion: postgres-operator.crunchydata.com/v1beta1
 kind: PostgresCluster
 metadata:
   name: hassdb
+  namespace: smart-home
 spec:
   image: registry.developers.crunchydata.com/crunchydata/crunchy-postgres:ubi8-14.7-0
   postgresVersion: 14

@@ -1,8 +1,14 @@
 ---
 apiVersion: v1
+kind: Namespace
+metadata:
+  name: media-server
+---
+apiVersion: v1
 kind: Secret
 metadata:
   name: postgres-backup-bucket-credentials
+  namespace: media-server
 type: Opaque
 data:
   gcs-key.json: ${GCP_BACKUP_BUCKET_CREDS}
@@ -11,6 +17,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: postgres-backup-encryption-password
+  namespace: media-server
 type: Opaque
 stringData:
   gcs.conf: |

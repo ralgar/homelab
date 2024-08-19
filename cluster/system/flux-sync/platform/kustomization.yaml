@@ -5,5 +5,5 @@ namespace: flux-system
 resources:
   - 389ds.yaml
   - external-secrets.yaml
-  - postgres.yaml
+  - postgres-operator.yaml
   - vault.yaml
