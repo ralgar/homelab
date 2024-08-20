@@ -1,6 +1,2 @@
 ---
-nova_conf_components:
-  - nova-api
-  - nova-compute
-  - nova-conductor
-  - nova-scheduler
+nova_kolla_config_dir: /etc/kolla/config/nova

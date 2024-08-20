@@ -8,6 +8,7 @@
   loop:
     - prechecks.yml
     - backends.yml
+    - service-config.yml
 
 - name: Flush Handlers
   ansible.builtin.meta: flush_handlers

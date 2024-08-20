@@ -320,7 +320,7 @@ enable_haproxy: "no"
 
 # OpenStack services can be enabled or disabled with these options
 #enable_aodh: "no"
-#enable_barbican: "no"
+enable_barbican: "yes"
 #enable_blazar: "no"
 #enable_ceilometer: "no"
 #enable_ceilometer_ipmi: "no"

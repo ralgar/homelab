@@ -1,26 +1,16 @@
 ---
-# TODO: Restore this after we figure out how to get Manila to boot from volume.
-# - name: Disable local block devices
-#   ansible.builtin.lineinfile:
-#     path: "/etc/kolla/{{ nova_component }}/nova.conf"
-#     insertafter: '^\[DEFAULT\]'
-#     regexp: 'max_local_block_devices'
-#     line: 'max_local_block_devices = 0'
-#   loop: "{{ nova_conf_components }}"
-#   loop_control:
-#     loop_var: nova_component
-#   notify: updated_nova_conf
+- name: Create the config override directory
+  ansible.builtin.file:
+    path: "{{ nova_kolla_config_dir }}"
+    state: directory
+    mode: '0750'
 
-- name: Set Nova to resume guest state after host reboot
-  ansible.builtin.lineinfile:
-    path: /etc/kolla/nova-compute/nova.conf
-    insertafter: '^\[DEFAULT\]'
-    regexp: '^resume_guests_state_on_host_boot'
-    line: 'resume_guests_state_on_host_boot = True'
-  loop: "{{ nova_conf_components }}"
-  loop_control:
-    loop_var: nova_component
-  notify: updated_nova_conf
+- name: Template the 'nova-compute.conf' override file
+  ansible.builtin.template:
+    src: nova-compute.conf.j2
+    dest: "{{ nova_kolla_config_dir }}/nova-compute.conf"
+    mode: '0640'
+  notify: restart_nova_compute
 
 - name: Flush Handlers
   ansible.builtin.meta: flush_handlers
