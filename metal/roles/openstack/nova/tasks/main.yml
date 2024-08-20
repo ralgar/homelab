@@ -1,14 +1,15 @@
 ---
-- name: Disable local block devices
-  ansible.builtin.lineinfile:
-    path: "/etc/kolla/{{ nova_component }}/nova.conf"
-    insertafter: '^\[DEFAULT\]'
-    regexp: 'max_local_block_devices'
-    line: 'max_local_block_devices = 0'
-  loop: "{{ nova_conf_components }}"
-  loop_control:
-    loop_var: nova_component
-  notify: updated_nova_conf
+# TODO: Restore this after we figure out how to get Manila to boot from volume.
+# - name: Disable local block devices
+#   ansible.builtin.lineinfile:
+#     path: "/etc/kolla/{{ nova_component }}/nova.conf"
+#     insertafter: '^\[DEFAULT\]'
+#     regexp: 'max_local_block_devices'
+#     line: 'max_local_block_devices = 0'
+#   loop: "{{ nova_conf_components }}"
+#   loop_control:
+#     loop_var: nova_component
+#   notify: updated_nova_conf
 
 - name: Set Nova to resume guest state after host reboot
   ansible.builtin.lineinfile:

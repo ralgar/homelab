@@ -19,5 +19,6 @@
     - openstack/defaults
     - openstack/nova
     - openstack/cinder
+    - openstack/manila
     - openstack/designate
     - openstack/octavia
