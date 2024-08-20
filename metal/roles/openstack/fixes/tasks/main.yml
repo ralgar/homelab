@@ -1,7 +1,0 @@
----
-- name: Set Python interpreter to Kolla venv
-  ansible.builtin.set_fact:
-    ansible_python_interpreter: "{{ kolla_venv }}/bin/python"
-
-- name: Include tasks
-  ansible.builtin.include_tasks: swift.yml

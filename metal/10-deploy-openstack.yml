@@ -15,7 +15,6 @@
     - openstack/bootstrap_host
     - openstack/configure_storage
     - openstack/deploy_kolla
-    - openstack/fixes
     - openstack/defaults
     - openstack/nova
     - openstack/cinder
