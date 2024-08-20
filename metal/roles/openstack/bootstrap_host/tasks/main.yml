@@ -7,7 +7,6 @@
   ansible.builtin.include_tasks: "{{ item }}"
   loop:
     - packages.yml
-    - storage.yml
     - files.yml
     - fixes.yml
     - octavia-certs.yml

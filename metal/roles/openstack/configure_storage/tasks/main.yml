@@ -1,0 +1,8 @@
+---
+- name: Include tasks
+  ansible.builtin.include_tasks: "{{ task }}"
+  loop:
+    - cinder.yml
+    - swift.yml
+  loop_control:
+    loop_var: task

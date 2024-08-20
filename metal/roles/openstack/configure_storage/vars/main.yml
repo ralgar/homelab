@@ -1,2 +1,3 @@
 ---
 swift_devices: "{{ ['/dev/vdd', '/dev/vde', '/dev/vdf'] if ci_pipeline else storage.swift.devices }}"
+cinder_standard_devices: "{{ ['/dev/vdc'] if ci_pipeline else storage.cinder.devices }}"
