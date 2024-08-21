@@ -9,3 +9,11 @@
     src: /etc/kolla/clouds.yaml
     dest: "{% if ci_pipeline == 'true' %}{{ playbook_dir }}/tests/output/{% else %}{{ playbook_dir }}/output/{% endif %}"
     flat: true
+
+- name: Assert shell configuration in '.bash_profile'
+  ansible.builtin.blockinfile:
+    path: /root/.bash_profile
+    prepend_newline: true
+    block: |
+      source {{ kolla_venv }}/bin/activate
+      source /etc/kolla/admin-openrc.sh
