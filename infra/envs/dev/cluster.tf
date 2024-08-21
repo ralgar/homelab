@@ -46,6 +46,7 @@ module "cluster1_agent" {
   agent_name    = "cluster1"
   project_path  = var.gitlab_project
   agent_version = "2.6.1"
+  replicas      = 1
 }
 
 module "cluster1_gitops" {

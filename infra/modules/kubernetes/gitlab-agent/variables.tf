@@ -13,3 +13,9 @@ variable "agent_version" {
   type        = string
   default     = "2.6.1"
 }
+
+variable "replicas" {
+  description = "Number of agentk replicas to deploy."
+  type        = number
+  default     = 2
+}

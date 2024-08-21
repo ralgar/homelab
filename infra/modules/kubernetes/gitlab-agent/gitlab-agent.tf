@@ -25,4 +25,9 @@ resource "helm_release" "gitlab_agent" {
     name  = "config.token"
     value = gitlab_cluster_agent_token.this.token
   }
+
+  set {
+    name  = "replicas"
+    value = var.replicas
+  }
 }
