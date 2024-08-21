@@ -37,6 +37,17 @@ resource "openstack_containerinfra_cluster_v1" "cluster1" {
   merge_labels = true
 }
 
+module "cluster1_agent" {
+  source        = "../../modules/kubernetes/gitlab-agent"
+  providers = {
+    helm       = helm.cluster1
+  }
+
+  agent_name    = "cluster1"
+  project_path  = var.gitlab_project
+  agent_version = "2.6.1"
+}
+
 module "cluster1_gitops" {
   source    = "../../modules/kubernetes/flux"
   providers = {

@@ -16,6 +16,16 @@ variable "environment" {
   default     = "dev"
 }
 
+variable "gitlab_project" {
+  description = "GitLab Project path with namespace (eg. 'myuser/mycloudlab')."
+  type        = string
+}
+
+variable "gitlab_token" {
+  description = "GitLab Personal Access Token (PAT) or CI Job Token (may have permission issues)."
+  type        = string
+}
+
 variable "gitops_repo" {
   description = "Full path of the Git repo. Ex. 'http://domain.tld/user/repo.git'"
   type        = string

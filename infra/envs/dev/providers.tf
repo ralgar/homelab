@@ -5,6 +5,9 @@ terraform {
     local = {
       source  = "hashicorp/local"
     }
+    gitlab    = {
+      source = "gitlabhq/gitlab"
+    }
     openstack = {
       source  = "terraform-provider-openstack/openstack"
       version = "~> 1.52.1"
@@ -25,6 +28,11 @@ provider "openstack" {
   user_name           = sensitive(local.openstack_auth.username)
   password            = sensitive(local.openstack_auth.password)
   tenant_name         = var.environment
+}
+
+# Configure the GitLab Provider
+provider "gitlab" {
+  token = var.gitlab_token
 }
 
 provider "google" {
