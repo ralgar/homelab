@@ -5,7 +5,7 @@ copyright: >
   </div>
 repo_url: https://gitlab.com/ralgar/homelab
 site_url: https://ralgar.gitlab.io/homelab/
-docs_dir: ./
+docs_dir: ./content
 
 theme:
   name: material
