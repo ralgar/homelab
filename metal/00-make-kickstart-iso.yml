@@ -4,6 +4,5 @@
   become: false
   vars_files:
     - vars/main.yml
-    - vars/globals.yml
   roles:
     - rhel9/kickstart

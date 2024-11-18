@@ -10,86 +10,73 @@ If you don't already have an OpenStack cloud available, you can use the
 
 ## Initial Configuration
 
-Before we begin deployment, we need to configure the variables files
- `globals.yml` and `main.yml` in `metal/vars/`.
+Before we begin deployment, we need to configure everything under the
+ highlighted keys in `metal/vars/main.yml`:
 
-!!! tip
-    Be sure to set these correctly, otherwise the deployment will not work.
+!!!tip
+    It is strongly recommended to use consistent identifiers to define
+    your block devices, such as the WWN identifiers from `/dev/disk/by-id`.
 
-1. Search for the following values in `globals.yml`, and make sure they
-   are set correctly.
+```yaml title="metal/vars/main.yml" hl_lines="7 11 15 20 39 49"
+common:
+  # Name (path) of the venv, using the root user's home as the base.
+  # Ex. A value of 'kolla-venv' will become '/root/kolla-venv'
+  venv: kolla-venv
 
-    ```yaml title="metal/vars/globals.yml"
-    # The desired static IP address of the node.
-    kolla_internal_vip_address: "192.168.1.11"
+  # Path to your SSH pubkey file. This will be used to access the node.
+  ssh_pubkey_file: ~/.ssh/id_ed25519.pub
 
-    # The network interface that is connected to your local network.
-    network_interface: "eno1"
+storage:
+  # Target block device for the Openstack host's root filesystem.
+  root_device: /dev/disk/by-id/nvme-WD_BLACK_SN770_1TB_23020Q804222
 
-    # The other network interface.
-    # This one should NOT have an IP address, and doesn't need a connection.
-    neutron_external_interface: "eno2"
-    ```
+  cinder:
+    # Target block device(s) for Cinder "standard" (HDD) tier.
+    devices:
+      - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002bd0bf3c11919471
 
-1. Make sure the highlighted keys in `main.yml` are set correctly.
+  swift:
+    # Target block device(s) for Swift.
+    devices:
+      - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002d7240bf3ecf84b7
+      - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002d7240f041b207bc
+      - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002d72410a433d4109
+      - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002d72413745f2e841
 
-    !!!tip
-        It is strongly recommended to use consistent identifiers to define
-        your block devices, such as the WWN identifiers from `/dev/disk/by-id`.
+network:
+  # A domain to use for the internal OpenStack infrastructure.
+  domain: homelab.internal
 
-    ```yaml title="metal/vars/main.yml" hl_lines="7 11 15 20 42 45 50 51"
-    common:
-      # Name (path) of the venv, using the root user's home as the base.
-      # Ex. A value of 'kolla-venv' will become '/root/kolla-venv'
-      venv: kolla-venv
+  # A hostname/subdomain to assign to the AIO OpenStack node.
+  hostname: openstack
 
-      # Path to your SSH pubkey file. This will be used to access the node.
-      ssh_pubkey_file: ~/.ssh/id_ed25519.pub
+  # A list of two public DNS resolvers to use for the network.
+  dns_servers: ['1.1.1.1', '1.0.0.1']
 
-    storage:
-      # Target block device for the Openstack host's root filesystem.
-      root_device: /dev/disk/by-id/nvme-WD_BLACK_SN770_1TB_23020Q804222
+  # Configure the OpenStack internal provider network - where SSH and the
+  #  OpenStack WebUI and APIs will be exposed.
+  # This should connect to your internal (private) LAN.
+  internal:
+    interface: eno1
+    ip_address: 10.254.20.11
+    network_cidr: 10.254.20.0/24
+    gateway_addr: 10.254.20.1
 
-      cinder:
-        # Target block device(s) for Cinder "standard" (HDD) tier.
-        devices:
-          - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002bd0bf3c11919471
-
-      swift:
-        # Target block device(s) for Swift.
-        devices:
-          - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002d7240bf3ecf84b7
-          - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002d7240f041b207bc
-          - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002d72410a433d4109
-          - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002d72413745f2e841
-
-    network:
-      # A domain to use for the internal OpenStack infrastructure.
-      domain: homelab.internal
-
-      # A hostname/subdomain to assign to the AIO OpenStack node.
-      hostname: openstack
-
-      # A list of two public DNS resolvers to use for the network.
-      public_dns_servers: ['1.1.1.1', '1.0.0.1']
-
-      # Desired names (within OpenStack) of your 'public' network and subnet.
-      # This network is attached to your LAN.
-      public_network_name: public
-      public_subnet_name: public
-
-      # CIDR of your LAN subnet.
-      public_subnet_cidr: 192.168.1.0/24
-
-      # The IP address of your LAN gateway (your router).
-      public_subnet_gateway_ip: 192.168.1.254
-
-      # Range of the floating IP address pool for public OpenStack network.
-      # This should be OUTSIDE of the DHCP range of your router, and should
-      #  NOT include the IP address of your gateway or your OpenStack node.
-      public_subnet_allocation_pool_start: 192.168.1.20
-      public_subnet_allocation_pool_end: 192.168.1.100
-    ```
+  # Configure external provider network(s), where OpenStack can create
+  #  publicly-accessible IP addresses for your infrastructure.
+  # These should be internal DMZs, or public subnets assigned by your ISP.
+  # NOTE: If using VLANs, use a contiguous range (eg. 10-14 or 20-29).
+  external:
+    interface: eno2
+    type: vlan                          # Must be one of 'flat' or 'vlan'.
+    networks:
+      - name: public                    # Name to assign the network.
+        vlan_id: 10                     # Specify a VLAN ID.
+        network_cidr: 10.254.10.0/24    # Network address in CIDR notation.
+        gateway_addr: 10.254.10.1       # IP address of the default gateway.
+        dhcp_pool_start: 10.254.10.10   # Start IP of the DHCP pool.
+        dhcp_pool_end: 10.254.10.254    # End IP of the DHCP pool.
+```
 
 ---
 

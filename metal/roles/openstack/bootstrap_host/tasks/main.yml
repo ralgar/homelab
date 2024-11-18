@@ -6,14 +6,4 @@
 - name: Include main tasks
   ansible.builtin.include_tasks: "{{ item }}"
   loop:
-    - packages.yml
     - files.yml
-    - fixes.yml
-    - octavia-certs.yml
-
-- name: Include CI Pipeline tasks
-  ansible.builtin.include_tasks: ci-pipeline.yml
-  when: ci_pipeline == "true"
-
-- name: Flush Handlers
-  ansible.builtin.meta: flush_handlers

@@ -1,8 +1,4 @@
 ---
 kolla_venv: "{{ common.kolla_venv }}"
-public_network_name: "{{ network.public_network_name }}"
-public_subnet_name: "{{ network.public_subnet_name }}"
-public_subnet_cidr: "{{ network.public_subnet_cidr }}"
-public_subnet_gateway_ip: "{{ network.public_subnet_gateway_ip }}"
-public_subnet_allocation_pool_start: "{{ network.public_subnet_allocation_pool_start }}"
-public_subnet_allocation_pool_end: "{{ network.public_subnet_allocation_pool_end }}"
+
+external_networks: "{{ network.external }}"

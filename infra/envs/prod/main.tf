@@ -1,5 +1,5 @@
-data "openstack_networking_network_v2" "public" {
-  name     = "public"
+data "openstack_networking_network_v2" "dmz0" {
+  name     = "dmz0"
   external = true
 }
 

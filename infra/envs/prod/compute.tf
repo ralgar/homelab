@@ -5,7 +5,7 @@ module "fcos" {
   keypair = data.openstack_compute_keypair_v2.admin
 
   // Network configuration
-  network = data.openstack_networking_network_v2.public
+  network = data.openstack_networking_network_v2.dmz0
   dns_zone = openstack_dns_zone_v2.environment
 
   // Storage volumes

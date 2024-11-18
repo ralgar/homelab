@@ -3,49 +3,9 @@
   ansible.builtin.set_fact:
     ansible_python_interpreter: "{{ designate_kolla_venv }}/bin/python"
 
-- name: Add upstream server configuration in 'named.conf'
-  ansible.builtin.blockinfile:
-    path: "/etc/kolla/designate-backend-bind9/named.conf"
-    prepend_newline: true
-    insertafter: 'recursion'
-    block: |8  # This is fucking stupid, but it renders correctly.
-                    forwarders {
-                    {% for server in designate_upstream_servers %}
-                    {{ server }};
-                    {% endfor %}
-            };
-                    forward only;
-    marker: "        // {mark} ANSIBLE MANAGED BLOCK"
-  notify: designate_restart_bind9
+- name: Include record creation tasks
+  ansible.builtin.include_tasks: create-records.yml
 
-- name: Enable recursion in 'named.conf'
-  ansible.builtin.lineinfile:
-    path: "/etc/kolla/designate-backend-bind9/named.conf"
-    regexp: 'recursion'
-    line: '        recursion yes;'
-  notify: designate_restart_bind9
-
-- name: Create the internal DNS zone
-  openstack.cloud.dns_zone:
-    name: "{{ designate_default_zone }}."
-    description: Internal zone
-    email: "placeholder@{{ designate_default_zone }}"
-    type: primary
-    ttl: 3600
-    state: present
-    cloud: kolla-admin
-  environment:
-    OS_CLIENT_CONFIG_FILE: /etc/kolla/clouds.yaml
-
-- name: Create the DNS A record for OpenStack AIO node
-  openstack.cloud.recordset:
-    zone: "{{ designate_default_zone }}."
-    name: "{{ designate_openstack_node_hostname }}.{{ designate_default_zone }}."
-    recordset_type: "a"
-    records: ["{{ ansible_default_ipv4.address | default(ansible_all_ipv4_addresses[0]) }}"]
-    description: OpenStack node A record
-    ttl: 3600
-    state: present
-    cloud: kolla-admin
-  environment:
-    OS_CLIENT_CONFIG_FILE: /etc/kolla/clouds.yaml
+- name: Include recursive resolver tasks
+  ansible.builtin.include_tasks: enable-recursion.yml
+  when: designate_enable_recursion

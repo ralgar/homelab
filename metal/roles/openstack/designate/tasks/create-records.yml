@@ -1,0 +1,25 @@
+---
+- name: Create the internal DNS zone
+  openstack.cloud.dns_zone:
+    name: "{{ designate_default_zone }}."
+    description: Internal zone
+    email: "placeholder@{{ designate_default_zone }}"
+    type: primary
+    ttl: 3600
+    state: present
+    cloud: kolla-admin
+  environment:
+    OS_CLIENT_CONFIG_FILE: /etc/kolla/clouds.yaml
+
+- name: Create the DNS A record for OpenStack AIO node
+  openstack.cloud.recordset:
+    zone: "{{ designate_default_zone }}."
+    name: "{{ designate_openstack_node_hostname }}.{{ designate_default_zone }}."
+    recordset_type: "a"
+    records: ["{{ ansible_default_ipv4.address | default(ansible_all_ipv4_addresses[0]) }}"]
+    description: OpenStack node A record
+    ttl: 3600
+    state: present
+    cloud: kolla-admin
+  environment:
+    OS_CLIENT_CONFIG_FILE: /etc/kolla/clouds.yaml

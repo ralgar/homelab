@@ -13,7 +13,7 @@
 
 - name: Stat the public network
   openstack.cloud.networks_info:
-    name: "{{ public_network_name }}"
+    name: "{{ external_networks.networks[0].name }}"
     cloud: kolla-admin
   environment:
     OS_CLIENT_CONFIG_FILE: /etc/kolla/clouds.yaml
@@ -34,7 +34,6 @@
     coe: kubernetes
     docker_storage_driver: overlay2
     docker_volume_size: 40
-    dns_nameserver: "{{ ansible_default_ipv4.address }}"
     volume_driver: cinder
     network_driver: flannel
     server_type: vm

@@ -1,0 +1,22 @@
+---
+- name: Add upstream server configuration in 'named.conf'
+  ansible.builtin.blockinfile:
+    path: "/etc/kolla/designate-backend-bind9/named.conf"
+    prepend_newline: true
+    insertafter: 'recursion'
+    block: |8  # This is fucking stupid, but it renders correctly.
+                    forwarders {
+                    {% for server in designate_upstream_servers %}
+                    {{ server }};
+                    {% endfor %}
+            };
+                    forward only;
+    marker: "        // {mark} ANSIBLE MANAGED BLOCK"
+  notify: designate_restart_bind9
+
+- name: Enable recursion in 'named.conf'
+  ansible.builtin.lineinfile:
+    path: "/etc/kolla/designate-backend-bind9/named.conf"
+    regexp: 'recursion'
+    line: '        recursion yes;'
+  notify: designate_restart_bind9

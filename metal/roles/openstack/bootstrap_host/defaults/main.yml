@@ -9,21 +9,3 @@ ci_pipeline: false
 # Name (path) of the venv, using the root user's home as the base.
 # Ex. A value of 'kolla-venv' will become '/root/kolla-venv'
 kolla_venv: /root/kolla-venv
-
-# Desired names of your 'public' network and subnet.
-# These will be directly attached to your LAN.
-public_network_name: public
-public_subnet_name: public
-
-# CIDR of your LAN subnet
-public_subnet_cidr: 192.168.1.0/24
-
-# IP address to assign to the gateway of the OpenStack network.
-# This is NOT your router's IP.
-public_subnet_gateway_ip: 192.168.1.19
-
-# Range of the floating IP address pool for OpenStack instances.
-# This should be OUTSIDE of the DHCP range of your router, and
-#  NOT include the gateway IP address.
-public_subnet_allocation_pool_start: 192.168.1.20
-public_subnet_allocation_pool_end: 192.168.1.90

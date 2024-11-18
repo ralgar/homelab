@@ -1,26 +1,52 @@
 ---
-- name: "Create '{{ public_network_name }}' network"
+- name: Disable flat networks on physnet1
+  ansible.builtin.lineinfile:
+    path: "/etc/kolla/neutron-server/ml2_conf.ini"
+    regexp: '^flat_networks'
+    line: "flat_networks = "
+  when: external_networks.type == 'vlan'
+  notify: restart_neutron_server
+
+- name: Enable VLANs on physnet1
+  ansible.builtin.lineinfile:
+    path: "/etc/kolla/neutron-server/ml2_conf.ini"
+    regexp: '^network_vlan_ranges'
+    line: "network_vlan_ranges = physnet1:{{ external_networks.networks[0]['vlan_id'] }}:{{ external_networks.networks[-1]['vlan_id'] }}"
+  when: external_networks.type == 'vlan'
+  notify: restart_neutron_server
+
+- name: Flush Handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Create external networks
   openstack.cloud.network:
-    name: "{{ public_network_name }}"
+    name: "{{ external_network.name }}"
     external: true
     shared: true
-    provider_network_type: flat
     provider_physical_network: physnet1
+    provider_network_type: "{{ 'vlan' if external_networks.type == 'vlan' else 'flat' }}"
+    provider_segmentation_id: "{{ external_network.vlan_id if external_networks.type == 'vlan' else default(omit) }}"
     state: present
     cloud: kolla-admin
   environment:
     OS_CLIENT_CONFIG_FILE: /etc/kolla/clouds.yaml
+  loop: "{{ external_networks.networks }}"
+  loop_control:
+    loop_var: external_network
 
-- name: "Create '{{ public_subnet_name }}' subnet"
+- name: Create external default subnets
   openstack.cloud.subnet:
-    name: "{{ public_subnet_name }}"
+    name: default
     state: present
-    network_name: "{{ public_network_name }}"
-    cidr: "{{ public_subnet_cidr }}"
-    gateway_ip: "{{ public_subnet_gateway_ip }}"
+    network_name: "{{ external_network.name }}"
+    cidr: "{{ external_network.network_cidr }}"
+    gateway_ip: "{{ external_network.gateway_addr }}"
     enable_dhcp: true
-    allocation_pool_start: "{{ public_subnet_allocation_pool_start }}"
-    allocation_pool_end: "{{ public_subnet_allocation_pool_end }}"
+    allocation_pool_start: "{{ external_network.dhcp_pool_start }}"
+    allocation_pool_end: "{{ external_network.dhcp_pool_end }}"
     cloud: kolla-admin
   environment:
     OS_CLIENT_CONFIG_FILE: /etc/kolla/clouds.yaml
+  loop: "{{ external_networks.networks }}"
+  loop_control:
+    loop_var: external_network

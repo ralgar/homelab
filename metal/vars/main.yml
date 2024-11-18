@@ -32,21 +32,44 @@ network:
   hostname: openstack
 
   # A list of two public DNS resolvers to use for the network.
-  public_dns_servers: ['1.1.1.1', '1.0.0.1']
+  dns_servers: ['1.1.1.1', '1.0.0.1']
 
-  # Desired names (within OpenStack) of your 'public' network and subnet.
-  # This network is attached to your LAN.
-  public_network_name: public
-  public_subnet_name: public
+  # Configure the OpenStack internal provider network - where SSH and the
+  #  OpenStack WebUI and APIs will be exposed.
+  # This should connect to your internal (private) LAN.
+  internal:
+    interface: eno1
+    ip_address: 10.254.20.11
+    network_cidr: 10.254.20.0/24
+    gateway_addr: 10.254.20.1
 
-  # CIDR of your LAN subnet.
-  public_subnet_cidr: 192.168.1.0/24
+  # Configure external provider network(s), where OpenStack can create
+  #  publicly-accessible IP addresses for your infrastructure.
+  # These should be internal DMZs, or public subnets assigned by your ISP.
+  # NOTE: If using VLANs, allocate a range (eg. 10-14 or 20-29).
+  external:
+    interface: eno2
+    type: vlan                          # Must be one of 'flat' or 'vlan'.
+    networks:
+      - name: dmz0                      # Name to assign the OpenStack network.
+        vlan_id: 10                     # Specify a VLAN ID. Unused when network type is 'flat'.
+        network_cidr: 10.254.10.0/24    # Network address in CIDR notation.
+        gateway_addr: 10.254.10.1       # IP address of the default gateway.
+        dhcp_pool_start: 10.254.10.10   # Start IP of the DHCP pool (managed by OpenStack).
+        dhcp_pool_end: 10.254.10.254    # End IP of the DHCP pool (managed by OpenStack).
 
-  # The IP address of your LAN gateway (your router).
-  public_subnet_gateway_ip: 192.168.1.254
+      - name: dmz1
+        vlan_id: 11
+        network_cidr: 10.254.11.0/24
+        gateway_addr: 10.254.11.1
+        dhcp_pool_start: 10.254.11.10
+        dhcp_pool_end: 10.254.11.254
 
-  # Range of the floating IP address pool for public OpenStack network.
-  # This should be OUTSIDE of the DHCP range of your router, and should
-  #  NOT include the IP address of your gateway or your OpenStack node.
-  public_subnet_allocation_pool_start: 192.168.1.20
-  public_subnet_allocation_pool_end: 192.168.1.100
+services:
+  # Designate is the OpenStack DNS service.
+  designate:
+
+    # Configure Designate as a recursive resolver. This can be a useful hack
+    #  if your router has very substandard capabilities. Otherwise, there are
+    #  probably better ways to configure DNS resolution for your network.
+    recursive_lookup: false

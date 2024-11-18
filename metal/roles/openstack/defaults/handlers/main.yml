@@ -1,0 +1,6 @@
+---
+- name: Restart 'neutron-server'
+  community.docker.docker_container:
+    name: neutron_server
+    restart: true
+  listen: restart_neutron_server
