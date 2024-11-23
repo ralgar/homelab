@@ -13,7 +13,7 @@
 
 - name: Stat the public network
   openstack.cloud.networks_info:
-    name: "{{ external_networks.networks[0].name }}"
+    name: "{{ external_networks.networks[1].name }}"
     cloud: kolla-admin
   environment:
     OS_CLIENT_CONFIG_FILE: /etc/kolla/clouds.yaml

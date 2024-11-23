@@ -13,6 +13,7 @@ resource "openstack_compute_instance_v2" "fcos" {
   flavor_name         = "m1.large"
   key_pair            = var.keypair.name
   user_data           = data.ignition_config.final.rendered
+  config_drive        = true
   stop_before_destroy = true
 
   block_device {
@@ -44,8 +45,6 @@ resource "openstack_compute_instance_v2" "fcos" {
   }
 
   network {
-    uuid = var.network.id
+    port = openstack_networking_port_v2.fcos.id
   }
-
-  security_groups = [ "default", openstack_networking_secgroup_v2.fcos.name ]
 }

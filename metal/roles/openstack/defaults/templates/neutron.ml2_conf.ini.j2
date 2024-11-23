@@ -1,0 +1,5 @@
+[ml2_type_vlan]
+network_vlan_ranges = physnet1:{{ external_networks.networks[0]['vlan_id'] }}:{{ external_networks.networks[-1]['vlan_id'] }}
+
+[ml2_type_flat]
+flat_networks =

@@ -4,6 +4,8 @@ data "ignition_config" "output" {
     data.ignition_file.zincati_updates.rendered,
   ]
 
+  kernel_arguments = data.ignition_kernel_arguments.network_config.rendered
+
   links = [
     data.ignition_link.timezone.rendered,
   ]

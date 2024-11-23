@@ -5,7 +5,7 @@ required_version = ">= 1.0"
   required_providers {
     ignition = {
       source = "community-terraform-providers/ignition"
-      version = "2.1.3"
+      version = "2.3.5"
     }
     openstack = {
       source  = "terraform-provider-openstack/openstack"

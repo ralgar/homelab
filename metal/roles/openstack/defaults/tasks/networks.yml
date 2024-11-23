@@ -1,17 +1,17 @@
 ---
-- name: Disable flat networks on physnet1
-  ansible.builtin.lineinfile:
-    path: "/etc/kolla/neutron-server/ml2_conf.ini"
-    regexp: '^flat_networks'
-    line: "flat_networks = "
-  when: external_networks.type == 'vlan'
-  notify: restart_neutron_server
+- name: Ensure the '/etc/kolla/config/neutron' directory exists
+  ansible.builtin.file:
+    path: /etc/kolla/config/neutron
+    state: directory
+    mode: '0750'
 
 - name: Enable VLANs on physnet1
-  ansible.builtin.lineinfile:
-    path: "/etc/kolla/neutron-server/ml2_conf.ini"
-    regexp: '^network_vlan_ranges'
-    line: "network_vlan_ranges = physnet1:{{ external_networks.networks[0]['vlan_id'] }}:{{ external_networks.networks[-1]['vlan_id'] }}"
+  ansible.builtin.template:
+    src: neutron.ml2_conf.ini.j2
+    dest: /etc/kolla/config/neutron/ml2_conf.ini
+    owner: root
+    group: root
+    mode: '0640'
   when: external_networks.type == 'vlan'
   notify: restart_neutron_server
 
@@ -41,9 +41,10 @@
     network_name: "{{ external_network.name }}"
     cidr: "{{ external_network.network_cidr }}"
     gateway_ip: "{{ external_network.gateway_addr }}"
-    enable_dhcp: true
-    allocation_pool_start: "{{ external_network.dhcp_pool_start }}"
-    allocation_pool_end: "{{ external_network.dhcp_pool_end }}"
+    enable_dhcp: "{{ external_network.dhcp_enabled | default(true) }}"
+    allocation_pool_start: "{{ external_network.dhcp_pool_start | default(omit) }}"
+    allocation_pool_end: "{{ external_network.dhcp_pool_end | default(omit) }}"
+    dns_nameservers: "{{ external_network.dns_servers | default(omit) }}"
     cloud: kolla-admin
   environment:
     OS_CLIENT_CONFIG_FILE: /etc/kolla/clouds.yaml

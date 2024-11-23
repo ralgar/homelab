@@ -53,17 +53,31 @@ network:
     networks:
       - name: dmz0                      # Name to assign the OpenStack network.
         vlan_id: 10                     # Specify a VLAN ID. Unused when network type is 'flat'.
-        network_cidr: 10.254.10.0/24    # Network address in CIDR notation.
+        network_cidr: 10.254.10.0/30    # Network address in CIDR notation.
         gateway_addr: 10.254.10.1       # IP address of the default gateway.
-        dhcp_pool_start: 10.254.10.10   # Start IP of the DHCP pool (managed by OpenStack).
-        dhcp_pool_end: 10.254.10.254    # End IP of the DHCP pool (managed by OpenStack).
+        dhcp_enabled: false             # Toggle the OpenStack DHCP service on this subnet. (default: true)
+        dns_servers: ['1.1.1.1']        # Manually configure DNS server(s) for the subnet.
 
       - name: dmz1
         vlan_id: 11
-        network_cidr: 10.254.11.0/24
+        network_cidr: 10.254.11.0/30
         gateway_addr: 10.254.11.1
-        dhcp_pool_start: 10.254.11.10
-        dhcp_pool_end: 10.254.11.254
+        dhcp_enabled: false
+        dns_servers: ['1.1.1.1']
+
+      - name: dmz2
+        vlan_id: 12
+        network_cidr: 10.254.12.0/24
+        gateway_addr: 10.254.12.1
+        dhcp_pool_start: 10.254.12.10   # Start IP of the DHCP pool (managed by OpenStack).
+        dhcp_pool_end: 10.254.12.254    # End IP of the DHCP pool (managed by OpenStack).
+
+      - name: dmz3
+        vlan_id: 13
+        network_cidr: 10.254.13.0/24
+        gateway_addr: 10.254.13.1
+        dhcp_pool_start: 10.254.13.10   # Start IP of the DHCP pool (managed by OpenStack).
+        dhcp_pool_end: 10.254.13.254    # End IP of the DHCP pool (managed by OpenStack).
 
 services:
   # Designate is the OpenStack DNS service.

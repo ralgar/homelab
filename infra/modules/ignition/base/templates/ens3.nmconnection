@@ -1,0 +1,11 @@
+[connection]
+id=ens3
+type=ethernet
+interface-name=ens3
+[ipv4]
+address1=${cidr_address},${gateway}
+dhcp-hostname=${hostname}
+dns=${dns_servers};
+dns-search=
+may-fail=false
+method=manual
