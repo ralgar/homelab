@@ -58,7 +58,7 @@ You'll also need the following:
 
 - A GitLab account
 - A Google account (for off-site backups)
-- A Cloudflare account and ownership of a root domain
+- A Cloudflare account and ownership of a second-level domain (like `example.com`)
 
 ---
 
@@ -85,3 +85,10 @@ You'll need to install a few dependencies on your local system.
     git clone https://gitlab.com/<your-namespace>/homelab.git
     cd homelab
     ```
+
+!!!note
+    While the main branch is the source of truth for this project, it may
+    sometimes be in an undesirable state to work with. Git tags are
+    provided to denote stable points in the project's history, and are
+    guaranteed to be suitable as a starting point. It is strongly suggested
+    that you use the latest tag!
