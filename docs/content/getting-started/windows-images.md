@@ -44,10 +44,11 @@ Once you've satisfied the dependencies, building is simple.
     available, and/or set parallelism to an appropriate value using the Packer
     CLI option `-parallel-builds=1`.
 
-1. From the project's root directory, start the build(s).
+1. From the `templates/` directory, start the build(s).
 
     ```bash
-    packer build -parallel-builds=2 templates/
+    cd templates
+    packer build -parallel-builds=2 .
     ```
 
 1. If the builds were successful, you will find the resultant images in the

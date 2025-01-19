@@ -1,5 +1,9 @@
 build {
-  sources = ["source.qemu.windows_2019_core"]
+  sources = [
+    "source.qemu.windows_2019_core",
+    "source.qemu.windows_2019_desktop"
+  ]
+
   provisioner "ansible" {
     playbook_file = "./playbooks/windows-server.yml"
     user          = "Admin"

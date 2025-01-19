@@ -36,6 +36,7 @@ cache:
   key: "$CI_COMMIT_REF_NAME"
   paths:
     - infra/envs/**/.terraform/
+    - .packer/
 
 variables:
   TF_ROOT: ${CI_PROJECT_DIR}/infra/envs/prod
@@ -110,6 +111,25 @@ terraform:validate:
   script:
     - cd ${TF_ROOT}
     - gitlab-terraform validate
+
+packer:validate:
+  stage: lint
+  image:
+    name: docker.io/hashicorp/packer:1.11
+    entrypoint: [""]
+  variables:
+    PACKER_PLUGIN_PATH: ${CI_PROJECT_DIR}/.packer/plugins
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - .gitlab-ci.yml
+        - templates/**/*
+  before_script:
+    - apk add ansible
+  script:
+    - cd templates
+    - packer init .
+    - packer validate .
 
 terraform:plan:
   stage: build
