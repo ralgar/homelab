@@ -52,6 +52,7 @@ nav:
     - getting-started/prerequisites.md
     - getting-started/deploy-openstack.md
     - getting-started/cicd-configuration.md
+    - getting-started/windows-images.md
   - Deployment Environments:
     - environments/production.md
     - environments/development.md

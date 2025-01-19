@@ -21,6 +21,7 @@ You should have intermediate knowledge of the following technologies:
 - Ansible
 - Terraform
 - Kubernetes
+- Packer
 
 ---
 

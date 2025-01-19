@@ -1,0 +1,101 @@
+---
+- name: Common Windows Server Configuration
+  hosts: all
+  vars:
+    cloudbaseinit_url: https://github.com/cloudbase/cloudbase-init/releases/download/1.1.6/CloudbaseInitSetup_1_1_6_x64.msi
+  tasks:
+
+    - name: Disable the 'Administrator' built-in account
+      win_shell: Disable-LocalUser -Name Administrator
+
+    - name: Disable WinRM
+      win_shell: |
+        Set-NetFirewallRule -Name "Windows Remote Management (HTTP-In)" -Enabled True -Action Block
+        Set-NetFirewallRule -Group "Windows Remote Management" -Enabled True
+        if ((Get-Service -Name WinRM).Status -eq "Running") {
+          Disable-PSRemoting -Force
+        }
+        Stop-Service winrm
+        Set-Service -Name winrm -StartupType Disabled
+
+    - name: Show File Extensions in Explorer
+      win_regedit:
+        path: HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced
+        name: HideFileExt
+        type: dword
+        data: 0
+
+    - name: Enable QuickEdit Mode
+      win_regedit:
+        path: HKCU:\Console
+        name: QuickEdit
+        type: dword
+        data: 1
+
+    - name: Show Administrative Tools in Start Menu
+      win_regedit:
+        path: HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced
+        name: Start_ShowRun
+        type: dword
+        data: 1
+
+    - name: Show Administrative Tools in Start Menu
+      win_regedit:
+        path: HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced
+        name: StartMenuAdminTools
+        type: dword
+        data: 1
+
+    - name: Zero Hibernation File
+      win_regedit:
+        path: HKLM:\System\CurrentControlSet\Control\Power
+        name: HibernateFileSizePercent
+        type: dword
+        data: 0
+
+    - name: Disable Hibernation Mode
+      win_regedit:
+        path: HKLM:\System\CurrentControlSet\Control\Power
+        name: HibernateEnabled
+        type: dword
+        data: 0
+
+    - name: Disable Screensaver
+      win_regedit:
+        path: HKCU:\Control Panel\Desktop
+        name: ScreenSaveActive
+        type: dword
+        data: 0
+
+    - name: "Disable password expiration for '{{ ansible_user }}' user"
+      ansible.windows.win_user:
+        name: "{{ ansible_user }}"
+        password_never_expires: true
+
+    - name: Install all updates and reboot as many times as needed
+      ansible.windows.win_updates:
+        category_names: '*'
+        reboot: true
+
+    - name: Disable OpenSSH password login
+      win_lineinfile:
+        path: C:\ProgramData\ssh\sshd_config
+        regex: 'PasswordAuthentication'
+        line: 'PasswordAuthentication no'
+
+    - name: Disable OpenSSH shared 'administators_authorized_keys file
+      win_lineinfile:
+        path: C:\ProgramData\ssh\sshd_config
+        regex: "{{ item }}"
+        line: '# Removed line'
+      loop:
+        - Match Group administrators
+        - administrators_authorized_keys
+
+    - name: Install CloudBase-Init
+      win_shell: |
+        Invoke-WebRequest -Uri {{ cloudbaseinit_url }} -OutFile cloudbaseinit.msi
+        Start-Process -Wait -FilePath msiexec.exe -ArgumentList "/i cloudbaseinit.msi /qn /l*v log.txt"
+        Get-Content -Path log.txt
+        Remove-Item -Path cloudbaseinit.msi
+        Remove-Item -Path log.txt

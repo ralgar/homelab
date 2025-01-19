@@ -19,6 +19,12 @@
     - [x] Heat (Stack Orchestration)
     - [x] Magnum (Container Orchestration)
 
+### Administrative Features
+
+- [x] Automated building of cloud-ready Windows Server images.
+    - [x] Windows Server 2019 Datacenter (Core)
+    - [x] Windows Server 2019 Datacenter (Desktop)
+
 ---
 
 ## Homelab Infrastructure
