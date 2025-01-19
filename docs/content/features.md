@@ -15,6 +15,7 @@
     - [x] Designate (DNS)
     - [x] Cinder (Block Storage)
     - [x] Swift (Object Storage)
+    - [x] Glance (Image Storage)
     - [x] Manila (Shared Filesystems)
     - [x] Heat (Stack Orchestration)
     - [x] Magnum (Container Orchestration)
