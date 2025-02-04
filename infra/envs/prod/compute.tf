@@ -17,5 +17,5 @@ module "fcos" {
 
   // Services configuration
   environment = var.environment
-  domain      = local.environment_domain
+  domain      = trimsuffix(local.environment_domain, ".")
 }
