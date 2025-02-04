@@ -1,4 +1,3 @@
-variable "dns_zone" {}
 variable "fcos_version" {
   description = "Desired major version of the instance image"
   type        = number

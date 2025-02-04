@@ -6,7 +6,6 @@ module "fcos" {
 
   // Network configuration
   network = var.environment == "prod" ? data.openstack_networking_network_v2.dmz0 : data.openstack_networking_network_v2.dmz1
-  dns_zone = openstack_dns_zone_v2.environment
 
   // Storage volumes
   data_volume  = openstack_blockstorage_volume_v3.container_data
@@ -18,5 +17,5 @@ module "fcos" {
 
   // Services configuration
   environment = var.environment
-  domain      = trimsuffix(openstack_dns_zone_v2.environment.name, ".")
+  domain      = local.environment_domain
 }
