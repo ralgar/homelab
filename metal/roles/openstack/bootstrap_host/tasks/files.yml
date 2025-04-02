@@ -13,7 +13,7 @@
 - name: Template '/etc/kolla/globals.yml'
   ansible.builtin.template:
     src: "globals.yml.j2"
-    dest: /etc/kolla/globals2.yml
+    dest: /etc/kolla/globals.yml
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
     mode: 0644

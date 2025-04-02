@@ -1,5 +1,5 @@
 data "openstack_networking_network_v2" "public" {
-  name     = "public"
+  name     = "dmz3"
   external = true
 }
 
