@@ -10,6 +10,7 @@
     cloud: kolla-admin
   environment:
     OS_CLIENT_CONFIG_FILE: /etc/kolla/clouds.yaml
+  register: openstack_prod_project
 
 - name: "Assign roles for the 'prod' project"
   openstack.cloud.role_assignment:

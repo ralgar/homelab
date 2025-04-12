@@ -3,27 +3,9 @@
   ansible.builtin.set_fact:
     ansible_python_interpreter: "{{ manila_kolla_venv }}/bin/python"
 
-- name: Install venv dependencies
-  ansible.builtin.pip:
-    name:
-      - python-manilaclient
-
-- name: Create Manila flavor
-  openstack.cloud.compute_flavor:
-    name: manila-share
-    id: "100"
-    vcpus: 2
-    ram: 4096
-    disk: 0
-    state: present
-    cloud: kolla-admin
-  environment:
-    OS_CLIENT_CONFIG_FILE: /etc/kolla/clouds.yaml
-  notify: create_default_share_type
-
 - name: Download Manila image
   ansible.builtin.get_url:
     url: https://tarballs.opendev.org/openstack/manila-image-elements/images/manila-service-image-master.qcow2
     dest: /root/manila-service-image.qcow2
     mode: 640
-  notify: upload_manila_image
+  notify: create_default_share_type

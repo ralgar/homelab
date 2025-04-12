@@ -36,6 +36,7 @@
       - 'ansible-core>=2.14,<2.16'
       - dbus-python
       - 'openstacksdk==2.1.0'
+      - python-manilaclient
       - python-openstackclient
       - selinux
 

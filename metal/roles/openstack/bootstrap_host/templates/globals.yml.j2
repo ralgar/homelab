@@ -331,10 +331,10 @@ enable_barbican: "yes"
 #enable_ceilometer_ipmi: "no"
 #enable_cells: "no"
 #enable_central_logging: "no"
-#enable_ceph_rgw: "no"
-#enable_ceph_rgw_loadbalancer: "{{ enable_ceph_rgw | bool }}"
+enable_ceph_rgw: "yes"
+enable_ceph_rgw_loadbalancer: "no"
 enable_cinder: "yes"
-enable_cinder_backup: "no"
+enable_cinder_backup: "yes"
 #enable_cinder_backend_hnas_nfs: "no"
 #enable_cinder_backend_iscsi: "{{ enable_cinder_backend_lvm | bool }}"
 enable_cinder_backend_lvm: "yes"
@@ -388,10 +388,10 @@ neutron_dns_domain: "homelab.internal."
 enable_magnum: "yes"
 enable_cluster_user_trust: "true"
 enable_manila: "yes"
-enable_manila_backend_generic: "yes"
+enable_manila_backend_generic: "no"
 #enable_manila_backend_hnas: "no"
-#enable_manila_backend_cephfs_native: "no"
-#enable_manila_backend_cephfs_nfs: "no"
+enable_manila_backend_cephfs_native: "yes"
+enable_manila_backend_cephfs_nfs: "yes"
 #enable_manila_backend_glusterfs_nfs: "no"
 #enable_mariabackup: "no"
 #enable_masakari: "no"
@@ -431,8 +431,8 @@ enable_redis: "yes"
 #enable_senlin: "no"
 #enable_skyline: "no"
 #enable_solum: "no"
-enable_swift: "yes"
-enable_swift_s3api: "yes"
+#enable_swift: "no"
+#enable_swift_s3api: "no"
 #enable_tacker: "no"
 #enable_telegraf: "no"
 #enable_trove: "no"
@@ -504,6 +504,9 @@ enable_swift_s3api: "yes"
 # Manila
 #ceph_manila_user: "manila"
 #ceph_manila_keyring: "client.{{ ceph_manila_user }}.keyring"
+# RadosGW
+ceph_rgw_swift_compatibility: "no"  # Counter-intuitive, but needs to be off for Swift to work.
+ceph_rgw_swift_account_in_url: "yes"
 
 #############################
 # Keystone - Identity Options
@@ -525,9 +528,9 @@ enable_swift_s3api: "yes"
 # Glance - Image Options
 ########################
 # Configure image backend.
-#glance_backend_ceph: "no"
+glance_backend_ceph: "yes"
 glance_backend_file: "no"
-glance_backend_swift: "yes"
+#glance_backend_swift: "no"
 #glance_backend_vmware: "no"
 #glance_backend_s3: "no"
 #enable_glance_image_cache: "no"
@@ -572,10 +575,10 @@ glance_backend_swift: "yes"
 # Cinder - Block Storage Options
 ################################
 # Enable / disable Cinder backends
-#cinder_backend_ceph: "no"
+cinder_backend_ceph: "yes"
 #cinder_backend_vmwarevc_vmdk: "no"
 #cinder_backend_vmware_vstorage_object: "no"
-cinder_volume_group: "cinder-standard"
+cinder_volume_group: "cinder-premium"
 # Valid options are [ '', redis, etcd ]
 #cinder_coordination_backend: "{{ 'redis' if enable_redis|bool else 'etcd' if enable_etcd|bool else '' }}"
 

@@ -1,0 +1,54 @@
+---
+- name: Create Ceph pool for RadosGW
+  ansible.builtin.command: ceph osd pool create radosgw
+
+- name: Initialize pool for RadosGW
+  ansible.builtin.command: ceph osd pool application enable radosgw rgw
+
+# Kolla Ansible seems to expect port 6780 here, and the default conflicts with Horizon anyway
+- name: Deploy Ceph RadosGW daemon in the cluster
+  ansible.builtin.command: ceph orch apply rgw radosgw --port=6780 --placement=1
+
+- name: Wait for RadosGW daemon to start
+  ansible.builtin.wait_for:
+    port: 6780
+    timeout: 60
+
+- name: Get RGW daemon user name
+  ansible.builtin.shell: "ceph orch ps | grep rgw.radosgw | awk '{print $1}'"
+  register: ceph_rgw_daemon_user
+  failed_when: ceph_rgw_daemon_user.stdout | trim == ""  # Fail if no value retrieved
+
+- name: Read Kolla Ansible passwords file
+  slurp:
+    src: /etc/kolla/passwords.yml
+  register: kolla_passwords
+
+- name: Execute RadosGW configuration commands
+  ansible.builtin.command: "ceph config set client.{{ ceph_rgw_daemon_user.stdout }} {{ rgw_conf_item.key }} {{ rgw_conf_item.value }}"
+  loop:
+    - key: rgw_keystone_api_version
+      value: "3"
+    - key: rgw_keystone_url
+      value: "http://{{ ansible_default_ipv4.address }}:5000"
+    - key: rgw_keystone_admin_user
+      value: "ceph_rgw"
+    - key: rgw_keystone_admin_password
+      value: "{{ (kolla_passwords.content | b64decode | from_yaml).ceph_rgw_keystone_password }}"
+    - key: rgw_keystone_admin_project
+      value: "service"
+    - key: rgw_keystone_admin_domain
+      value: "default"
+    - key: rgw_keystone_verify_ssl
+      value: "false"
+    - key: rgw_keystone_accepted_roles
+      value: "admin,member,_member_"
+    - key: rgw_s3_auth_use_keystone
+      value: "true"
+    - key: rgw_swift_account_in_url
+      value: "true"
+  loop_control:
+    loop_var: rgw_conf_item
+
+- name: Restart the RadosGW daemon
+  ansible.builtin.command: sudo ceph orch restart rgw.radosgw

@@ -7,18 +7,29 @@
   ansible.builtin.include_tasks: "{{ item }}"
   loop:
     - prechecks.yml
-    - backends.yml
     - service-config.yml
 
 - name: Flush Handlers
   ansible.builtin.meta: flush_handlers
 
-- name: Create 'PREMIUM' volume type
+- name: Set backend for '__DEFAULT__' volume type
+  openstack.cloud.volume_type:
+    name: __DEFAULT__
+    extra_specs:
+      volume_backend_name: rbd-1
+    description: Default Volume Type (HDD)
+    is_public: True
+    state: present
+    cloud: kolla-admin
+  environment:
+    OS_CLIENT_CONFIG_FILE: /etc/kolla/clouds.yaml
+
+- name: Set backend for 'PREMIUM' volume type
   openstack.cloud.volume_type:
     name: PREMIUM
     extra_specs:
-      volume_backend_name: lvm-2
-    description: Premium Volume Type (SSD)
+      volume_backend_name: lvm-1
+    description: Premium Volume Type (NVMe)
     is_public: True
     state: present
     cloud: kolla-admin

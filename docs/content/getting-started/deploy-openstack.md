@@ -17,7 +17,7 @@ Before we begin deployment, we need to configure everything under the
     It is strongly recommended to use consistent identifiers to define
     your block devices, such as the WWN identifiers from `/dev/disk/by-id`.
 
-```yaml title="metal/vars/main.yml" hl_lines="7 11 15 20 39 49"
+```yaml title="metal/vars/main.yml" hl_lines="7 11 14 34 44"
 common:
   # Name (path) of the venv, using the root user's home as the base.
   # Ex. A value of 'kolla-venv' will become '/root/kolla-venv'
@@ -30,18 +30,13 @@ storage:
   # Target block device for the Openstack host's root filesystem.
   root_device: /dev/disk/by-id/nvme-WD_BLACK_SN770_1TB_23020Q804222
 
-  cinder:
-    # Target block device(s) for Cinder "standard" (HDD) tier.
-    devices:
-      - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002bd0bf3c11919471
-
-  swift:
-    # Target block device(s) for Swift.
-    devices:
-      - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002d7240bf3ecf84b7
-      - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002d7240f041b207bc
-      - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002d72410a433d4109
-      - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002d72413745f2e841
+  # Target block device(s) for Ceph (OpenStack volume/shared/object storage)
+  ceph_osds:
+    - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002bd0bf3c11919471
+    - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002d7240bf3ecf84b7
+    - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002d7240f041b207bc
+    - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002d72410a433d4109
+    - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002d72413745f2e841
 
 network:
   # A domain to use for the internal OpenStack infrastructure.

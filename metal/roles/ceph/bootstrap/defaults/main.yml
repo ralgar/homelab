@@ -1,0 +1,10 @@
+---
+ci_pipeline: false
+
+ceph_version_codename: squid
+
+# Default OSDs for automated tests
+ceph_default_osds:
+  - /dev/vdc
+  - /dev/vdd
+  - /dev/vde

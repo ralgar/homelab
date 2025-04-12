@@ -11,18 +11,15 @@ storage:
   # Target block device for the Openstack host's root filesystem.
   root_device: /dev/disk/by-id/nvme-WD_BLACK_SN770_1TB_23020Q804222
 
-  cinder:
-    # Target block device(s) for Cinder "standard" (HDD) tier.
-    devices:
-      - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002bd0bf3c11919471
-
-  swift:
-    # Target block device(s) for Swift.
-    devices:
-      - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002d7240bf3ecf84b7
-      - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002d7240f041b207bc
-      - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002d72410a433d4109
-      - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002d72413745f2e841
+  # Target block device(s) for Ceph (OpenStack volume/shared/object storage)
+  ceph_osds:
+    - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002f8c147436d4397c
+    - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002f8c14683615cea5
+    - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002f8c149138899fe1
+    - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002f8c14a839e50ed4
+    - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002f8c145935382d4b
+    - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002f8c14d53c913316
+    - /dev/disk/by-id/wwn-0x6b8ca3a0faf798002f8c14c93bd99c23
 
 network:
   # A domain to use for the internal OpenStack infrastructure.

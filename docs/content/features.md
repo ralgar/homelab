@@ -4,25 +4,30 @@
 
 ## OpenStack Cloud Platform
 
-- [x] **Automated deployment**
-    - [x] Builds a self-installing Rocky Linux ISO.
-    - [x] Provides Ansible roles for deploying a single-node OpenStack cloud.
-    - [x] Provides a GitLab Runner for infrastructure CI/CD jobs.
-- [x] **Deploys a full-featured cloud platform**
-    - [x] Nova (Compute)
-    - [x] Neutron (Networking)
-    - [x] Octavia (Load Balancing)
-    - [x] Designate (DNS)
-    - [x] Cinder (Block Storage)
-    - [x] Swift (Object Storage)
+### Automated Deployment
+
+- [x] Builds a self-installing Rocky Linux ISO
+- [x] Provides Ansible roles for deploying a single-node OpenStack cloud
+- [x] Provides a GitLab Runner for infrastructure CI/CD jobs
+
+### OpenStack Services
+
+- [x] Nova (Compute)
+- [x] Neutron (Networking)
+- [x] Octavia (Load Balancing)
+- [x] Designate (DNS)
+- [x] Ceph Storage Cluster
+    - [x] Cinder Volumes (Block Storage)
+    - [x] Cinder Backups (Block Storage)
     - [x] Glance (Image Storage)
     - [x] Manila (Shared Filesystems)
-    - [x] Heat (Stack Orchestration)
-    - [x] Magnum (Container Orchestration)
+    - [x] RADOS Gateway (Object Storage)
+- [x] Heat (Stack Orchestration)
+- [x] Magnum (Container Orchestration)
 
 ### Administrative Features
 
-- [x] Automated building of cloud-ready Windows Server images.
+- [x] Automated building of cloud-ready Windows Server images
     - [x] Windows Server 2019 Datacenter (Core)
     - [x] Windows Server 2019 Datacenter (Desktop)
 

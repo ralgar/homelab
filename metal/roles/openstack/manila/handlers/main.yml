@@ -1,22 +1,7 @@
 ---
-- name: 'Upload the Manila image'
-  openstack.cloud.image:
-    name: manila-service-image
-    filename: /root/manila-service-image.qcow2
-    container_format: bare
-    disk_format: qcow2
-    min_disk: 5  # Must be set for volume-backed root disks
-    owner: service
-    visibility: private
-    state: present
-    cloud: kolla-admin
-  environment:
-    OS_CLIENT_CONFIG_FILE: /etc/kolla/clouds.yaml
-  listen: upload_manila_image
-
 - name: Create default share type
   ansible.builtin.shell: |
     source /etc/kolla/admin-openrc.sh
     source {{ manila_kolla_venv }}/bin/activate
-    openstack share type create default_share_type True
+    openstack share type create default_share_type False
   listen: create_default_share_type

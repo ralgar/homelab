@@ -25,7 +25,7 @@
     shared: true
     provider_physical_network: physnet1
     provider_network_type: "{{ 'vlan' if external_networks.type == 'vlan' else 'flat' }}"
-    provider_segmentation_id: "{{ external_network.vlan_id if external_networks.type == 'vlan' else default(omit) }}"
+    provider_segmentation_id: "{{ external_network.get('vlan_id', omit) if external_networks.type == 'vlan' else omit }}"
     state: present
     cloud: kolla-admin
   environment:

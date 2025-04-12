@@ -1,0 +1,14 @@
+---
+- name: Create the 'cinder-premium' LVM physical volume (for CI pipeline)
+  community.general.parted:
+    device: /dev/vdb
+    number: 1
+    flags: [ lvm ]
+    state: present
+    part_end: 100%
+
+- name: Create the 'cinder-premium' LVM volume group (for CI pipeline)
+  community.general.lvg:
+    vg: cinder-premium
+    pvs: /dev/vdb1
+    pesize: 16M

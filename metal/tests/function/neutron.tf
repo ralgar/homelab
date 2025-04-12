@@ -16,7 +16,7 @@ data "openstack_networking_network_v2" "external" {
 }
 
 data "openstack_networking_subnet_v2" "external" {
-  name = "public"
+  name = "default"
 }
 
 resource "openstack_networking_router_v2" "internal" {

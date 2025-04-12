@@ -1,0 +1,4 @@
+---
+- name: Bootstrap Ceph cluster
+  ansible.builtin.include_tasks: bootstrap_ceph.yml
+  listen: bootstrap_ceph

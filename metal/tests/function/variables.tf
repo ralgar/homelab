@@ -7,5 +7,5 @@ variable "openstack_clouds_file" {
 variable "environment" {
   description = "Deployment environment (prod, staging, or dev)."
   type        = string
-  default     = "dev"
+  default     = "admin"
 }

@@ -11,12 +11,13 @@
     - vars/main.yml
   roles:
     - common/wait_for_connection
+    - ceph/bootstrap
     - openstack/bootstrap_host
     - openstack/configure_storage
     - openstack/deploy_kolla
-    - openstack/defaults
     - openstack/nova
     - openstack/cinder
     - openstack/manila
     - openstack/designate
     - openstack/octavia
+    - openstack/defaults

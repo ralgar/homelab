@@ -1,3 +1,8 @@
 ---
-ci_pipeline: false
-swift_kolla_venv: /root/kolla-venv
+kolla_config_directories:
+  - /etc/kolla/config/cinder
+  - /etc/kolla/config/cinder/cinder-backup
+  - /etc/kolla/config/cinder/cinder-volume
+  - /etc/kolla/config/glance
+  - /etc/kolla/config/manila
+  - /etc/kolla/config/nova

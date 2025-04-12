@@ -1,0 +1,6 @@
+[global]
+fsid = {{ ceph_cluster_fsid.stdout }}
+mon_host = [v2:{{ ansible_default_ipv4.address }}:3300/0,v1:{{ ansible_default_ipv4.address }}:6789/0]
+auth_cluster_required = cephx
+auth_service_required = cephx
+auth_client_required = cephx

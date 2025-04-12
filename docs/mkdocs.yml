@@ -57,6 +57,9 @@ nav:
     - environments/production.md
     - environments/development.md
   - Managing OpenStack:
+    - Ceph:
+      - Benchmarking: managing-openstack/ceph/benchmarking.md
+      - Dashboard Access: managing-openstack/ceph/dashboard-access.md
     - Cinder:
       - Import/Export Volumes: managing-openstack/cinder/import-export-volumes.md
       - Troubleshooting: managing-openstack/cinder/troubleshooting.md

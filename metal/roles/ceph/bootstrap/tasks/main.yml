@@ -1,0 +1,30 @@
+---
+- name: Assert the 'epel-release' repository
+  ansible.builtin.dnf:
+    name: epel-release
+    state: present
+
+- name: "Assert the 'centos-release-ceph-{{ ceph_version_codename }}' repository"
+  ansible.builtin.dnf:
+    name: "centos-release-ceph-{{ ceph_version_codename }}"
+    state: present
+
+- name: Assert the required packages
+  ansible.builtin.dnf:
+    name:
+      - cephadm
+      - ceph-base
+      - ceph-common
+      - podman
+      - python3-jinja2
+    state: present
+
+- name: Trigger Ceph installation handler if not installed
+  ansible.builtin.stat:
+    path: /etc/ceph/ceph.conf
+  register: ceph_conf
+  changed_when: not ceph_conf.stat.exists
+  notify: bootstrap_ceph
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers

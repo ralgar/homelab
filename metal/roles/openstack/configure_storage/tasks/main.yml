@@ -1,8 +1,42 @@
 ---
-- name: Include tasks
-  ansible.builtin.include_tasks: "{{ task }}"
-  loop:
-    - cinder.yml
-    - swift.yml
+- name: Get Ceph cluster FSID
+  ansible.builtin.command: ceph fsid
+  register: ceph_cluster_fsid
+  notify: configure_radosgw  # Always trigger handler for now
+
+- name: Include CI pipeline tasks
+  ansible.builtin.include_tasks: ci_pipeline.yml
+  when: ci_pipeline == "true"
+
+- name: Assert that Kolla config directories exist
+  ansible.builtin.file:
+    path: "{{ kolla_config_directory }}"
+    state: directory
+    mode: 0770
+  loop: "{{ kolla_config_directories }}"
   loop_control:
-    loop_var: task
+    loop_var: kolla_config_directory
+
+- name: Trigger Cinder configuration handler if not already configured
+  ansible.builtin.stat:
+    path: /etc/kolla/config/cinder/ceph.conf
+  register: cinder_ceph_config_file
+  changed_when: not cinder_ceph_config_file.stat.exists
+  notify: configure_cinder
+
+- name: Trigger Glance configuration handler if not already configured
+  ansible.builtin.stat:
+    path: /etc/kolla/config/glance/ceph.conf
+  register: glance_ceph_config_file
+  changed_when: not glance_ceph_config_file.stat.exists
+  notify: configure_glance
+
+- name: Trigger Manila configuration handler if not already configured
+  ansible.builtin.stat:
+    path: /etc/kolla/config/manila/ceph.conf
+  register: manila_ceph_config_file
+  changed_when: not manila_ceph_config_file.stat.exists
+  notify: configure_manila
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers

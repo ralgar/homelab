@@ -1,25 +1,19 @@
 ---
-- name: Include ring generation tasks
-  include_tasks: "{{ item }}"
+- name: Configure storage for Cinder
+  ansible.builtin.include_tasks: "{{ item }}"
   loop:
-    - object_ring.yml
-    - account_ring.yml
-    - container_ring.yml
-  listen: generate_rings
+    - cinder.yml
+    - cinder_backup.yml
+  listen: configure_cinder
 
-- name: Rebalance the ring files
-  community.docker.docker_container:
-    name: swift-ring-builder
-    image: docker.io/kolla/centos-source-swift-base:4.0.0
-    entrypoint: ['swift-ring-builder']
-    command: ["/mnt/{{ swift_ring }}.builder", 'rebalance']
-    auto_remove: true
-    volumes:
-      - /etc/kolla/config/swift:/mnt
-  loop:
-    - object
-    - account
-    - container
-  loop_control:
-    loop_var: swift_ring
-  listen: generate_rings
+- name: Configure storage for Glance
+  ansible.builtin.include_tasks: glance.yml
+  listen: configure_glance
+
+- name: Configure storage for Manila
+  ansible.builtin.include_tasks: manila.yml
+  listen: configure_manila
+
+- name: Configure storage for RadosGW
+  ansible.builtin.include_tasks: radosgw.yml
+  listen: configure_radosgw

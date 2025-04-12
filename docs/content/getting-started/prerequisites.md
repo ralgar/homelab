@@ -16,6 +16,7 @@ You should have intermediate knowledge of the following technologies:
 
 - Linux
 - Git
+- Ceph
 - OpenStack or another cloud platform
 - GitLab or another CI/CD platform
 - Ansible

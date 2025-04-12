@@ -10,7 +10,7 @@ resource "openstack_compute_instance_v2" "openstack" {
   flavor_id = openstack_compute_flavor_v2.openstack.id
   key_pair  = openstack_compute_keypair_v2.ephemeral.name
 
-  // Root Volume from Image
+  // Root Volume from Image ('/dev/vda')
   block_device {
     uuid                  = openstack_images_image_v2.rocky9_cloud.id
     source_type           = "image"
@@ -20,7 +20,7 @@ resource "openstack_compute_instance_v2" "openstack" {
     delete_on_termination = true
   }
 
-  // LVM "Premium" Storage Volume
+  // LVM cinder-premium ('/dev/vdb')
   block_device {
     source_type           = "blank"
     destination_type      = "volume"
@@ -29,7 +29,7 @@ resource "openstack_compute_instance_v2" "openstack" {
     delete_on_termination = true
   }
 
-  // LVM "Standard" Storage Volume
+  // Ceph OSD 0 ('/dev/vdc')
   block_device {
     source_type           = "blank"
     destination_type      = "volume"
@@ -38,7 +38,7 @@ resource "openstack_compute_instance_v2" "openstack" {
     delete_on_termination = true
   }
 
-  // Object Storage Volume 1
+  // Ceph OSD 1 ('/dev/vdd')
   block_device {
     source_type           = "blank"
     destination_type      = "volume"
@@ -47,16 +47,7 @@ resource "openstack_compute_instance_v2" "openstack" {
     delete_on_termination = true
   }
 
-  // Object Storage Volume 2
-  block_device {
-    source_type           = "blank"
-    destination_type      = "volume"
-    volume_size           = 20
-    boot_index            = -1
-    delete_on_termination = true
-  }
-
-  // Object Storage Volume 3
+  // Ceph OSD 2 ('/dev/vde')
   block_device {
     source_type           = "blank"
     destination_type      = "volume"

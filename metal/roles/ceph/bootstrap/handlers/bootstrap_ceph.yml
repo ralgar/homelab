@@ -1,0 +1,23 @@
+---
+- name: Execute cephadm bootstrap command
+  ansible.builtin.command:
+    argv:
+      - cephadm
+      - bootstrap
+      - --mon-ip
+      - "{{ ansible_default_ipv4.address }}"
+      - --skip-monitoring-stack
+      - --single-host-defaults
+      - --allow-fqdn-hostname
+
+- name: Create Ceph OSDs
+  ansible.builtin.command: "ceph orch daemon add osd {{ ansible_fqdn }}:{{ osd }}"
+  loop: "{{ ceph_osds }}"
+  loop_control:
+    loop_var: osd
+
+- name: Set Ceph max parallel OSD scrubs to 1
+  ansible.builtin.command: ceph config set osd osd_max_scrubs 1
+
+- name: Set small sleep between scrub operations (to lighten the load)
+  ansible.builtin.command: ceph config set osd osd_scrub_sleep 0.1
