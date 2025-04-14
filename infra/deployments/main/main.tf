@@ -1,10 +1,10 @@
-data "openstack_networking_network_v2" "dmz0" {
+data "openstack_networking_network_v2" "prod" {
   name     = "dmz0"
   external = true
 }
 
-data "openstack_networking_network_v2" "dmz1" {
-  name     = "dmz1"
+data "openstack_networking_network_v2" "dev" {
+  name     = "dmz2"
   external = true
 }
 
@@ -13,5 +13,5 @@ data "openstack_compute_keypair_v2" "admin" {
 }
 
 data "openstack_identity_project_v3" "prod" {
-  name = "prod"
+  name = "${var.deployment}-prod"
 }

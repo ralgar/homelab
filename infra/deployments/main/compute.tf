@@ -5,7 +5,7 @@ module "fcos" {
   keypair = data.openstack_compute_keypair_v2.admin
 
   // Network configuration
-  network = var.environment == "prod" ? data.openstack_networking_network_v2.dmz0 : data.openstack_networking_network_v2.dmz1
+  network = var.environment == "prod" ? data.openstack_networking_network_v2.prod : data.openstack_networking_network_v2.dev
 
   // Storage volumes
   data_volume  = openstack_blockstorage_volume_v3.container_data
