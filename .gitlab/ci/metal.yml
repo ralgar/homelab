@@ -1,0 +1,10 @@
+---
+ansible-lint:
+  stage: lint
+  image: registry.gitlab.com/pipeline-components/ansible-lint:latest
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - metal/**/*
+  script:
+    - ansible-lint --show-relpath metal

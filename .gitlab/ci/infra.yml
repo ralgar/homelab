@@ -1,0 +1,137 @@
+---
+spec:
+  inputs:
+    deployment:
+      description: Name of the deployment (`infra/deployments/?`) to manage.
+      type: string
+    environment:  # Can't sanitize input due to GitLab restrictions, but MUST conform.
+      description: Name of the environment to deploy (prod, or dev-*).
+      type: string
+---
+variables:
+  TF_VERSION: 1.2.6
+  TF_BOOTSTRAP: ${CI_PROJECT_DIR}/infra/bootstrap
+  TF_ROOT: ${CI_PROJECT_DIR}/infra/deployments/$[[ inputs.deployment ]]
+  TF_STATE_NAME: $[[ inputs.deployment ]]-$[[ inputs.environment ]]
+  TF_VAR_deployment: $[[ inputs.deployment ]]
+  TF_VAR_environment: $[[ inputs.environment ]]
+  TF_VAR_gitops_repo: ${CI_PROJECT_URL}.git
+
+default:
+  tags:
+    - openstack
+  interruptible: true
+
+stages:
+  - prepare
+  - lint
+  - build
+  - deploy
+  - cleanup
+
+cache:
+  key: "$CI_COMMIT_REF_NAME"
+  paths:
+    - infra/deployments/$[[ inputs.deployment ]]/.terraform/
+
+terraform:init:
+  stage: prepare
+  image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:${TF_VERSION}
+  rules:
+    - when: always
+  script:
+    - gitlab-terraform init
+
+terraform:validate:
+  stage: lint
+  image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:${TF_VERSION}
+  rules:
+    - if: '"$[[ inputs.environment | expand_vars ]]" != "prod"'
+  script:
+    - gitlab-terraform validate
+
+terraform:plan:
+  stage: build
+  image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:${TF_VERSION}
+  rules:
+    - when: always
+  variables:
+    TF_STATE_NAME: $[[ inputs.deployment ]]-prod  # We always want to plan against prod
+    TF_VAR_environment: prod
+  before_script:  # Create the prod project/tenant first
+    - export TF_ROOT="${TF_BOOTSTRAP}"
+    - export TF_STATE_NAME="$[[ inputs.deployment ]]-prod-bootstrap"
+    - gitlab-terraform plan -var openstack_clouds_file=${OS_CLOUDS}
+    - gitlab-terraform apply
+  script:         # Then plan against it
+    - export TF_ROOT="${CI_PROJECT_DIR}/infra/deployments/$[[ inputs.deployment ]]"
+    - export TF_STATE_NAME="$[[ inputs.deployment ]]-prod"
+    - gitlab-terraform plan -var openstack_clouds_file=${OS_CLOUDS} -var-file=${TF_VARS_FILE}
+    - gitlab-terraform plan-json
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - ${TF_ROOT}/plan.cache
+    reports:
+      terraform: ${TF_ROOT}/plan.json
+
+terraform:apply:
+  stage: deploy
+  image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:${TF_VERSION}
+  rules:
+    - if: '"$[[ inputs.environment | expand_vars ]]" == "prod"'
+      when: manual
+      allow_failure: true  # true for non-blocking manual job
+  needs:
+    - job: terraform:plan   # Make sure we apply the plan as-is
+      artifacts: true
+  environment:
+    name: $[[ inputs.deployment ]]-$[[ inputs.environment ]]
+    action: start
+    on_stop: terraform:destroy
+    auto_stop_in: never
+  before_script:  # Create the project/tenant first
+    - export TF_ROOT="${TF_BOOTSTRAP}"
+    - export TF_STATE_NAME="$[[ inputs.deployment ]]-$[[ inputs.environment ]]-bootstrap"
+    - gitlab-terraform plan -var openstack_clouds_file=${OS_CLOUDS}
+    - gitlab-terraform apply
+  script:         # Then create the deployment
+    - export TF_ROOT="${CI_PROJECT_DIR}/infra/deployments/$[[ inputs.deployment ]]"
+    - export TF_STATE_NAME="$[[ inputs.deployment ]]-$[[ inputs.environment ]]"
+    - gitlab-terraform apply
+
+terraform:apply:dev:
+  extends: terraform:apply
+  needs:
+    - job: terraform:plan
+      artifacts: false     # We don't want the plan since this isn't prod
+  rules:
+    - if: '"$[[ inputs.environment | expand_vars ]]" != "prod"'
+      when: manual
+      allow_failure: true  # true for non-blocking manual job
+  environment:
+    name: $[[ inputs.deployment ]]-$[[ inputs.environment ]]
+    action: start
+    on_stop: terraform:destroy
+    auto_stop_in: 6 hours
+  script:
+    - export TF_ROOT="${CI_PROJECT_DIR}/infra/deployments/$[[ inputs.deployment ]]"
+    - export TF_STATE_NAME="$[[ inputs.deployment ]]-$[[ inputs.environment ]]"
+    - gitlab-terraform plan -var openstack_clouds_file=${OS_CLOUDS} -var-file=${TF_VARS_FILE}
+    - gitlab-terraform apply
+
+terraform:destroy:
+  stage: cleanup
+  image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:${TF_VERSION}
+  rules:
+    - when: manual
+      allow_failure: true  # true for non-blocking manual job
+  environment:
+    name: $[[ inputs.deployment ]]-$[[ inputs.environment ]]
+    action: stop
+  script:         # Destroy the deployment first
+    - gitlab-terraform destroy -var openstack_clouds_file=${OS_CLOUDS} -var-file=${TF_VARS_FILE}
+  after_script:   # Then destroy the project/tenant
+    - export TF_ROOT="${TF_BOOTSTRAP}"
+    - export TF_STATE_NAME="$[[ inputs.deployment ]]-$[[ inputs.environment ]]-bootstrap"
+    - gitlab-terraform destroy -var openstack_clouds_file=${OS_CLOUDS}

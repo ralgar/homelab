@@ -53,9 +53,10 @@ nav:
     - getting-started/deploy-openstack.md
     - getting-started/cicd-configuration.md
     - getting-started/windows-images.md
-  - Deployment Environments:
-    - environments/production.md
-    - environments/development.md
+  - Managing Deployments:
+    - deployments/introduction.md
+    - deployments/main.md
+    - deployments/main-k8s.md
   - Managing OpenStack:
     - Ceph:
       - Benchmarking: managing-openstack/ceph/benchmarking.md

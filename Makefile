@@ -1,4 +1,4 @@
-TF_ROOT  := ./infra/envs/dev
+TF_ROOT  := ./infra/deployments/main-k8s
 
 CURRENT_REF := $(shell git symbolic-ref HEAD)
 

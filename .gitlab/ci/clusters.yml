@@ -1,0 +1,14 @@
+---
+kube-linter:
+  stage: lint
+  image:
+    name: docker.io/stackrox/kube-linter:v0.6.5-alpine
+    entrypoint: [""]
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - .gitlab/ci/cluster.yml
+        - .kube-linter.yml
+        - cluster/**/*
+  script:
+    - /kube-linter lint cluster

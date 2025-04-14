@@ -9,7 +9,6 @@
   loop:
     - networks.yml
     - flavors.yml
-    - projects.yml
 
 - name: Check if the default CoreOS image exists in Glance
   openstack.cloud.image_info:

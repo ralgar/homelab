@@ -1,0 +1,30 @@
+---
+markdownlint:
+  stage: lint
+  image:
+    name: ghcr.io/igorshubovych/markdownlint-cli:v0.38.0
+    entrypoint: [""]
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - .gitlab/ci/docs.yml
+        - "**/*.md"
+  script:
+    - markdownlint "**/*.md"
+
+# Deploy to GitLab Pages using mkdocs
+pages:
+  stage: build
+  image:
+    name: docker.io/squidfunk/mkdocs-material:9
+    entrypoint: [""]
+  rules:
+    - if: $CI_COMMIT_TAG
+      changes:
+        - .gitlab/ci/docs.yml
+        - docs/**/*
+  script:
+    - mkdocs build --config-file docs/mkdocs.yml --site-dir ${CI_PROJECT_DIR}/public
+  artifacts:
+    paths:
+      - public

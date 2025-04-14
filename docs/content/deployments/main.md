@@ -1,11 +1,33 @@
-# Production
+# Deployment: main
 
-The Production environment is a single instance that runs on Fedora CoreOS.
+The `main` deployment is a single instance that runs on Fedora CoreOS.
  It's designed to be simple, secure, and low maintenance.
 
 ---
 
-## Deployment
+## Additional CI/CD variables
+
+See [Setting the CI/CD Variables](../getting-started/cicd-configuration.md/#setting-the-cicd-variables)
+ for additional information.
+
+1. Create a variable *file* named `TF_VARS_FILE`, with the following contents.
+
+    ```hcl title="TF_VARS_FILE"
+    domain = "<your-public-domain>"
+
+    restic_password = "<your-restic-repository-password>"
+
+    // See https://rclone.org/drive for setup documentation.
+    // NOTE: All double quotes within the token JSON string must be escaped.
+    gdrive_oauth = {
+      client_id = "<your-gdrive-client-id>"
+      client_secret = "<your-gdrive-client-secret>"
+      token = "<your-gdrive-oauth-token>"
+      root_folder_id = "<your-gdrive-root-folder-id>"
+    }
+    ```
+
+## Initial Deployment (Production)
 
 Now that we've completed all of the prerequisite steps, actually deploying the
  production environment is very simple.
@@ -19,7 +41,7 @@ First, we need to manually trigger the initial pipeline run.
 
 1. Select either the `main` branch, or the latest tagged version.
 
-    !!!note
+    !!! note
         While the main branch is the source of truth for this project, it may
         sometimes be in an undesirable state to fork from. Git tags are
         provided to denote stable points in the project's history, and are

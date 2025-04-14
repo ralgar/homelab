@@ -1,11 +1,10 @@
 # CI/CD Configuration
 
-The final step, before we can start deploying workloads, is to configure the
- CI/CD settings.
+Before we can start deploying we need to configure the CI/CD.
 
 !!! tip
-    This section is extremely important. If you do not configure the CI/CD
-    correctly, the pipelines will not run as intended.
+    This is extremely important. If you do not configure the CI/CD correctly,
+    the pipelines will not run as intended.
 
 ---
 
@@ -18,41 +17,44 @@ In your GitLab project, go to **Settings >> CI/CD**, and expand the
    `metal/output/clouds.yaml` file that was generated when deploying
    OpenStack.
 
-1. Create a variable *file* named `TF_VARS_FILE`, with the following contents.
-
-    ```hcl title="TF_VARS_FILE"
-    domain = "<your-public-domain>"
-
-    restic_password = "<your-restic-repository-password>"
-
-    // See https://rclone.org/drive for setup documentation.
-    // NOTE: All double quotes within the token JSON string must be escaped.
-    gdrive_oauth = {
-      client_id = "<your-gdrive-client-id>"
-      client_secret = "<your-gdrive-client-secret>"
-      token = "<your-gdrive-oauth-token>"
-      root_folder_id = "<your-gdrive-root-folder-id>"
-    }
-    ```
-
 ---
 
-## Merge Requests configuration
+## Deploying the GitLab Runner
 
-In your GitLab project, go to **Settings >> Merge Requests**.
+This step will deploy a local GitLab Runner, in a Docker container, directly
+ on the OpenStack host. This will be used to run CI/CD jobs within your
+ OpenStack environment.
 
-1. Set **Merge Method** to *Fast-forward Merge.*
+!!! warning "Security Risk"
+    Using a self-hosted runner can potentially be dangerous. If a malicious actor
+    were to open a Merge Request containing exploit code, they could potentially
+    execute that code on your OpenStack host. To counter this risk, you should
+    adjust your repository settings so that untrusted users cannot run CI jobs
+    without explicit approval.
 
-1. Set **Squash Merging** to *Require.*
+1. Create a new Runner in your GitLab repository settings, with the tag
+   `openstack`, and set the token environment variable on your local system.
 
-1. Under **Merge Checks**, enable *Pipelines must succeed.*
-
-1. Set the **Squash commit message template**, like so.
-
-    ```conf
-    %{title}
-
-    %{description}
-
-    MR: %{url}
+    ```sh
+    export GITLAB_RUNNER_TOKEN=<your-gitlab-runner-token>
     ```
+
+1. Go back to the *Runners* page, find the ID number of the runner, and set
+   the ID environment variable on your local system.
+
+    !!! tip
+        The ID number will be in the format `#12345678`. Do NOT include the hash
+        sign when setting the variable, only the digits.
+
+    ```sh
+    export GITLAB_RUNNER_ID=<your-gitlab-runner-id>
+    ```
+
+1. Run `99-gitlab-runner.yml` against your OpenStack host.
+
+    ```sh
+    ansible-playbook -i <node-ip-address>, 99-gitlab-runner.yml
+    ```
+
+1. Refresh the *Runners* page in GitLab, and make sure your new runner has
+   connected.

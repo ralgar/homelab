@@ -8,10 +8,14 @@ variable "domain" {
   type        = string
 }
 
+variable "deployment" {
+  description = "Name of the deployment. Should correspond to the name of the current directory."
+  type = string
+}
+
 variable "environment" {
   description = "Deployment environment (prod, staging, or dev)."
   type        = string
-  default     = "prod"
 }
 
 // Production Server Variables

@@ -1,14 +1,23 @@
-# Development (K8s)
+# Deployment: main-k8s (WIP)
 
-The included Kubernetes cluster is currently in development (beta status), and
- resides in the development environment. It will be migrated into production
- starting with `v3.0.0`.
+The `main-k8s` deployment is a WIP migration of the `main` deployment to
+ Kubernetes, and is not intended for most users. It is not currently deployed
+ using CI/CD, but relies on the `Makefile` included in the project root.
 
 ---
 
 ## Deployment
 
-1. Set the following environment variables.
+1. Create a new OpenStack project called `main-k8s`, and increase the default
+   volume and snapshot quotas for it.
+
+    ```sh
+    openstack project create main-k8s
+    openstack quota set --volumes 25 main-k8s
+    openstack quota set --snapshots 25 main-k8s
+    ```
+
+1. Set the following environment variables on your local machine.
 
     ```sh
     export GOOGLE_CREDENTIALS=/path/to/gcloud/credentials.json
@@ -63,7 +72,7 @@ Apps are deployed to the cluster by use of the `cluster` directory.
 ## Destroying the environment
 
 !!!warning
-    The dev environment is completely ephemeral. Destroying it will delete
+    The environment is completely ephemeral. Destroying it will delete
     everything, including backups.
 
 To completely destroy the development infrastructure:

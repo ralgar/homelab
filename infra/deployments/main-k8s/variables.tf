@@ -13,7 +13,7 @@ variable "domain" {
 variable "environment" {
   description = "Deployment environment (prod, staging, or dev)."
   type        = string
-  default     = "dev"
+  default     = "main-k8s"
 }
 
 variable "gitlab_project" {

@@ -26,5 +26,5 @@ provider "openstack" {
   user_domain_name    = sensitive(local.openstack_auth.user_domain_name)
   user_name           = sensitive(local.openstack_auth.username)
   password            = sensitive(local.openstack_auth.password)
-  tenant_name         = var.environment
+  tenant_name         = "${var.deployment}-${var.environment}"
 }

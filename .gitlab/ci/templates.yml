@@ -1,0 +1,19 @@
+---
+packer:validate:
+  stage: lint
+  image:
+    name: docker.io/hashicorp/packer:1.11
+    entrypoint: [""]
+  variables:
+    PACKER_PLUGIN_PATH: ${CI_PROJECT_DIR}/.packer/plugins
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - .gitlab/ci/templates.yml
+        - templates/**/*
+  before_script:
+    - apk add ansible
+  script:
+    - cd templates
+    - packer init .
+    - packer validate .

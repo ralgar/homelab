@@ -5,8 +5,7 @@ This project provides Packer templates for automating the creation of
  function just like Linux cloud images, offering built-in support for SSH
  access using public key authentication.
 
-These are completely optional, and not required for using the
- [Deployment Environments](../environments/production.md).
+These are completely optional, and not currently used in any deployments.
 
 ---
 
