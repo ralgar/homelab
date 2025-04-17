@@ -13,5 +13,5 @@ data "openstack_compute_keypair_v2" "admin" {
 }
 
 data "openstack_identity_project_v3" "prod" {
-  name = "${var.deployment}-prod"
+  name = var.deployment
 }

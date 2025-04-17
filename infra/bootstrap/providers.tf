@@ -1,11 +1,11 @@
 # Define required providers
 terraform {
-required_version = ">= 1.0"
+  required_version = ">= 1.0"
   backend "http" {}
   required_providers {
     openstack = {
       source  = "terraform-provider-openstack/openstack"
-      version = "~> 1.52.1"
+      version = "~> 3.0.0"
     }
   }
 }
