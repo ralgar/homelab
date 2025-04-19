@@ -1,0 +1,8 @@
+---
+- name: Copy over 'glance-image-import.conf'
+  ansible.builtin.copy:
+    src: glance-image-import.conf
+    dest: /etc/kolla/config/glance/glance-image-import.conf
+    owner: root
+    group: root
+    mode: 0644
