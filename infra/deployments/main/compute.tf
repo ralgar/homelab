@@ -1,6 +1,6 @@
 module "fcos" {
   source       = "../../modules/openstack/fcos-mediasrv"
-  fcos_version = 39
+  fcos_version = 41
 
   keypair = data.openstack_compute_keypair_v2.admin
 

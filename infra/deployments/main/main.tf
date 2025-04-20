@@ -4,7 +4,7 @@ data "openstack_networking_network_v2" "prod" {
 }
 
 data "openstack_networking_network_v2" "dev" {
-  name     = "dmz2"
+  name     = "dmz1"
   external = true
 }
 
