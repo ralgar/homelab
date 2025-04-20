@@ -34,7 +34,7 @@ cache:
   paths:
     - infra/deployments/$[[ inputs.deployment ]]/.terraform/
 
-terraform:init:
+$[[ inputs.deployment | expand_vars ]]:init:
   stage: prepare
   image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:${TF_VERSION}
   rules:
@@ -42,7 +42,7 @@ terraform:init:
   script:
     - gitlab-terraform init
 
-terraform:validate:
+$[[ inputs.deployment | expand_vars ]]:validate:
   stage: lint
   image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:${TF_VERSION}
   rules:
@@ -50,7 +50,7 @@ terraform:validate:
   script:
     - gitlab-terraform validate
 
-terraform:plan:
+$[[ inputs.deployment | expand_vars ]]:plan:
   stage: build
   image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:${TF_VERSION}
   rules:
@@ -75,7 +75,7 @@ terraform:plan:
     reports:
       terraform: ${TF_ROOT}/plan.json
 
-terraform:apply:
+$[[ inputs.deployment | expand_vars ]]:apply:
   stage: deploy
   image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:${TF_VERSION}
   rules:
@@ -83,12 +83,12 @@ terraform:apply:
       when: manual
       allow_failure: true  # true for non-blocking manual job
   needs:
-    - job: terraform:plan   # Make sure we apply the plan as-is
+    - job: $[[ inputs.deployment | expand_vars ]]:plan   # Make sure we apply the plan as-is
       artifacts: true
   environment:
     name: $[[ inputs.deployment ]]-$[[ inputs.environment ]]
     action: start
-    on_stop: terraform:destroy
+    on_stop: $[[ inputs.deployment | expand_vars ]]:destroy
     auto_stop_in: never
   before_script:  # Create the project/tenant first
     - export TF_ROOT="${TF_BOOTSTRAP}"
@@ -100,10 +100,10 @@ terraform:apply:
     - export TF_STATE_NAME="$[[ inputs.deployment ]]-$[[ inputs.environment ]]"
     - gitlab-terraform apply
 
-terraform:apply:dev:
-  extends: terraform:apply
+$[[ inputs.deployment | expand_vars ]]:apply:dev:
+  extends: $[[ inputs.deployment | expand_vars ]]:apply
   needs:
-    - job: terraform:plan
+    - job: $[[ inputs.deployment | expand_vars ]]:plan
       artifacts: false     # We don't want the plan since this isn't prod
   rules:
     - if: '"$[[ inputs.environment | expand_vars ]]" != "prod"'
@@ -112,7 +112,7 @@ terraform:apply:dev:
   environment:
     name: $[[ inputs.deployment ]]-$[[ inputs.environment ]]
     action: start
-    on_stop: terraform:destroy
+    on_stop: $[[ inputs.deployment | expand_vars ]]:destroy
     auto_stop_in: 6 hours
   script:
     - export TF_ROOT="${CI_PROJECT_DIR}/infra/deployments/$[[ inputs.deployment ]]"
@@ -120,7 +120,7 @@ terraform:apply:dev:
     - gitlab-terraform plan -var openstack_clouds_file=${OS_CLOUDS} -var-file=${TF_VARS_FILE}
     - gitlab-terraform apply
 
-terraform:destroy:
+$[[ inputs.deployment | expand_vars ]]:destroy:
   stage: cleanup
   image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:${TF_VERSION}
   rules:

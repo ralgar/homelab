@@ -1,0 +1,15 @@
+---
+- name: Ensure the '/etc/kolla/config/neutron' directory exists
+  ansible.builtin.file:
+    path: /etc/kolla/config/neutron
+    state: directory
+    mode: '0750'
+
+- name: Enable VLANs on physnet1
+  ansible.builtin.template:
+    src: neutron/ml2_conf.ini.j2
+    dest: /etc/kolla/config/neutron/ml2_conf.ini
+    owner: root
+    group: root
+    mode: '0640'
+  when: external_networks.type == 'vlan'

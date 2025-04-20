@@ -1,7 +1,0 @@
----
-- name: Restart 'neutron-server'
-  community.docker.docker_container:
-    name: neutron_server
-    state: healthy
-    restart: true
-  listen: restart_neutron_server

@@ -20,4 +20,3 @@
     - openstack/manila
     - openstack/designate
     - openstack/octavia
-    - openstack/defaults

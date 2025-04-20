@@ -8,6 +8,11 @@ This project manages deployments using dynamic GitLab CI/CD pipelines, enabling
 This approach ensures safe, scalable testing and validation of infrastructure
  changes before they are promoted to production.
 
+!!! tip
+    With any of the provided deployments, it is highly likely that you'll need to
+    start by opening a Merge Request and configuring the networks to match your
+    environment. Shared networks are defined in the 'admin' deployment.
+
 ---
 
 ## Deployments

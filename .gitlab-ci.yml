@@ -31,7 +31,7 @@ include:
 
 # We define the deployments here.
 .deployment_matrix: &deployments
-  - DEPLOYMENT: ['main']
+  - DEPLOYMENT: ['admin', 'main']
 
 # Spawn a parallel matrix of Child Pipelines using the 'deployment_matrix'.
 # Deploys to production.
@@ -42,7 +42,7 @@ infra:prod:
     include:
       - local: .gitlab/ci/infra.yml
         inputs:
-          deployment: "${DEPLOYMENT}"
+          deployment: ${DEPLOYMENT}
           environment: prod
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE != "web"
@@ -50,7 +50,6 @@ infra:prod:
         - infra/deployments/${DEPLOYMENT}/**/*
         - infra/modules/**/*
         - .gitlab/ci/terraform.yml
-        - .gitlab-ci.yml
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "web"
   parallel:
     matrix: *deployments
@@ -64,7 +63,7 @@ infra:dev:
     include:
       - local: .gitlab/ci/infra.yml
         inputs:
-          deployment: "${DEPLOYMENT}"
+          deployment: ${DEPLOYMENT}
           environment: dev-${CI_MERGE_REQUEST_IID}
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -72,6 +71,5 @@ infra:dev:
         - infra/deployments/${DEPLOYMENT}/**/*
         - infra/modules/**/*
         - .gitlab/ci/terraform.yml
-        - .gitlab-ci.yml
   parallel:
     matrix: *deployments

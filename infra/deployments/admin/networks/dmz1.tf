@@ -1,0 +1,25 @@
+resource "openstack_networking_network_v2" "dmz1" {
+  count          = var.environment == "prod" ? 1 : 0
+  name           = "dmz1"
+  admin_state_up = "true"
+
+  external = true
+  shared   = true
+
+  segments {
+    physical_network = "physnet1"
+    network_type     = "vlan"
+    segmentation_id  = 11
+  }
+}
+
+resource "openstack_networking_subnet_v2" "dmz1" {
+  count       = var.environment == "prod" ? 1 : 0
+  name        = "default"
+  network_id  = openstack_networking_network_v2.dmz1[0].id
+
+  cidr            = "10.254.11.0/30"
+  gateway_ip      = "10.254.11.1"
+  dns_nameservers = ["1.1.1.1", "1.0.0.1"]
+  enable_dhcp     = false
+}

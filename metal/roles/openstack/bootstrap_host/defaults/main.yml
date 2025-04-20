@@ -2,10 +2,14 @@
 # The OpenStack release to install. Must be a stable version.
 openstack_release: "2023.2"
 
+# Name (path) of the venv, using the root user's home as the base.
+# Ex. A value of 'kolla-venv' will become '/root/kolla-venv'
+kolla_venv: /root/kolla-venv
+
 # Whether we are running in a CI pipeline or not.
 # Toggles some additional configuration tasks.
 ci_pipeline: false
 
-# Name (path) of the venv, using the root user's home as the base.
-# Ex. A value of 'kolla-venv' will become '/root/kolla-venv'
-kolla_venv: /root/kolla-venv
+ci_pipeline_external_networks:
+  interface: eth1
+  type: flat                          # Must be one of 'flat' or 'vlan'.

@@ -55,6 +55,7 @@ nav:
     - getting-started/windows-images.md
   - Managing Deployments:
     - deployments/introduction.md
+    - deployments/admin.md
     - deployments/main.md
     - deployments/main-k8s.md
   - Managing OpenStack:

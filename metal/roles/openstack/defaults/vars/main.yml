@@ -1,4 +1,0 @@
----
-kolla_venv: "{{ common.kolla_venv }}"
-
-external_networks: "{{ ci_pipeline_external_networks if ci_pipeline else network.external }}"

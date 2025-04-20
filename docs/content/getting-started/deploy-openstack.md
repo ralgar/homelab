@@ -17,7 +17,7 @@ Before we begin deployment, we need to configure everything under the
     It is strongly recommended to use consistent identifiers to define
     your block devices, such as the WWN identifiers from `/dev/disk/by-id`.
 
-```yaml title="metal/vars/main.yml" hl_lines="7 11 14 34 44"
+```yaml title="metal/vars/main.yml" hl_lines="7 11 14 34 43"
 common:
   # Name (path) of the venv, using the root user's home as the base.
   # Ex. A value of 'kolla-venv' will become '/root/kolla-venv'
@@ -60,17 +60,10 @@ network:
   # Configure external provider network(s), where OpenStack can create
   #  publicly-accessible IP addresses for your infrastructure.
   # These should be internal DMZs, or public subnets assigned by your ISP.
-  # NOTE: If using VLANs, use a contiguous range (eg. 10-14 or 20-29).
   external:
     interface: eno2
-    type: vlan                          # Must be one of 'flat' or 'vlan'.
-    networks:
-      - name: public                    # Name to assign the network.
-        vlan_id: 10                     # Specify a VLAN ID.
-        network_cidr: 10.254.10.0/24    # Network address in CIDR notation.
-        gateway_addr: 10.254.10.1       # IP address of the default gateway.
-        dhcp_pool_start: 10.254.10.10   # Start IP of the DHCP pool.
-        dhcp_pool_end: 10.254.10.254    # End IP of the DHCP pool.
+    type: vlan                # Must be one of 'flat' or 'vlan'.
+    vlan_range: [1000, 2000]  # Range of VLANs for Neutron to be aware of.
 ```
 
 ---
@@ -126,3 +119,5 @@ network:
     ```
 
 **With that, your cloud platform should now be fully up and running!**
+
+Now it's time to move on to [deploying the 'admin' project](../deployments/admin.md).
