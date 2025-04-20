@@ -18,7 +18,7 @@ ExecStart=/usr/bin/podman run -d --rm --replace \
     --name jellyfin \
     --user 9023:9030 \
     -v /srv/jellyfin:/config:Z \
-    -v /mnt/library:/media/library:z \
+    -v /var/mnt/library:/media/library:z \
     --network proxy \
     docker.io/jellyfin/jellyfin:latest
 
