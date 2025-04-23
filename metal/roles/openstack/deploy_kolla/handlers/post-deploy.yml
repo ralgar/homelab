@@ -17,3 +17,16 @@
     block: |
       source {{ kolla_venv }}/bin/activate
       source /etc/kolla/admin-openrc.sh
+
+- name: Set Python interpreter to venv
+  ansible.builtin.set_fact:
+    ansible_python_interpreter: "{{ kolla_venv }}/bin/python"
+
+- name: Create 'admin' SSH public key
+  openstack.cloud.keypair:
+    name: admin
+    public_key: "{{ lookup('file', common.ssh_pubkey_file | mandatory) }}"
+    state: present
+    cloud: kolla-admin
+  environment:
+    OS_CLIENT_CONFIG_FILE: /etc/kolla/clouds.yaml
