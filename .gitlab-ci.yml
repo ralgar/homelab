@@ -49,7 +49,7 @@ infra:prod:
       changes:
         - infra/deployments/${DEPLOYMENT}/**/*
         - infra/modules/**/*
-        - .gitlab/ci/terraform.yml
+        - .gitlab/ci/infra.yml
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "web"
   parallel:
     matrix: *deployments
@@ -70,6 +70,6 @@ infra:dev:
       changes:
         - infra/deployments/${DEPLOYMENT}/**/*
         - infra/modules/**/*
-        - .gitlab/ci/terraform.yml
+        - .gitlab/ci/infra.yml
   parallel:
     matrix: *deployments

@@ -66,7 +66,7 @@ $[[ inputs.deployment | expand_vars ]]:plan:
   script:         # Then plan against it
     - export TF_ROOT="${CI_PROJECT_DIR}/infra/deployments/$[[ inputs.deployment ]]"
     - export TF_STATE_NAME="$[[ inputs.deployment ]]-prod"
-    - gitlab-terraform plan -var openstack_clouds_file=${OS_CLOUDS} -var-file=${TF_VARS_FILE}
+    - gitlab-terraform plan -var openstack_clouds_file=${OS_CLOUDS}
     - gitlab-terraform plan-json
   artifacts:
     expire_in: 1 hour
@@ -117,7 +117,7 @@ $[[ inputs.deployment | expand_vars ]]:apply:dev:
   script:
     - export TF_ROOT="${CI_PROJECT_DIR}/infra/deployments/$[[ inputs.deployment ]]"
     - export TF_STATE_NAME="$[[ inputs.deployment ]]-$[[ inputs.environment ]]"
-    - gitlab-terraform plan -var openstack_clouds_file=${OS_CLOUDS} -var-file=${TF_VARS_FILE}
+    - gitlab-terraform plan -var openstack_clouds_file=${OS_CLOUDS}
     - gitlab-terraform apply
 
 $[[ inputs.deployment | expand_vars ]]:destroy:
@@ -130,7 +130,7 @@ $[[ inputs.deployment | expand_vars ]]:destroy:
     name: $[[ inputs.deployment ]]-$[[ inputs.environment ]]
     action: stop
   script:         # Destroy the deployment first
-    - gitlab-terraform destroy -var openstack_clouds_file=${OS_CLOUDS} -var-file=${TF_VARS_FILE}
+    - gitlab-terraform destroy -var openstack_clouds_file=${OS_CLOUDS}
   after_script:   # Then destroy the project/tenant
     - export TF_ROOT="${TF_BOOTSTRAP}"
     - export TF_STATE_NAME="$[[ inputs.deployment ]]-$[[ inputs.environment ]]-bootstrap"
