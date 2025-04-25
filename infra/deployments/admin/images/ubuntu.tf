@@ -18,4 +18,11 @@ resource "openstack_images_image_v2" "ubuntu_2404_2025_04_03" {
 
     cinder_img_volume_type = "PREMIUM"
   }
+
+  // Ignore when Glance converts the image to RAW format
+  lifecycle {
+    ignore_changes = [
+      disk_format
+    ]
+  }
 }
