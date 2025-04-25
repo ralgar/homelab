@@ -12,4 +12,5 @@ data "ignition_systemd_unit" "swag" {
     domain      = var.domain
     staging     = var.environment == "staging" ? "true" : "false"
   })
+  enabled = false
 }

@@ -19,6 +19,7 @@ data "ignition_config" "output" {
   ]
 
   systemd = [
+    data.ignition_systemd_unit.containers.rendered,
     data.ignition_systemd_unit.hass.rendered,
     data.ignition_systemd_unit.jellyfin.rendered,
     data.ignition_systemd_unit.jellyseerr.rendered,

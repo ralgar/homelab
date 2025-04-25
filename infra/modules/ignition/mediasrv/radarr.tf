@@ -9,4 +9,5 @@ data "ignition_directory" "radarr" {
 data "ignition_systemd_unit" "radarr" {
   name    = "radarr.service"
   content = file("${path.module}/files/radarr.service")
+  enabled = false
 }

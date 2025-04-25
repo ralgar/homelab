@@ -9,4 +9,5 @@ data "ignition_directory" "jellyseerr" {
 data "ignition_systemd_unit" "jellyseerr" {
   name    = "jellyseerr.service"
   content = file("${path.module}/files/jellyseerr.service")
+  enabled = false
 }

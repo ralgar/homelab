@@ -9,4 +9,5 @@ data "ignition_directory" "prowlarr" {
 data "ignition_systemd_unit" "prowlarr" {
   name    = "prowlarr.service"
   content = file("${path.module}/files/prowlarr.service")
+  enabled = false
 }

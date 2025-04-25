@@ -1,0 +1,10 @@
+[Unit]
+Description=Backup all Autorestic locations
+Wants=network-online.target packages.service
+After=network-online.target packages.service
+
+[Service]
+Type=oneshot
+Environment=XDG_CACHE_HOME=/root/.cache
+ExecStartPre=systemd-inhibit /usr/bin/autorestic check
+ExecStart=systemd-inhibit /usr/bin/autorestic backup -a

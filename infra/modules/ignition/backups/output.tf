@@ -1,16 +1,12 @@
 data "ignition_config" "output" {
   files = [
-    data.ignition_file.backup_script.rendered,
-    data.ignition_file.etc_environment.rendered,
-    data.ignition_file.etc_profiled_restic.rendered,
-    data.ignition_file.rclone_config.rendered,
-    data.ignition_file.restic_password.rendered,
+    data.ignition_file.autorestic_config.rendered,
   ]
 
   systemd = [
     data.ignition_systemd_unit.packages.rendered,
-    data.ignition_systemd_unit.restic_service.rendered,
-    data.ignition_systemd_unit.restic_timer.rendered,
+    data.ignition_systemd_unit.autorestic_service.rendered,
+    data.ignition_systemd_unit.autorestic_timer.rendered,
   ]
 }
 

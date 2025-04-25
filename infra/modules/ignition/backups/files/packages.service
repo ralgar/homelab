@@ -15,7 +15,7 @@ RemainAfterExit=yes
 # added to the root image in a future Fedora CoreOS release as it will
 # prevent the service from failing.
 ExecStart=/usr/bin/rpm-ostree install -y --apply-live --allow-inactive \
-    rclone \
+    autorestic \
     restic
 ExecStart=/bin/touch /var/lib/%N.stamp
 

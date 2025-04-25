@@ -9,4 +9,5 @@ data "ignition_directory" "hass" {
 data "ignition_systemd_unit" "hass" {
   name    = "hass.service"
   content = file("${path.module}/files/hass.service")
+  enabled = false
 }

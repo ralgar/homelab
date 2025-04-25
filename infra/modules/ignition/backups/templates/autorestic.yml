@@ -1,0 +1,32 @@
+---
+version: 2
+
+locations:
+  container_data:
+    from:
+      - /var/srv
+    to:
+      - backblaze
+    forget: prune
+    options:
+      forget:
+        keep-daily: 7       # Keep 7 last daily snapshots
+        keep-weekly: 4      # Keep 4 last weekly snapshots
+        keep-monthly: 12    # Keep 12 last monthly snapshots
+    hooks:
+      prevalidate:
+        # Stop containers first so we get consistent data
+        - systemctl stop containers.target
+      success:
+        - systemctl start containers.target
+      failure:
+        - systemctl start containers.target
+
+backends:
+  backblaze:
+    type: b2
+    path: ${backblaze_bucket}:/fcos
+    key: ${restic_password}
+    env:
+      B2_ACCOUNT_ID: ${backblaze_account_id}
+      B2_ACCOUNT_KEY: ${backblaze_account_key}

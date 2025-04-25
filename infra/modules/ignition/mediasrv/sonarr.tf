@@ -9,4 +9,5 @@ data "ignition_directory" "sonarr" {
 data "ignition_systemd_unit" "sonarr" {
   name    = "sonarr.service"
   content = file("${path.module}/files/sonarr.service")
+  enabled = false
 }

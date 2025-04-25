@@ -3,6 +3,7 @@ Description=Sonarr Container
 Documentation=man:podman-generate-systemd(1)
 Wants=podman-networks.service
 After=podman-networks.service
+PartOf=containers.target
 RequiresMountsFor=%t/containers
 
 [Service]
@@ -32,4 +33,4 @@ Type=notify
 NotifyAccess=all
 
 [Install]
-WantedBy=default.target
+WantedBy=containers.target

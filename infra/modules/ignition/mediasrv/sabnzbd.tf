@@ -17,4 +17,5 @@ data "ignition_directory" "usenet" {
 data "ignition_systemd_unit" "sabnzbd" {
   name    = "sabnzbd.service"
   content = file("${path.module}/files/sabnzbd.service")
+  enabled = false
 }

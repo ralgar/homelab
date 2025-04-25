@@ -9,4 +9,5 @@ data "ignition_directory" "mosquitto" {
 data "ignition_systemd_unit" "mosquitto" {
   name    = "mosquitto.service"
   content = file("${path.module}/files/mosquitto.service")
+  enabled = false
 }

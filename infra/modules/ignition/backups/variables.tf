@@ -2,17 +2,25 @@ variable "environment" {
   type = string
 }
 
+variable "backblaze_bucket" {
+  description = "Name of the Backblaze bucket."
+  type        = string
+  sensitive   = true
+}
+
+variable "backblaze_account_id" {
+  description = "ID of the Backblaze account."
+  type        = string
+  sensitive   = true
+}
+
+variable "backblaze_account_key" {
+  description = "Key (secret) for the Backblaze account."
+  type        = string
+  sensitive   = true
+}
+
 variable "restic_password" {
   description = "Password for the Restic backup repo."
   type        = string
-}
-
-variable "gdrive_oauth" {
-  description = "OAuth credentials for Google Drive (see https://rclone.org/drive)."
-  type = object({
-    client_id = string
-    client_secret = string
-    token = string
-    root_folder_id = string
-  })
 }

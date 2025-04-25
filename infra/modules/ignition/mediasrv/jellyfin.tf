@@ -17,4 +17,5 @@ data "ignition_directory" "library" {
 data "ignition_systemd_unit" "jellyfin" {
   name    = "jellyfin.service"
   content = file("${path.module}/files/jellyfin.service")
+  enabled = false
 }

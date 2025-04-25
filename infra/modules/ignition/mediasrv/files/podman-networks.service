@@ -9,4 +9,4 @@ RemainAfterExit=yes
 ExecStart=/usr/bin/podman network create --ignore proxy
 
 [Install]
-WantedBy=default.target
+WantedBy=containers.target

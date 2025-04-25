@@ -6,10 +6,13 @@ module "base" {
 }
 
 module "backups" {
-  source          = "../../ignition/backups"
-  environment     = var.environment
-  restic_password = var.restic_password
-  gdrive_oauth    = var.gdrive_oauth
+  source      = "../../ignition/backups"
+  environment = var.environment
+
+  backblaze_account_id  = var.backblaze_account_id
+  backblaze_account_key = var.backblaze_account_key
+  backblaze_bucket      = var.backblaze_bucket
+  restic_password       = var.restic_password
 }
 
 module "mediasrv" {
