@@ -7,25 +7,18 @@ The `main` deployment is a single instance that runs on Fedora CoreOS.
 
 ## Additional CI/CD variables
 
-See [Setting the CI/CD Variables](../getting-started/cicd-configuration.md/#setting-the-cicd-variables)
+See [Setting CI/CD Variables](../getting-started/cicd-configuration.md/#setting-cicd-variables)
  for additional information.
 
-1. Create a variable *file* named `TF_VARS_FILE`, with the following contents.
+1. Create/set the following *masked* variables in GitLab CI.
 
-    ```hcl title="TF_VARS_FILE"
-    domain = "<your-public-domain>"
-
-    restic_password = "<your-restic-repository-password>"
-
-    // See https://rclone.org/drive for setup documentation.
-    // NOTE: All double quotes within the token JSON string must be escaped.
-    gdrive_oauth = {
-      client_id = "<your-gdrive-client-id>"
-      client_secret = "<your-gdrive-client-secret>"
-      token = "<your-gdrive-oauth-token>"
-      root_folder_id = "<your-gdrive-root-folder-id>"
-    }
-    ```
+    | **Key**                        | **Description**                                           |
+    |--------------------------------|-----------------------------------------------------------|
+    | `TF_VAR_backblaze_account_id`  | Backblaze application credential (account ID).            |
+    | `TF_VAR_backblaze_account_key` | Backblaze applicationcredential (secret key).             |
+    | `TF_VAR_backblaze_bucket`      | Name of a bucket to use for backups (must exist already). |
+    | `TF_VAR_domain`                | A DNS Zone that you control.                              |
+    | `TF_VAR_restic_password`       | A strong password for backup encryption.                  |
 
 ## Initial Deployment (Production)
 

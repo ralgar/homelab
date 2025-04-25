@@ -2,20 +2,31 @@
 
 Before we can start deploying we need to configure the CI/CD.
 
-!!! tip
-    This is extremely important. If you do not configure the CI/CD correctly,
-    the pipelines will not run as intended.
-
 ---
 
-## Setting the CI/CD variables
+## Setting CI/CD variables
 
 In your GitLab project, go to **Settings >> CI/CD**, and expand the
  **Variables** section.
 
-1. Create a variable *file* named `OS_CLOUDS`, with the contents of your
-   `metal/output/clouds.yaml` file that was generated when deploying
-   OpenStack.
+!!! tip "Tip (Optional)"
+    You can scope variables to a specific deployment or deployment
+    environment by setting a wildcard like `main-*`, or a full environment
+    name like `main-prod`, for the **Environment** parameter.
+
+!!! warning "Security Risk"
+    Make sure you set the visibility of sensitive variables to *Masked*,
+    othewise they could appear in the CI logs!
+
+### OpenStack Credentials
+
+The most important value to set is the OpenStack credentials file, which will
+ allow your CI pipelines to authenticate and manage resources in your
+ OpenStack cloud.
+
+- Create a **variable file** named `OS_CLOUDS`, with the contents of your
+  `metal/output/clouds.yaml` file that was generated when deploying
+  OpenStack.
 
 ---
 

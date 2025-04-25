@@ -59,7 +59,7 @@ You can use any hardware you like, however, provided it meets the following
 You'll also need the following:
 
 - A GitLab account
-- A Google account (for off-site backups)
+- A Backblaze account (for off-site backups)
 - A Cloudflare account and ownership of a second-level domain (like `example.com`)
 
 ---
