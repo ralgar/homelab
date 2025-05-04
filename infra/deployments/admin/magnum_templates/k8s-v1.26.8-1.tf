@@ -1,5 +1,7 @@
 resource "openstack_containerinfra_clustertemplate_v1" "k8s_1_26_8_1" {
-  name                  = "Kubernetes v1.26.8-1"
+  name   = "Kubernetes v1.26.8-1"
+  public = true
+
   image                 = data.openstack_images_image_v2.fcos_41_latest.id
   coe                   = "kubernetes"
   dns_nameserver        = "1.1.1.1"
