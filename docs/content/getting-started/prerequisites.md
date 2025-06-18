@@ -72,6 +72,7 @@ You'll need to install a few dependencies on your local system.
 
 - [Ansible](https://www.ansible.com/)
     - [python-netaddr](https://pypi.org/project/netaddr)
+- [Podman](https://podman.io/)
 - [Terraform](https://www.terraform.io/)
 - [kubectl](https://kubernetes.io/docs/reference/kubectl/)
 
