@@ -85,11 +85,6 @@ network:
 1. Boot the ISO, and wait for the automated installer to finish (the system
    will reboot).
 
-    !!! bug
-        At the GRUB boot menu, you will need to press **e** to edit the kernel
-        command line, and append `inst.ks=hd:LABEL=Rocky-9-0-x86_64-dvd:/ks.cfg`
-        after `quiet`. Then, press **Ctrl-x** to continue.
-
 1. After it has finished rebooting, SSH into your new node to confirm that
    it's ready.
 
