@@ -8,6 +8,9 @@
     user: 9999:{{ docker_group.gid }}
     network_mode: host
     volumes:
+      # I'm aware of how stupid this is. Blame GitLab for being unable to
+      #  stick to a single directory for runner config.
       - /etc/gitlab-runner:/.gitlab-runner
+      - /etc/gitlab-runner:/home/gitlab-runner
       - /var/run/docker.sock:/var/run/docker.sock
   listen: recreate_container
