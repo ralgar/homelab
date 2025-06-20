@@ -99,3 +99,8 @@
         Get-Content -Path log.txt
         Remove-Item -Path cloudbaseinit.msi
         Remove-Item -Path log.txt
+
+    - name: Run Sysprep to generalize the image
+      win_shell: |
+        $unattendFile = Join-Path $env:ProgramFiles "Cloudbase Solutions\Cloudbase-Init\conf\Unattend.xml"
+        & $env:SystemRoot\System32\Sysprep\Sysprep.exe /oobe /generalize /mode:vm /quit /quiet /unattend:$unattendFile
