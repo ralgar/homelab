@@ -27,7 +27,7 @@ resource "openstack_dns_recordset_v2" "env" {
   name    = local.environment_domain
   type    = "A"
   records = [module.fcos.ipv4_address]
-  ttl     = 1
+  ttl     = 3600
 }
 
 resource "openstack_dns_recordset_v2" "env_wildcard" {
@@ -38,5 +38,5 @@ resource "openstack_dns_recordset_v2" "env_wildcard" {
   name    = "*.${openstack_dns_recordset_v2.env.name}"
   type    = "CNAME"
   records = [openstack_dns_recordset_v2.env.name]
-  ttl     = 1
+  ttl     = 3600
 }
