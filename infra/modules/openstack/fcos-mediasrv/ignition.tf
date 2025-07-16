@@ -2,7 +2,6 @@ module "base" {
   source  = "../../ignition/base"
   keypair = var.keypair
   domain  = var.domain
-  subnet  = data.openstack_networking_subnet_v2.default
 }
 
 module "backups" {
