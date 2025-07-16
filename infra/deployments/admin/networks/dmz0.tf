@@ -21,7 +21,7 @@ resource "openstack_networking_subnet_v2" "dmz0" {
   cidr            = "10.254.10.0/24"
   gateway_ip      = "10.254.10.1"
   dns_nameservers = ["1.1.1.1", "1.0.0.1"]
-  enable_dhcp     = false
+  enable_dhcp     = true
 
   allocation_pool {
     start = "10.254.10.10"
