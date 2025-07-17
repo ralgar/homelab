@@ -1,7 +1,6 @@
 # Define required providers
 terraform {
 required_version = ">= 1.0"
-  backend "http" {}
   required_providers {
     ignition = {
       source = "community-terraform-providers/ignition"

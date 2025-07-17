@@ -2,39 +2,16 @@ variable "fcos_version" {
   description = "Desired major version of the instance image"
   type        = number
 }
+variable "domain" {}
 variable "keypair" {}
 variable "network" {}
-variable "data_volume" {}
-variable "media_volume" {}
 
-variable "environment" {
-  type = string
+variable "ignition_configs" {
+  type        = list(any)
+  description = "List of ignition configs to apply to the instance."
 }
 
-variable "domain" {
-  type = string
-}
-
-// Backup credentials
-variable "backblaze_bucket" {
-  description = "Name of the Backblaze bucket."
-  type        = string
-  sensitive   = true
-}
-
-variable "backblaze_account_id" {
-  description = "ID of the Backblaze account."
-  type        = string
-  sensitive   = true
-}
-
-variable "backblaze_account_key" {
-  description = "Key (secret) for the Backblaze account."
-  type        = string
-  sensitive   = true
-}
-
-variable "restic_password" {
-  description = "Password for the Restic backup repo."
-  type        = string
+variable "volumes" {
+  type        = list(any)
+  description = "List of block storage volumes to attach to the instance."
 }

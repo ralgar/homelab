@@ -13,7 +13,6 @@ resource "openstack_compute_instance_v2" "fcos" {
   flavor_name         = "m1.large"
   key_pair            = var.keypair.name
   user_data           = data.ignition_config.final.rendered
-  config_drive        = true
   stop_before_destroy = true
 
   block_device {
@@ -26,22 +25,16 @@ resource "openstack_compute_instance_v2" "fcos" {
     delete_on_termination = true
   }
 
-  block_device {
-    uuid                  = var.data_volume.id
-    source_type           = "volume"
-    destination_type      = "volume"
-    boot_index            = -1
-    delete_on_termination = false
-    multiattach           = true
-  }
-
-  block_device {
-    uuid                  = var.media_volume.id
-    source_type           = "volume"
-    destination_type      = "volume"
-    boot_index            = -1
-    delete_on_termination = false
-    multiattach           = true
+  // Attach additional block devices
+  dynamic "block_device" {
+    for_each = var.volumes
+    content {
+      uuid                  = block_device.value.id
+      source_type           = "volume"
+      destination_type      = "volume"
+      boot_index            = -1
+      delete_on_termination = false
+    }
   }
 
   network {
