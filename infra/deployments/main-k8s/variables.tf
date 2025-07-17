@@ -8,7 +8,6 @@ variable "domain" {
   description = "A public domain that you own (ex: mydomain.com)"
   type        = string
   default     = "cluster.internal"
-  sensitive   = true
 }
 
 variable "environment" {
@@ -25,7 +24,6 @@ variable "gitlab_project" {
 variable "gitlab_token" {
   description = "GitLab Personal Access Token (PAT) or CI Job Token (may have permission issues)."
   type        = string
-  sensitive   = true
 }
 
 variable "gitops_repo" {

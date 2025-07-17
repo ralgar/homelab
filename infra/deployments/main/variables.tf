@@ -6,7 +6,6 @@ variable "openstack_clouds_file" {
 variable "domain" {
   description = "A public domain that you own (ex: mydomain.com)"
   type        = string
-  sensitive   = true
 }
 
 variable "deployment" {
@@ -41,5 +40,4 @@ variable "backblaze_account_key" {
 variable "restic_password" {
   description = "Password for the Restic backup repo."
   type        = string
-  sensitive   = true
 }
