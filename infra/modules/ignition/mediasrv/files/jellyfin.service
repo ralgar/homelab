@@ -21,7 +21,7 @@ ExecStart=/usr/bin/podman run -d --rm --replace \
     -v /srv/jellyfin:/config:Z \
     -v /var/mnt/library:/media/library:z \
     --network proxy \
-    docker.io/jellyfin/jellyfin:latest
+    ghcr.io/jellyfin/jellyfin:10.10
 
 ExecStop=/usr/bin/podman stop --ignore -t 10 --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore -t 10 --cidfile=%t/%n.ctr-id
