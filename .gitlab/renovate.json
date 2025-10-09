@@ -2,12 +2,6 @@
   "extends": ["config:recommended"],
   "prConcurrentLimit": 5,
   "prHourlyLimit": 5,
-  "flux": {
-    "fileMatch": ["cluster/.+\\.ya?ml$"]
-  },
-  "kubernetes": {
-    "fileMatch": ["cluster/.+\\.ya?ml$"]
-  },
   "packageRules": [
     {
       "matchUpdateTypes": ["major", "minor"],

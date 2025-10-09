@@ -1,6 +1,6 @@
 ---
 markdownlint:
-  stage: lint
+  stage: validate
   image:
     name: ghcr.io/igorshubovych/markdownlint-cli:v0.38.0
     entrypoint: [""]

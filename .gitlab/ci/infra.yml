@@ -24,7 +24,7 @@ default:
 
 stages:
   - prepare
-  - lint
+  - validate
   - build
   - deploy
   - cleanup
@@ -43,7 +43,7 @@ $[[ inputs.deployment | expand_vars ]]:init:
     - gitlab-terraform init
 
 $[[ inputs.deployment | expand_vars ]]:validate:
-  stage: lint
+  stage: validate
   image: registry.gitlab.com/gitlab-org/terraform-images/releases/terraform:${TF_VERSION}
   rules:
     - if: '"$[[ inputs.environment | expand_vars ]]" != "prod"'

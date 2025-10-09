@@ -1,6 +1,6 @@
 ---
 packer:validate:
-  stage: lint
+  stage: validate
   image:
     name: docker.io/hashicorp/packer:1.11
     entrypoint: [""]

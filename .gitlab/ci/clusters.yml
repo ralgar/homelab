@@ -1,6 +1,6 @@
 ---
 kube-linter:
-  stage: lint
+  stage: validate
   image:
     name: docker.io/stackrox/kube-linter:v0.6.5-alpine
     entrypoint: [""]

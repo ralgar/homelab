@@ -16,9 +16,10 @@ default:
   interruptible: true
 
 stages:
-  - lint
+  - validate
   - build
   - trigger
+  - renovate
 
 cache:
   key: "$CI_COMMIT_REF_NAME"
@@ -29,6 +30,7 @@ include:
   - local: '/.gitlab/ci/clusters.yml'
   - local: '/.gitlab/ci/docs.yml'
   - local: '/.gitlab/ci/metal.yml'
+  - local: '/.gitlab/ci/renovate.yml'
   - local: '/.gitlab/ci/templates.yml'
 
 # We define the deployments here.
