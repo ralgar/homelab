@@ -2,7 +2,7 @@
 markdownlint:
   stage: validate
   image:
-    name: ghcr.io/igorshubovych/markdownlint-cli:v0.38.0
+    name: ghcr.io/igorshubovych/markdownlint-cli:v0.45.0
     entrypoint: [""]
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
