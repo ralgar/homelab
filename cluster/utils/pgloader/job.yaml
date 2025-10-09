@@ -9,6 +9,7 @@ metadata:
     ignore-check.kube-linter.io/no-read-only-root-fs: "Unimportant for this app."
 spec:
   backoffLimit: 0
+  ttlSecondsAfterFinished: 3600   # Delete 1 hour after finishing
   template:
     metadata:
       labels:
