@@ -2,7 +2,7 @@
 packer:validate:
   stage: validate
   image:
-    name: docker.io/hashicorp/packer:1.11
+    name: docker.io/hashicorp/packer:1.14
     entrypoint: [""]
   variables:
     PACKER_PLUGIN_PATH: ${CI_PROJECT_DIR}/.packer/plugins
