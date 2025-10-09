@@ -24,7 +24,7 @@ resource "kubernetes_secret_v1" "flux_secrets" {
 resource "helm_release" "flux_sync" {
   repository       = "https://fluxcd-community.github.io/helm-charts"
   chart            = "flux2-sync"
-  version          = "1.8.1"
+  version          = "1.14.0"
   name             = "flux-system"
   namespace        = "flux-system"
   create_namespace = true
