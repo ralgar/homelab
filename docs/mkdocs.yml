@@ -53,6 +53,7 @@ nav:
     - getting-started/deploy-openstack.md
     - getting-started/cicd-configuration.md
     - getting-started/windows-images.md
+    - getting-started/renovate-bot.md
   - Managing Deployments:
     - deployments/introduction.md
     - deployments/admin.md

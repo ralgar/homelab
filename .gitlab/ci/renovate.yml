@@ -1,0 +1,32 @@
+---
+spec:
+  inputs:
+    version:
+      description: Renovate version to run
+      type: string
+      default: '41'
+---
+renovate-validate:
+  stage: validate
+  image: docker.io/renovate/renovate:$[[ inputs.version ]]
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - .gitlab/renovate.json
+        - .gitlab/ci/renovate.yml
+  script:
+    - renovate-config-validator
+
+renovate:
+  stage: renovate
+  image: docker.io/renovate/renovate:$[[ inputs.version ]]
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: always
+    - when: never
+  variables:
+    RENOVATE_PLATFORM: gitlab
+    RENOVATE_ENDPOINT: "https://gitlab.com/api/v4"
+    RENOVATE_REPOSITORIES: $CI_PROJECT_PATH
+  script:
+    - renovate
