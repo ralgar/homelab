@@ -7,7 +7,7 @@ spec:
   interval: 5m
   chart:
     spec:
-      version: "0.26.x"  # This seems to follow Kubernetes version tags
+      version: "0.33.x"  # This seems to follow Kubernetes version tags
       chart: descheduler
       sourceRef:
         kind: HelmRepository
