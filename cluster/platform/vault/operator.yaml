@@ -144,7 +144,7 @@ spec:
     spec:
       containers:
         - name: vault-operator
-          image: "ghcr.io/banzaicloud/vault-operator:1.16.0"
+          image: "ghcr.io/banzaicloud/vault-operator:1.19.0"
           imagePullPolicy: IfNotPresent
           command:
             - vault-operator
