@@ -48,7 +48,7 @@ spec:
               memory: 250Mi
       containers:
         - name: jellyfin
-          image: "docker.io/jellyfin/jellyfin:10.8.13"
+          image: "docker.io/jellyfin/jellyfin:10.10.7"
           imagePullPolicy: IfNotPresent
           ports:
             - name: jellyfin-http
