@@ -26,7 +26,7 @@ spec:
         fsGroup: 101883
       containers:
         - name: mosquitto
-          image: docker.io/eclipse-mosquitto:2.0.18
+          image: docker.io/eclipse-mosquitto:2.0.22
           imagePullPolicy: IfNotPresent
           ports:
             - name: mosquitto-http

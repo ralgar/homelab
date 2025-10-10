@@ -31,7 +31,7 @@ spec:
           level: "s0:c123,c456"
       initContainers:
         - name: init-database
-          image: "ghcr.io/onedr0p/radarr:4.7.5.7809"
+          image: ghcr.io/home-operations/radarr:6.0.2
           imagePullPolicy: IfNotPresent
           command: ["/configmaps/init-db.sh"]
           env:
@@ -101,7 +101,7 @@ spec:
             readOnlyRootFilesystem: false
       containers:
         - name: radarr
-          image: "ghcr.io/onedr0p/radarr:4.7.5.7809"
+          image: ghcr.io/home-operations/radarr:6.0.2
           imagePullPolicy: IfNotPresent
           env:
             - name: RADARR__API_KEY

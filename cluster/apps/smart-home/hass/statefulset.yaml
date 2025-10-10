@@ -26,7 +26,7 @@ spec:
         fsGroup: 108123
       initContainers:
         - name: init
-          image: docker.io/bash:5.2
+          image: docker.io/bash:5.3
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: hass-config
@@ -43,7 +43,7 @@ spec:
               memory: 250Mi
       containers:
         - name: hass
-          image: ghcr.io/onedr0p/home-assistant:2023.11.2
+          image: ghcr.io/home-operations/home-assistant:2025.10.1
           imagePullPolicy: IfNotPresent
           ports:
             - name: hass-http

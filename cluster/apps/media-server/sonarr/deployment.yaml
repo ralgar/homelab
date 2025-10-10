@@ -31,7 +31,7 @@ spec:
           level: "s0:c123,c456"
       initContainers:
         - name: init-database
-          image: "ghcr.io/onedr0p/sonarr-develop:4.0.0.710"
+          image: ghcr.io/home-operations/sonarr:4.0.15
           imagePullPolicy: IfNotPresent
           command: ["/configmaps/init-db.sh"]
           env:
@@ -106,7 +106,7 @@ spec:
             readOnlyRootFilesystem: false
       containers:
         - name: sonarr
-          image: "ghcr.io/onedr0p/sonarr-develop:4.0.0.710"
+          image: ghcr.io/home-operations/sonarr:4.0.15
           imagePullPolicy: IfNotPresent
           env:
             - name: SONARR__API_KEY

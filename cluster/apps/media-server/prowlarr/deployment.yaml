@@ -31,7 +31,7 @@ spec:
         fsGroup: 109696
       initContainers:
         - name: init-database
-          image: "ghcr.io/onedr0p/prowlarr:1.9.4.4039"
+          image: ghcr.io/home-operations/prowlarr:2.1.3
           imagePullPolicy: IfNotPresent
           command: ["/configmaps/init-db.sh"]
           env:
@@ -101,7 +101,7 @@ spec:
             readOnlyRootFilesystem: false
       containers:
         - name: prowlarr
-          image: "ghcr.io/onedr0p/prowlarr:1.9.4.4039"
+          image: ghcr.io/home-operations/prowlarr:2.1.3
           imagePullPolicy: IfNotPresent
           env:
             - name: PROWLARR__API_KEY
