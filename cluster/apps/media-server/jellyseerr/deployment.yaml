@@ -48,7 +48,7 @@ spec:
               memory: 250Mi
       containers:
         - name: jellyseerr
-          image: docker.io/fallenbagel/jellyseerr:preview-postgres@sha256:15f9bd26ec3d3e6aa9b0459604a39797e0003dbb5cf7c22b2df835c3aea2c503
+          image: ghcr.io/fallenbagel/jellyseerr:2.7.3
           imagePullPolicy: IfNotPresent
           env:
             - name: DB_TYPE
