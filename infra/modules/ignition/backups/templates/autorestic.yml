@@ -25,7 +25,7 @@ locations:
 backends:
   backblaze:
     type: b2
-    path: ${backblaze_bucket}:/fcos
+    path: ${backblaze_bucket}:/${fqdn}
     key: ${restic_password}
     env:
       B2_ACCOUNT_ID: ${backblaze_account_id}

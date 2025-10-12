@@ -1,6 +1,7 @@
 module "backups" {
   source      = "../../modules/ignition/backups"
   environment = var.environment
+  fqdn        = trimsuffix(local.environment_domain, ".")
 
   backblaze_account_id  = var.backblaze_account_id
   backblaze_account_key = var.backblaze_account_key

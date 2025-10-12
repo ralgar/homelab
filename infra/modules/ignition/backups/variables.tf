@@ -2,6 +2,11 @@ variable "environment" {
   type = string
 }
 
+variable "fqdn" {
+  description = "Fully-Qualified Domain Name. Used in the backup path and hostname."
+  type        = string
+}
+
 variable "backblaze_bucket" {
   description = "Name of the Backblaze bucket."
   type        = string
