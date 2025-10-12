@@ -1,6 +1,8 @@
 [Unit]
 Description=SABnzbd Container
+Requires=containers.target
 PartOf=containers.target
+After=containers.target
 
 [Container]
 ContainerName=sabnzbd
