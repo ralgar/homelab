@@ -49,4 +49,7 @@ resource "openstack_compute_instance_v2" "fcos" {
   network {
     port = openstack_networking_port_v2.fcos.id
   }
+
+  // Hard dependency to avoid race condition during attachment
+  depends_on = [openstack_blockstorage_volume_v3.container_storage]
 }
