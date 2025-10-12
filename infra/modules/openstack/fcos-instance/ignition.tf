@@ -1,7 +1,9 @@
 module "base" {
-  source  = "../../ignition/base"
-  keypair = var.keypair
-  domain  = var.domain
+  source = "../../ignition/base"
+
+  keypair  = var.keypair
+  domain   = var.domain
+  quadlets = var.quadlets
 }
 
 data "ignition_config" "final" {

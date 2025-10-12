@@ -1,0 +1,14 @@
+[Unit]
+Description=Container storage filesystem
+Before=local-fs.target
+After=dev-vdb.device
+Requires=dev-vdb.device
+
+[Mount]
+What=/dev/vdb
+Where=/var/lib/containers/storage
+Type=xfs
+Options=defaults
+
+[Install]
+WantedBy=local-fs.target

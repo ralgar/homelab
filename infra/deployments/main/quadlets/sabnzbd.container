@@ -1,0 +1,25 @@
+[Unit]
+Description=SABnzbd Container
+PartOf=containers.target
+
+[Container]
+ContainerName=sabnzbd
+Image=ghcr.io/home-operations/sabnzbd:rolling
+User=9030
+Group=9030
+
+Label=io.containers.autoupdate=registry
+
+Environment=UMASK=0007
+
+Volume=sabnzbd-data:/config:Z,U
+Volume=/var/mnt/usenet:/media/usenet:z
+
+Network=proxy.network
+
+[Service]
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=containers.target

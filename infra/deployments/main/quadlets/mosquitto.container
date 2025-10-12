@@ -1,0 +1,27 @@
+[Unit]
+Description=Mosquitto Container
+PartOf=containers.target
+
+[Container]
+ContainerName=mosquitto
+Image=docker.io/eclipse-mosquitto:2.0
+User=1883
+Group=1883
+
+Label=io.containers.autoupdate=registry
+
+Environment=UMASK=0007
+
+Volume=mosquitto-config:/mosquitto/config:Z
+Volume=mosquitto-data:/mosquitto/data:Z
+Volume=mosquitto-log:/mosquitto/log:Z
+
+Network=proxy.network
+PublishPort=1883:1883
+
+[Service]
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=containers.target

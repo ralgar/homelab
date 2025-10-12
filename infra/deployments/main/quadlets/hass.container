@@ -1,0 +1,24 @@
+[Unit]
+Description=Home Assistant Container
+PartOf=containers.target
+
+[Container]
+ContainerName=hass
+Image=ghcr.io/home-operations/home-assistant:rolling
+User=9024
+Group=9024
+
+Label=io.containers.autoupdate=registry
+
+Environment=UMASK=0007
+
+Volume=hass-data:/config:Z,U
+
+Network=proxy.network
+
+[Service]
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=containers.target

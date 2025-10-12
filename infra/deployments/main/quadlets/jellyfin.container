@@ -1,0 +1,24 @@
+[Unit]
+Description=Jellyfin Container
+PartOf=containers.target
+
+[Container]
+ContainerName=jellyfin
+Image=ghcr.io/jellyfin/jellyfin:10.10
+User=9023
+Group=9030
+
+Label=io.containers.autoupdate=registry
+
+Volume=jellyfin-cache:/cache:Z
+Volume=jellyfin-data:/config:Z
+Volume=/var/mnt/library:/media/library:z,ro
+
+Network=proxy.network
+
+[Service]
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=containers.target

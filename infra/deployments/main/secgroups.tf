@@ -1,10 +1,10 @@
-resource "openstack_networking_secgroup_v2" "fcos" {
-  name        = "fcos-mediasrv"
-  description = "FCOS media server"
+resource "openstack_networking_secgroup_v2" "media_server" {
+  name        = "Media Server"
+  description = "Allows SSH, HTTP/S, and MQTT."
 }
 
 resource "openstack_networking_secgroup_rule_v2" "ssh" {
-  security_group_id = "${openstack_networking_secgroup_v2.fcos.id}"
+  security_group_id = "${openstack_networking_secgroup_v2.media_server.id}"
   description       = "SSH"
   direction         = "ingress"
   ethertype         = "IPv4"
@@ -15,7 +15,7 @@ resource "openstack_networking_secgroup_rule_v2" "ssh" {
 }
 
 resource "openstack_networking_secgroup_rule_v2" "http" {
-  security_group_id = "${openstack_networking_secgroup_v2.fcos.id}"
+  security_group_id = "${openstack_networking_secgroup_v2.media_server.id}"
   description       = "HTTP"
   direction         = "ingress"
   ethertype         = "IPv4"
@@ -26,7 +26,7 @@ resource "openstack_networking_secgroup_rule_v2" "http" {
 }
 
 resource "openstack_networking_secgroup_rule_v2" "https" {
-  security_group_id = "${openstack_networking_secgroup_v2.fcos.id}"
+  security_group_id = "${openstack_networking_secgroup_v2.media_server.id}"
   description       = "HTTPS"
   direction         = "ingress"
   ethertype         = "IPv4"
@@ -37,7 +37,7 @@ resource "openstack_networking_secgroup_rule_v2" "https" {
 }
 
 resource "openstack_networking_secgroup_rule_v2" "mqtt" {
-  security_group_id = "${openstack_networking_secgroup_v2.fcos.id}"
+  security_group_id = "${openstack_networking_secgroup_v2.media_server.id}"
   description       = "MQTT"
   direction         = "ingress"
   ethertype         = "IPv4"

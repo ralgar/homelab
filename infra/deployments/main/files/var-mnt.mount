@@ -1,0 +1,14 @@
+[Unit]
+Description=Media storage filesystem
+Before=local-fs.target
+After=dev-vdc.device
+Requires=dev-vdc.device
+
+[Mount]
+What=/dev/vdc
+Where=/var/mnt
+Type=xfs
+Options=defaults
+
+[Install]
+WantedBy=local-fs.target

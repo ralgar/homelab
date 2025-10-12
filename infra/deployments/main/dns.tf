@@ -26,7 +26,7 @@ resource "openstack_dns_recordset_v2" "env" {
 
   name    = local.environment_domain
   type    = "A"
-  records = [module.fcos.ipv4_address]
+  records = [module.media_server.ipv4_address]
   ttl     = 1
 }
 

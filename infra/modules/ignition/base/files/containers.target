@@ -1,0 +1,7 @@
+[Unit]
+Description=All container services
+Wants=network-online.target local-fs.target
+After=network-online.target local-fs.target
+
+[Install]
+WantedBy=multi-user.target

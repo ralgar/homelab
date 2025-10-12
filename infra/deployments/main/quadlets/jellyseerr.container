@@ -1,0 +1,24 @@
+[Unit]
+Description=Jellyseerr Container
+PartOf=containers.target
+
+[Container]
+ContainerName=jellyseerr
+Image=ghcr.io/fallenbagel/jellyseerr:latest
+User=9025
+Group=9025
+
+Label=io.containers.autoupdate=registry
+
+Environment=UMASK=0007
+
+Volume=jellyseerr-data:/app/config:Z,U
+
+Network=proxy.network
+
+[Service]
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=containers.target

@@ -2,9 +2,9 @@
 version: 2
 
 locations:
-  container_data:
+  container_volumes:
     from:
-      - /var/srv
+      - /var/lib/containers/storage/volumes
     to:
       - backblaze
     forget: prune

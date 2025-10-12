@@ -1,0 +1,25 @@
+[Unit]
+Description=Prowlarr Container
+PartOf=containers.target
+
+[Container]
+ContainerName=prowlarr
+Image=ghcr.io/home-operations/prowlarr:rolling
+User=9031
+Group=9030
+
+Label=io.containers.autoupdate=registry
+
+Environment=UMASK=027
+
+Volume=prowlarr-data:/config:Z,U
+Volume=/var/mnt/usenet:/media/usenet:z
+
+Network=proxy.network
+
+[Service]
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=containers.target

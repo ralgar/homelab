@@ -1,0 +1,25 @@
+[Unit]
+Description=Sonarr Container
+PartOf=containers.target
+
+[Container]
+ContainerName=sonarr
+Image=ghcr.io/home-operations/sonarr:rolling
+User=9033
+Group=9030
+
+Label=io.containers.autoupdate=registry
+
+Environment=UMASK=0007
+
+Volume=sonarr-data:/config:Z,U
+Volume=/var/mnt:/media:z
+
+Network=proxy.network
+
+[Service]
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=containers.target

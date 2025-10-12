@@ -1,0 +1,25 @@
+[Unit]
+Description=Radarr Container
+PartOf=containers.target
+
+[Container]
+ContainerName=radarr
+Image=ghcr.io/home-operations/radarr:rolling
+User=9032
+Group=9030
+
+Label=io.containers.autoupdate=registry
+
+Environment=UMASK=0007
+
+Volume=radarr-data:/config:Z,U
+Volume=/var/mnt:/media:z
+
+Network=proxy.network
+
+[Service]
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=containers.target

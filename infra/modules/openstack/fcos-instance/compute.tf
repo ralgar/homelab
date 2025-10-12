@@ -9,8 +9,8 @@ data "openstack_images_image_v2" "fcos" {
 }
 
 resource "openstack_compute_instance_v2" "fcos" {
-  name                = "FCOS Media Server"
-  flavor_name         = "m1.large"
+  name                = var.name
+  flavor_name         = var.flavor_name
   key_pair            = var.keypair.name
   user_data           = data.ignition_config.final.rendered
   stop_before_destroy = true
@@ -20,9 +20,18 @@ resource "openstack_compute_instance_v2" "fcos" {
     source_type           = "image"
     destination_type      = "volume"
     volume_type           = "PREMIUM"
-    volume_size           = 80
+    volume_size           = 10
     boot_index            = 0
     delete_on_termination = true
+  }
+
+  // Storage for Podman images and volumes (`/var/lib/containers/storage`)
+  block_device {
+    uuid                  = openstack_blockstorage_volume_v3.container_storage.id
+    source_type           = "volume"
+    destination_type      = "volume"
+    boot_index            = -1
+    delete_on_termination = false
   }
 
   // Attach additional block devices
