@@ -14,7 +14,9 @@ Label=io.containers.autoupdate=registry
 
 Volume=jellyfin-cache:/cache:Z
 Volume=jellyfin-data:/config:Z
-Volume=/var/mnt/library:/media/library:z,ro
+Volume=/var/mnt/library/movies:/media/library/movies:z,ro
+Volume=/var/mnt/library/series:/media/library/series:z,ro
+Volume=/var/mnt/library/transcodes:/media/library/transcodes:Z
 
 Network=proxy.network
 
