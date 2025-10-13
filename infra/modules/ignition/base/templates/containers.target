@@ -1,0 +1,15 @@
+[Unit]
+Description=All container services
+Wants=network-online.target local-fs.target
+After=network-online.target local-fs.target
+
+%{ for unit in units ~}
+Requires=${trimsuffix(unit, ".container")}.service
+%{ endfor ~}
+
+%{ for unit in units ~}
+Before=${trimsuffix(unit, ".container")}.service
+%{ endfor ~}
+
+[Install]
+WantedBy=multi-user.target

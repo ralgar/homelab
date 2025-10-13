@@ -1,6 +1,8 @@
 data "ignition_systemd_unit" "containers_target" {
   name    = "containers.target"
-  content = file("${path.module}/files/containers.target")
+  content = templatefile("${path.module}/templates/containers.target", {
+    units = [for path, _ in var.quadlets : basename(path) if endswith(path, ".container")]
+  })
 }
 
 data "ignition_file" "quadlets" {
