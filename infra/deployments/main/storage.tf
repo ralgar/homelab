@@ -23,7 +23,15 @@ data "ignition_directory" "var_mnt_library" {
   path      = "/var/mnt/library"
   uid       = 9030
   gid       = 9030
-  mode      = 504
+  mode      = 504     # Decimal equivalent to '770'
+  overwrite = false
+}
+
+data "ignition_directory" "var_mnt_transcodes" {
+  path      = "/var/mnt/transcodes"
+  uid       = 9023
+  gid       = 9030
+  mode      = 504     # Decimal equivalent to '770'
   overwrite = false
 }
 
@@ -31,13 +39,14 @@ data "ignition_directory" "var_mnt_usenet" {
   path      = "/var/mnt/usenet"
   uid       = 9030
   gid       = 9030
-  mode      = 504
+  mode      = 504     # Decimal equivalent to '770'
   overwrite = false
 }
 
 data "ignition_config" "additional_storage" {
   directories = [
     data.ignition_directory.var_mnt_library.rendered,
+    data.ignition_directory.var_mnt_transcodes.rendered,
     data.ignition_directory.var_mnt_usenet.rendered,
   ]
   filesystems = [
