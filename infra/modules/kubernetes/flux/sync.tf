@@ -21,6 +21,13 @@ resource "kubernetes_secret_v1" "flux_secrets" {
   depends_on = [helm_release.flux_install]
 }
 
+// This prevents `helm_resource.flux_install` from hanging on destroy.
+// Flux needs time to destroy synced resources before it can uninstall itself.
+resource "time_sleep" "delay_destroy" {
+  depends_on = [helm_release.flux_install]
+  destroy_duration = "60s"
+}
+
 resource "helm_release" "flux_sync" {
   repository       = "https://fluxcd-community.github.io/helm-charts"
   chart            = "flux2-sync"
@@ -39,5 +46,6 @@ resource "helm_release" "flux_sync" {
   depends_on = [
     kubernetes_config_map_v1.flux_configs,
     kubernetes_secret_v1.flux_secrets,
+    time_sleep.delay_destroy,
   ]
 }
