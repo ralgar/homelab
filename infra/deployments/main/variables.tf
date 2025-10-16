@@ -19,6 +19,17 @@ variable "environment" {
   type        = string
 }
 
+variable "management_network" {
+  description = "A CIDR-notated management network from which to allow SSH (and other) access."
+  type        = string
+  sensitive   = true
+
+  validation {
+    condition = can(cidrhost(var.management_network, 1))
+    error_message = "'management_network' must be a valid CIDR (e.g., 10.0.0.0/24)"
+  }
+}
+
 // Backup credentials
 variable "backblaze_bucket" {
   description = "Name of the Backblaze bucket."

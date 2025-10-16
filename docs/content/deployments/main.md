@@ -12,13 +12,14 @@ See [Setting CI/CD Variables](../getting-started/cicd-configuration.md/#setting-
 
 1. Create/set the following *masked* variables in GitLab CI.
 
-    | **Key**                        | **Description**                                           |
-    |--------------------------------|-----------------------------------------------------------|
-    | `TF_VAR_backblaze_account_id`  | Backblaze application credential (account ID).            |
-    | `TF_VAR_backblaze_account_key` | Backblaze applicationcredential (secret key).             |
-    | `TF_VAR_backblaze_bucket`      | Name of a bucket to use for backups (must exist already). |
-    | `TF_VAR_domain`                | A DNS Zone that you control.                              |
-    | `TF_VAR_restic_password`       | A strong password for backup encryption.                  |
+    | **Key**                        | **Description**                                                               |
+    |--------------------------------|-------------------------------------------------------------------------------|
+    | `TF_VAR_backblaze_account_id`  | Backblaze application credential (account ID).                                |
+    | `TF_VAR_backblaze_account_key` | Backblaze application credential (secret key).                                |
+    | `TF_VAR_backblaze_bucket`      | Name of a bucket to use for backups (must exist already).                     |
+    | `TF_VAR_domain`                | A DNS Zone that you control.                                                  |
+    | `TF_VAR_management_network`    | A CIDR-notated management network from which to allow SSH (and other) access. |
+    | `TF_VAR_restic_password`       | A strong password for backup encryption.                                      |
 
 ## Initial Deployment (Production)
 
