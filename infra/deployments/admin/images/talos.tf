@@ -6,6 +6,7 @@ resource "openstack_images_image_v2" "talos_1_9_5" {
   decompress       = true
   min_disk_gb      = 10
   min_ram_mb       = 2048
+  visibility       = var.environment == "prod" ? "public" : "private"
 
   properties = {
     architecture = "x86_64"
