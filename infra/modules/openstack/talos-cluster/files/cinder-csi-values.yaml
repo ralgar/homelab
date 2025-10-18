@@ -1,0 +1,12 @@
+---
+csi:
+  plugin:
+    volumes:
+      - name: cacert
+        emptydir: {}    # We're not mounting a cacert right now
+    nodePlugin:
+      tolerations: []   # Do not schedule on control-plane nodes
+
+secret:
+  enabled: true
+  name: cloud-config

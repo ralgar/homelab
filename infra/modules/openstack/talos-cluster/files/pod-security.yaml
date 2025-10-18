@@ -1,0 +1,12 @@
+---
+cluster:
+  apiServer:
+    admissionControl:
+      # Exempt monitoring from PodSecurityConfiguration so that
+      #  kube-prometheus-stack-node-exporter can deploy.
+      - name: PodSecurity
+        configuration:
+          exemptions:
+            namespaces:
+              - monitoring
+              - vault

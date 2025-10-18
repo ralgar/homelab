@@ -1,0 +1,10 @@
+---
+cluster:
+  inlineManifests:
+    - name: openstack-cloud-provider
+      contents: |
+        ${indent(8, OS_CLOUD_PROVIDER_MANIFEST)}
+
+    - name: openstack-cinder-csi
+      contents: |
+        ${indent(8, OS_CINDER_CSI_MANIFEST)}

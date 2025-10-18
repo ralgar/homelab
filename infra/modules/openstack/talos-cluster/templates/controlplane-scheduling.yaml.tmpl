@@ -1,0 +1,11 @@
+%{ if worker_count == 0 }
+# Allow scheduling and load balancing on control plane
+cluster:
+  allowSchedulingOnControlPlanes: true
+machine:
+  nodeLabels:
+    node.kubernetes.io/exclude-from-external-load-balancers:
+      $patch: delete
+%{ else }
+# Do not allow scheduling and load balancing on control plane
+%{ endif }
