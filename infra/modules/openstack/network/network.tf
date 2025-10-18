@@ -2,6 +2,8 @@
 resource "openstack_networking_network_v2" "internal" {
   name           = var.network_name
   admin_state_up = "true"
+
+  tags = var.tags
 }
 
 resource "openstack_networking_subnet_v2" "default" {
@@ -11,6 +13,8 @@ resource "openstack_networking_subnet_v2" "default" {
   ip_version = 4
 
   dns_nameservers = ["1.1.1.1", "1.0.0.1"]
+
+  tags = var.tags
 }
 
 // Create the router between the internal and external networks
@@ -18,6 +22,8 @@ resource "openstack_networking_router_v2" "internal" {
   name                = var.network_name
   admin_state_up      = true
   external_network_id = var.external_network.id
+
+  tags = var.tags
 }
 
 resource "openstack_networking_router_interface_v2" "internal" {
