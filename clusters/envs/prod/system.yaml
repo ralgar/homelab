@@ -1,0 +1,48 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: system-controllers
+  namespace: flux-system
+spec:
+  interval: 1h
+  retryInterval: 1m
+  timeout: 5m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./clusters/base/system/controllers
+  prune: true
+  wait: true
+  postBuild:
+    substitute:
+      OPENSTACK_AUTH_URL: ${OPENSTACK_AUTH_URL}
+      DESIGNATE_AUTH_ID: ${DESIGNATE_AUTH_ID}
+      DESIGNATE_AUTH_SECRET: ${DESIGNATE_AUTH_SECRET}
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: system-configs
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: system-controllers
+  interval: 1h
+  retryInterval: 1m
+  timeout: 5m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./clusters/base/system/configs
+  prune: true
+  wait: true
+  patches:
+    # Replace staging ACME server for production
+    - patch: |
+        - op: replace
+          path: /spec/acme/server
+          value: https://acme-v02.api.letsencrypt.org/directory
+      target:
+        kind: ClusterIssuer
+        name: letsencrypt

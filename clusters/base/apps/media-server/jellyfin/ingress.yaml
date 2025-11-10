@@ -1,0 +1,58 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jellyfin
+  namespace: media-server
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: jellyfin
+  ports:
+    - name: jellyfin-http
+      port: 8096
+      protocol: TCP
+      targetPort: jellyfin-http
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: jellyfin-cert
+  namespace: media-server
+  labels:
+    app.kubernetes.io/name: jellyfin
+spec:
+  commonName: jellyfin
+  dnsNames:
+    - stream.${DOMAIN}
+  issuerRef:
+    name: internal-issuer
+    kind: ClusterIssuer
+  secretName: jellyfin-cert
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jellyfin
+  namespace: media-server
+  labels:
+    app.kubernetes.io/name: jellyfin
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: &fqdn stream.${DOMAIN}
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - *fqdn
+      secretName: jellyfin-cert
+  rules:
+    - host: *fqdn
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: jellyfin
+                port:
+                  name: jellyfin-http

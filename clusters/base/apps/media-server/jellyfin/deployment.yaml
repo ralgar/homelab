@@ -1,0 +1,97 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jellyfin
+  namespace: media-server
+  labels:
+    app.kubernetes.io/name: jellyfin
+  annotations:
+    ignore-check.kube-linter.io/no-read-only-root-fs: "Unsupported for this app."
+spec:
+  revisionHistoryLimit: 3
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: jellyfin
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: jellyfin
+    spec:
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: true
+      securityContext:
+        runAsUser: 108096
+        runAsGroup: 109030
+        fsGroup: 109030
+        seLinuxOptions:
+          level: "s0:c123,c456"
+      containers:
+        - name: jellyfin
+          image: "ghcr.io/jellyfin/jellyfin:10.10.7"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: jellyfin-http
+              containerPort: 8096
+              protocol: TCP
+          volumeMounts:
+            - name: ca-certificate
+              mountPath: /etc/ssl/certs/HomeLab_Internal_Root_CA.pem
+              subPath: root-cert.pem
+            - name: jellyfin-config
+              mountPath: /config
+            - name: media
+              mountPath: /media
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 2000Mi
+            requests:
+              cpu: 1000m
+              memory: 2000Mi
+          livenessProbe:
+            exec:
+              command:
+                - /bin/bash
+                - -c
+                - test "$(curl http://localhost:8096/health)" = "Healthy"
+            initialDelaySeconds: 60
+            timeoutSeconds: 10
+            periodSeconds: 10
+            failureThreshold: 5
+            successThreshold: 1
+          readinessProbe:
+            tcpSocket:
+              port: 8096
+            initialDelaySeconds: 0
+            timeoutSeconds: 1
+            periodSeconds: 10
+            failureThreshold: 3
+          startupProbe:
+            tcpSocket:
+              port: 8096
+            initialDelaySeconds: 0
+            timeoutSeconds: 1
+            periodSeconds: 5
+            failureThreshold: 30
+          securityContext:
+            runAsNonRoot: true
+            privileged: false
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+      volumes:
+        - name: ca-certificate
+          configMap:
+            name: homelab.internal
+        - name: jellyfin-config
+          persistentVolumeClaim:
+            claimName: jellyfin-config
+        - name: jellyfin-secrets
+          secret:
+            secretName: jellyfin-secrets
+        - name: media
+          persistentVolumeClaim:
+            claimName: media

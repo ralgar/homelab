@@ -1,0 +1,39 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: platform-controllers
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: system-configs
+  interval: 1h
+  retryInterval: 1m
+  timeout: 5m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./clusters/base/platform/controllers
+  prune: true
+  wait: true
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: platform-configs
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: platform-controllers
+  interval: 1h
+  retryInterval: 1m
+  timeout: 5m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./clusters/base/platform/configs
+  prune: true
+  wait: true
+  postBuild:
+    substitute:
+      DOMAIN: ${DOMAIN}

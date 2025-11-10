@@ -1,0 +1,30 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: media
+spec:
+  capacity:
+    storage: 1Gi  # No-op on externally-managed volumes
+  accessModes:
+    - ReadWriteMany
+  csi:
+    driver: cinder.csi.openstack.org
+    fsType: xfs
+    volumeHandle: ${MEDIA_VOLUME_ID}
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: cinder-standard
+  volumeMode: Filesystem
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: media
+spec:
+  volumeName: media
+  accessModes:
+    - ReadWriteMany
+  storageClassName: cinder-standard
+  resources:
+    requests:
+      storage: 1Gi  # No-op on externally-managed volumes

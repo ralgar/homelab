@@ -1,0 +1,78 @@
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: postgres-backup-credentials
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: gitlab
+  # Kubernetes secret object
+  target:
+    name: postgres-backup-credentials
+    creationPolicy: Owner
+    template:
+      type: Opaque
+      data:
+        s3.conf: |
+          [global]
+          repo1-cipher-pass = {{ .REPOSITORY_PASSWORD }}
+          repo1-s3-key = {{ .S3_ACCESS_KEY }}
+          repo1-s3-key-secret = {{ .S3_SECRET_KEY }}
+  # Vault secret object(s)
+  data:
+    - secretKey: REPOSITORY_PASSWORD
+      remoteRef:
+        key: BACKUPS__REPO_PASSWORD
+
+    - secretKey: S3_ACCESS_KEY
+      remoteRef:
+        key: BACKUPS__S3_ACCESS_KEY
+
+    - secretKey: S3_SECRET_KEY
+      remoteRef:
+        key: BACKUPS__S3_SECRET_KEY
+---
+apiVersion: postgres-operator.crunchydata.com/v1beta1
+kind: PostgresCluster
+metadata:
+  name: hassdb
+spec:
+  image: registry.developers.crunchydata.com/crunchydata/crunchy-postgres:ubi8-14.7-0
+  postgresVersion: 14
+  users:
+    - name: hass
+      databases:
+        - hass
+      password:
+        type: AlphaNumeric
+  instances:
+    - name: postgres1
+      dataVolumeClaimSpec:
+        accessModes:
+          - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: 5Gi
+  backups:
+    pgbackrest:
+      image: registry.developers.crunchydata.com/crunchydata/crunchy-pgbackrest:ubi8-2.41-4
+      configuration:
+        - secret:
+            name: postgres-backup-credentials
+      global:
+        repo1-path: /clusters/${DOMAIN}/pgbackrest/hass
+        repo1-cipher-type: aes-256-cbc
+        repo1-retention-full: "185"  # Keep 6 full months of backups
+        repo1-retention-full-type: time
+        repo1-s3-uri-style: path
+      repos:
+        - name: repo1
+          s3:
+            bucket: ${BACKUPS__S3_BUCKET}
+            endpoint: ${BACKUPS__S3_ENDPOINT}
+            region: ${BACKUPS__S3_REGION}
+          schedules:
+            full: "0 12 * * 0"            # Sunday at 12 PM UTC (4:00/5:00 AM PST/PDT)
+            incremental: "0 12 * * 1-6"   # Mon-Sat at 12 PM UTC (4:00/5:00 AM PST/PDT)

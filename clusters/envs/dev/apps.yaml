@@ -1,0 +1,49 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: media-server
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: platform-configs
+  interval: 1h
+  retryInterval: 1m
+  timeout: 5m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./clusters/base/apps/media-server
+  prune: true
+  wait: true
+  postBuild:
+    substitute:
+      DOMAIN: ${DOMAIN}
+      MEDIA_VOLUME_ID: ${MEDIA_VOLUME_ID}
+      BACKUPS__S3_BUCKET: cluster-backups-4265
+      BACKUPS__S3_ENDPOINT: s3.us-west-004.backblazeb2.com
+      BACKUPS__S3_REGION: us-east-1  # Always us-east-1 for Backblaze
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: smart-home
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: platform-configs
+  interval: 1h
+  retryInterval: 1m
+  timeout: 5m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./clusters/base/apps/smart-home
+  prune: true
+  wait: true
+  postBuild:
+    substitute:
+      DOMAIN: ${DOMAIN}
+      BACKUPS__S3_BUCKET: cluster-backups-4265
+      BACKUPS__S3_ENDPOINT: s3.us-west-004.backblazeb2.com
+      BACKUPS__S3_REGION: us-east-1  # Always us-east-1 for Backblaze

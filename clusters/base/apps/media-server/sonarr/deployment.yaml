@@ -1,0 +1,167 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sonarr-init
+  namespace: media-server
+data:
+  init.sh: |
+    #!/bin/sh
+    set -xeu
+
+    envsubst < /configmap/config.xml > /config/config.xml
+
+  config.xml: |
+    <Config>
+      <BindAddress>*</BindAddress>
+      <Port>8989</Port>
+      <SslPort>9898</SslPort>
+      <EnableSsl>False</EnableSsl>
+      <LaunchBrowser>False</LaunchBrowser>
+      <ApiKey>$SONARR__API_KEY</ApiKey>
+      <AuthenticationMethod>None</AuthenticationMethod>
+      <AuthenticationRequired>Enabled</AuthenticationRequired>
+      <LogLevel>debug</LogLevel>
+      <SslCertPath></SslCertPath>
+      <SslCertPassword></SslCertPassword>
+      <UrlBase></UrlBase>
+      <InstanceName>Sonarr</InstanceName>
+      <UpdateMechanism>Docker</UpdateMechanism>
+      <PostgresUser>$SONARR__POSTGRES_USER</PostgresUser>
+      <PostgresPassword>$SONARR__POSTGRES_PASSWORD</PostgresPassword>
+      <PostgresPort>$SONARR__POSTGRES_PORT</PostgresPort>
+      <PostgresHost>$SONARR__POSTGRES_HOST</PostgresHost>
+      <PostgresMainDb>$SONARR__POSTGRES_MAIN_DB</PostgresMainDb>
+      <PostgresLogDb>$SONARR__POSTGRES_LOG_DB</PostgresLogDb>
+    </Config>
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sonarr
+  namespace: media-server
+  labels:
+    app.kubernetes.io/name: sonarr
+  annotations:
+    ignore-check.kube-linter.io/no-read-only-root-fs: "Unsupported for this app."
+spec:
+  revisionHistoryLimit: 3
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sonarr
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: sonarr
+    spec:
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: true
+      securityContext:
+        runAsUser: 108989
+        runAsGroup: 109030
+        fsGroup: 109030
+        seLinuxOptions:
+          level: "s0:c123,c456"
+      initContainers:
+        - name: init
+          image: docker.io/blockstack/envsubst:latest@sha256:d64d7430289a2440d86b68047207d0454a4b67be6afa6600c4df4978d48aecfb
+          imagePullPolicy: IfNotPresent
+          command: ["/configmap/init.sh"]
+          env:
+            - name: SONARR__API_KEY
+              valueFrom: { secretKeyRef: { name: sonarr-secrets, key: apiKey } }
+            - name: SONARR__POSTGRES_HOST
+              valueFrom: { secretKeyRef: { name: mediadb-pguser-sonarr, key: host } }
+            - name: SONARR__POSTGRES_PORT
+              valueFrom: { secretKeyRef: { name: mediadb-pguser-sonarr, key: port } }
+            - name: SONARR__POSTGRES_USER
+              valueFrom: { secretKeyRef: { name: mediadb-pguser-sonarr, key: user } }
+            - name: SONARR__POSTGRES_PASSWORD
+              valueFrom: { secretKeyRef: { name: mediadb-pguser-sonarr, key: password } }
+            - name: SONARR__POSTGRES_MAIN_DB
+              value: sonarr-main
+            - name: SONARR__POSTGRES_LOG_DB
+              value: sonarr-log
+          volumeMounts:
+            - name: sonarr-init
+              mountPath: /configmap
+            - name: sonarr-config
+              mountPath: /config
+          resources:
+            requests:
+              cpu: 250m
+              memory: 250Mi
+            limits:
+              cpu: 250m
+              memory: 250Mi
+          securityContext:
+            runAsNonRoot: true
+            privileged: false
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+      containers:
+        - name: sonarr
+          image: ghcr.io/home-operations/sonarr:4.0.15
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: sonarr-http
+              containerPort: 8989
+              protocol: TCP
+          volumeMounts:
+            - name: sonarr-config
+              mountPath: /config
+            - name: media
+              mountPath: /media
+          resources:
+            requests:
+              cpu: 250m
+              memory: 250Mi
+            limits:
+              cpu: 2000m
+              memory: 500Mi
+          livenessProbe:
+            exec:
+              command:
+              - /usr/bin/env
+              - bash
+              - -c
+              - curl --fail localhost:8989/api/v3/system/status?apiKey=`IFS=\> && while read -d
+                \< E C; do if [[ $E = "ApiKey" ]]; then echo $C; fi; done < /config/config.xml`
+            failureThreshold: 5
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: 8989
+            initialDelaySeconds: 0
+            failureThreshold: 3
+            timeoutSeconds: 1
+            periodSeconds: 10
+          startupProbe:
+            tcpSocket:
+              port: 8989
+            initialDelaySeconds: 0
+            failureThreshold: 30
+            timeoutSeconds: 1
+            periodSeconds: 5
+          securityContext:
+            runAsNonRoot: true
+            privileged: false
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+      volumes:
+        - name: sonarr-init
+          configMap:
+            name: sonarr-init
+            defaultMode: 0700   # Executable for script
+        - name: sonarr-config
+          emptyDir:
+            sizeLimit: 128Mi
+        - name: media
+          persistentVolumeClaim:
+            claimName: media

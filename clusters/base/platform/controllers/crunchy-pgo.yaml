@@ -1,0 +1,36 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: postgres-operator
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: crunchy-pgo
+  namespace: postgres-operator
+spec:
+  interval: 120m
+  type: oci
+  url: oci://registry.developers.crunchydata.com/crunchydata
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: crunchy-pgo
+  namespace: postgres-operator
+spec:
+  interval: 5m
+  chart:
+    spec:
+      version: "5.6.0"
+      chart: pgo
+      sourceRef:
+        kind: HelmRepository
+        name: crunchy-pgo
+      interval: 60m
+  install:
+    crds: Create
+  upgrade:
+    crds: CreateReplace
+  values: {}

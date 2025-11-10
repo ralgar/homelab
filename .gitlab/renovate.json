@@ -3,10 +3,10 @@
   "prConcurrentLimit": 5,
   "prHourlyLimit": 5,
   "flux": {
-    "fileMatch": ["cluster/.+\\.ya?ml$"]
+    "fileMatch": ["clusters/.+\\.ya?ml$"]
   },
   "kubernetes": {
-    "fileMatch": ["cluster/.+\\.ya?ml$"]
+    "fileMatch": ["clusters/.+\\.ya?ml$"]
   },
   "packageRules": [
     {

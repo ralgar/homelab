@@ -1,0 +1,43 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: csi-snapshotter
+  namespace: kube-system
+spec:
+  interval: 1h
+  url: https://github.com/kubernetes-csi/external-snapshotter.git
+  ref:
+    tag: v8.4.0
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: snapshot-crds
+  namespace: kube-system
+spec:
+  interval: 1h
+  sourceRef:
+    kind: GitRepository
+    name: csi-snapshotter
+    namespace: kube-system
+  path: client/config/crd
+  prune: true
+  wait: true
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: snapshot-controller
+  namespace: kube-system
+spec:
+  interval: 1h
+  sourceRef:
+    kind: GitRepository
+    name: csi-snapshotter
+    namespace: kube-system
+  path: deploy/kubernetes/snapshot-controller
+  dependsOn:
+    - name: snapshot-crds
+  prune: true
+  wait: true

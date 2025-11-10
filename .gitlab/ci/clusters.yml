@@ -9,6 +9,6 @@ kube-linter:
       changes:
         - .gitlab/ci/clusters.yml
         - .kube-linter.yml
-        - cluster/**/*
+        - clusters/**/*
   script:
-    - /kube-linter lint cluster
+    - /kube-linter lint clusters

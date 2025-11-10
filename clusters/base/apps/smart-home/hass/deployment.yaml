@@ -1,0 +1,109 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hass
+  labels:
+    app.kubernetes.io/name: hass
+  annotations:
+    ignore-check.kube-linter.io/no-read-only-root-fs: "Unsupported for this app."
+spec:
+  revisionHistoryLimit: 3
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: hass
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: hass
+    spec:
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: true
+      securityContext:
+        runAsUser: 108123
+        runAsGroup: 108123
+        fsGroup: 108123
+      initContainers:
+        - name: init
+          image: docker.io/blockstack/envsubst:latest@sha256:d64d7430289a2440d86b68047207d0454a4b67be6afa6600c4df4978d48aecfb
+          imagePullPolicy: IfNotPresent
+          command: ["/configmap/init.sh"]
+          volumeMounts:
+            - name: hass-config
+              mountPath: /configmap
+            - name: hass-data
+              mountPath: /config
+          resources:
+            requests:
+              cpu: 250m
+              memory: 250Mi
+            limits:
+              cpu: 250m
+              memory: 250Mi
+          securityContext:
+            runAsNonRoot: true
+            privileged: false
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+      containers:
+        - name: hass
+          image: ghcr.io/home-operations/home-assistant:2025.10.4
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: hass-http
+              containerPort: 8123
+              protocol: TCP
+          env:
+            - name: POSTGRES_URI
+              valueFrom:
+                secretKeyRef:
+                  name: hassdb-pguser-hass
+                  key: uri
+          volumeMounts:
+            - name: hass-data
+              mountPath: /config
+          resources:
+            requests:
+              cpu: 250m
+              memory: 250Mi
+            limits:
+              cpu: 2000m
+              memory: 500Mi
+          livenessProbe:
+            tcpSocket:
+              port: 8123
+            failureThreshold: 5
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: 8123
+            initialDelaySeconds: 0
+            failureThreshold: 3
+            timeoutSeconds: 1
+            periodSeconds: 10
+          startupProbe:
+            tcpSocket:
+              port: 8123
+            initialDelaySeconds: 0
+            failureThreshold: 30
+            timeoutSeconds: 1
+            periodSeconds: 5
+          securityContext:
+            runAsNonRoot: true
+            privileged: false
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+      volumes:
+        - name: hass-config
+          configMap:
+            name: hass-config
+            defaultMode: 0770
+        - name: hass-data
+          persistentVolumeClaim:
+            claimName: hass-data

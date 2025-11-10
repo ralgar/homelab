@@ -58,7 +58,7 @@ module "cluster1_gitops" {
 
   repository = var.gitops_repo
   ref_name   = var.gitops_ref_name
-  path       = var.gitops_path
+  path       = "./clusters/envs/${var.environment}"
 
   configs = {
     DOMAIN            = trimsuffix(openstack_dns_zone_v2.environment.name, ".")

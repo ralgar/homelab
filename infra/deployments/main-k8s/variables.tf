@@ -14,7 +14,6 @@ variable "domain" {
 variable "environment" {
   description = "Deployment environment (prod, staging, or dev)."
   type        = string
-  default     = "main-k8s"
 }
 
 variable "gitlab_project" {
@@ -38,12 +37,6 @@ variable "gitops_ref_name" {
   description = "Full Git reference name to sync from. Ex. 'refs/heads/main'"
   type        = string
   default     = "refs/heads/main"
-}
-
-variable "gitops_path" {
-  description = "Git directory to sync from. Ex. './cluster/flux-sync'"
-  type        = string
-  default     = "./cluster/system/flux-sync"
 }
 
 variable "backup_repo_password" {

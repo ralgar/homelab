@@ -1,0 +1,77 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hass-config
+data:
+  init.sh: |
+    #!/bin/sh
+
+    set -xeu
+
+    cp /configmap/configuration.yaml /config/configuration.yaml || exit 1
+    chmod 664 /config/configuration.yaml || exit 1
+
+  configuration.yaml: |
+    ---
+    # Include the packages directory/subdirectories
+    homeassistant:
+      packages: !include_dir_merge_named packages/
+
+    # Manually load the default integrations
+    assist_pipeline:
+    automation:  # !include automations.yaml
+    # cloud:
+    config:
+    frontend:
+      themes: !include_dir_merge_named themes
+    # groups: !include groups.yaml
+    history:
+    http:
+      use_x_forwarded_for: true
+      trusted_proxies:
+        - 0.0.0.0/0  # Allow from all
+    input_boolean:
+    input_button:
+    input_datetime:
+    input_number:
+    input_select:
+    input_text:
+    logbook:
+    map:
+    #mobile_app:
+    person:
+    scene:  # !include scenes.yaml
+    script:  # !include scripts.yaml
+    ssdp:
+    sun:
+    system_health:
+    #tts:
+    #  - platform: google_translate
+    # updater:
+    zeroconf:
+    zone:
+
+    # CONFIGURE LOGGING
+    logger:
+      default: info
+      logs:
+        homeassistant.components.http.ban: info
+
+    # CONFIGURE DATABASE
+    recorder:
+      db_url: !env_var POSTGRES_URI
+      commit_interval: 0          # Commit data immediately
+      auto_purge: true
+      purge_keep_days: 7          # Number of days to keep when purging
+      exclude:
+        domains:
+          #- automation           # Don't record automations
+          - updater               # Don't record the updater
+          #- media_player         # Don't record media player states
+        entities:
+          - sun.sun               # Don't record sun data
+          - sensor.last_boot      # Comes from 'systemmonitor' sensor platform
+          - sensor.date           # Don't record date
+        event_types:
+          - call_service          # Don't record service calls
