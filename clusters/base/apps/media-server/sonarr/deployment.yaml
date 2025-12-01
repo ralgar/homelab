@@ -104,7 +104,7 @@ spec:
             readOnlyRootFilesystem: false
       containers:
         - name: sonarr
-          image: ghcr.io/home-operations/sonarr:4.0.15
+          image: ghcr.io/home-operations/sonarr:4.0.16
           imagePullPolicy: IfNotPresent
           ports:
             - name: sonarr-http
