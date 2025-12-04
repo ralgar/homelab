@@ -2,11 +2,12 @@ data "ignition_file" "autorestic_config" {
   path = "/root/.autorestic.yml"
   mode = 384
   content {
-    content = templatefile("${path.module}/templates/autorestic.yml", {
+    content = templatefile("${path.module}/templates/autorestic.yml.tmpl", {
       backblaze_bucket      = var.backblaze_bucket
       backblaze_account_id  = var.backblaze_account_id
       backblaze_account_key = var.backblaze_account_key
       fqdn                  = var.fqdn
+      healthcheck_url       = var.healthcheck_url
       restic_password       = var.restic_password
     })
   }

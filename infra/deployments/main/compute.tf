@@ -6,6 +6,7 @@ module "backups" {
   backblaze_account_id  = var.backblaze_account_id
   backblaze_account_key = var.backblaze_account_key
   backblaze_bucket      = var.backblaze_bucket
+  healthcheck_url       = var.healthcheck_url
   restic_password       = var.restic_password
 }
 

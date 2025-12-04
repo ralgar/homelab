@@ -19,6 +19,9 @@ locations:
         - systemctl stop containers.target
       success:
         - systemctl start containers.target
+%{ if healthcheck_url != null ~}
+        - curl -fsS -m 10 --retry 5 -o /dev/null ${healthcheck_url}
+%{ endif ~}
       failure:
         - systemctl start containers.target
 

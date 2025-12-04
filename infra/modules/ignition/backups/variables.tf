@@ -25,6 +25,13 @@ variable "backblaze_account_key" {
   sensitive   = true
 }
 
+variable "healthcheck_url" {
+  description = "Healthcheck URL to ping on backup success."
+  type        = string
+  sensitive   = true
+  default     = null
+}
+
 variable "restic_password" {
   description = "Password for the Restic backup repo."
   type        = string
