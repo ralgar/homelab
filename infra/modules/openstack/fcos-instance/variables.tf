@@ -4,7 +4,14 @@ variable "fcos_version" {
 }
 variable "domain" {}
 variable "keypair" {}
-variable "network" {}
+
+variable "network_id" {
+  type = string
+}
+
+variable "subnet_id" {
+  type = string
+}
 
 variable "name" {
   type        = string

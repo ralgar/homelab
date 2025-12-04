@@ -49,6 +49,7 @@ module "media_server" {
   ]
 
   // Network configuration
-  network = var.environment == "prod" ? data.openstack_networking_network_v2.prod : data.openstack_networking_network_v2.dev
+  network_id = var.environment == "prod" ? data.openstack_networking_network_v2.prod.id : data.openstack_networking_network_v2.dev.id
+  subnet_id = var.environment == "prod" ? data.openstack_networking_subnet_v2.prod.id : data.openstack_networking_subnet_v2.dev.id
   secgroup_ids = [openstack_networking_secgroup_v2.media_server.id]
 }
