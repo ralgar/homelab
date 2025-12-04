@@ -84,7 +84,7 @@ spec:
     - name: kube-prometheus-stack
   chart:
     spec:
-      version: "2.10.2"
+      version: "2.10.3"
       chart: loki-stack
       sourceRef:
         kind: HelmRepository
