@@ -48,7 +48,7 @@ spec:
   interval: 5m
   chart:
     spec:
-      version: "0.20.1"
+      version: "v0.20.2"
       chart: trust-manager
       sourceRef:
         kind: HelmRepository
