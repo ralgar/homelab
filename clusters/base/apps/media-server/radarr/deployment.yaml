@@ -104,7 +104,7 @@ spec:
             readOnlyRootFilesystem: false
       containers:
         - name: radarr
-          image: ghcr.io/home-operations/radarr:6.0.4
+          image: ghcr.io/home-operations/radarr:6.1.0
           imagePullPolicy: IfNotPresent
           ports:
             - name: radarr-http
