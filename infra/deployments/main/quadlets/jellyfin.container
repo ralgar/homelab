@@ -4,7 +4,7 @@ PartOf=containers.target
 
 [Container]
 ContainerName=jellyfin
-Image=ghcr.io/jellyfin/jellyfin:10.10
+Image=ghcr.io/jellyfin/jellyfin:10.11
 User=9023
 Group=9030
 

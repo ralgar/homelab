@@ -12,7 +12,7 @@ module "backups" {
 
 module "media_server" {
   source       = "../../modules/openstack/fcos-instance"
-  fcos_version = 41
+  fcos_version = 43
 
   name = "Media Server"
   flavor_name = "m1.large"
