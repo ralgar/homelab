@@ -50,7 +50,7 @@ spec:
             readOnlyRootFilesystem: false
       containers:
         - name: hass
-          image: ghcr.io/home-operations/home-assistant:2025.10.4
+          image: ghcr.io/home-operations/home-assistant:2025.12.5
           imagePullPolicy: IfNotPresent
           ports:
             - name: hass-http
