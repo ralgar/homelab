@@ -23,7 +23,7 @@ spec:
   interval: 5m
   chart:
     spec:
-      version: "1.23.0"
+      version: "1.23.4"
       chart: vault-operator
       sourceRef:
         kind: HelmRepository
