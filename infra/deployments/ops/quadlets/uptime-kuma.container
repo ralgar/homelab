@@ -1,0 +1,24 @@
+[Unit]
+Description=Uptime Kuma Container
+PartOf=containers.target
+
+[Container]
+ContainerName=uptime-kuma
+Image=ghcr.io/louislam/uptime-kuma:2.0.2-slim-rootless
+User=3001
+Group=3001
+
+Label=io.containers.autoupdate=registry
+
+Environment=UMASK=0007
+
+Volume=uptime-kuma-data:/app/data:Z,U
+
+PublishPort=3001:3001
+
+[Service]
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=containers.target

@@ -35,7 +35,7 @@ include:
 
 # We define the deployments here.
 .deployment_matrix: &deployments
-  - DEPLOYMENT: ['admin', 'main']
+  - DEPLOYMENT: ['admin', 'main', 'ops']
 
 # Spawn a parallel matrix of Child Pipelines using the 'deployment_matrix'.
 # Deploys to production.
