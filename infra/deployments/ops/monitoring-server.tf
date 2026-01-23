@@ -1,3 +1,28 @@
+locals {
+  monitoring_server_fqdn = "monitoring.${openstack_dns_zone_v2.ops.name}"
+}
+
+# DNS record for monitoring server
+resource "openstack_dns_recordset_v2" "monitoring" {
+  zone_id     = openstack_dns_zone_v2.ops.id
+  description = "Monitoring server (${var.environment})"
+
+  name    = local.monitoring_server_fqdn
+  type    = "A"
+  records = [module.monitoring_server.ipv4_address]
+}
+
+module "monitoring_backups" {
+  source      = "../../modules/ignition/backups"
+  environment = var.environment
+  fqdn        = trimsuffix(local.monitoring_server_fqdn, ".")
+
+  backblaze_account_id  = var.backblaze_account_id
+  backblaze_account_key = var.backblaze_account_key
+  backblaze_bucket      = var.backblaze_bucket
+  restic_password       = var.restic_password
+}
+
 module "monitoring_server" {
   source       = "../../modules/openstack/fcos-instance"
   fcos_version = 43
@@ -6,12 +31,17 @@ module "monitoring_server" {
   flavor_name = "c1.small"
   container_storage_size = 20
 
-  domain  = "monitoring.internal"
+  domain  = trimsuffix(local.monitoring_server_fqdn, ".")
   keypair = data.openstack_compute_keypair_v2.admin
 
   quadlets = {
     "${path.module}/quadlets/uptime-kuma.container" = {}
   }
+
+  // Additional Ignition configs to merge
+  ignition_configs = [
+    module.monitoring_backups.ignition_config,
+  ]
 
   // Network configuration
   network_id = var.environment == "prod" ? data.openstack_networking_network_v2.prod.id : data.openstack_networking_network_v2.dev.id
