@@ -1,0 +1,30 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: monitoring-controllers
+spec:
+  targetNamespace: monitoring
+  interval: 1h
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./kubernetes/workloads/system/monitoring/controllers
+  prune: true
+  wait: true
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: monitoring-configs
+spec:
+  targetNamespace: monitoring
+  interval: 1h
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./kubernetes/workloads/system/monitoring/configs
+  prune: true
+  wait: true
+  dependsOn:
+    - name: monitoring-controllers

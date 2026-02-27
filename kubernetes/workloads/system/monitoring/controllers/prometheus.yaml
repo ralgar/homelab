@@ -1,0 +1,61 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: prometheus-community
+spec:
+  interval: 120m
+  url: https://prometheus-community.github.io/helm-charts
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kube-prometheus-stack
+spec:
+  interval: 5m
+  chart:
+    spec:
+      version: "77.13.0"
+      chart: kube-prometheus-stack
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus-community
+      interval: 60m
+  timeout: 10m
+  install:
+    crds: Create
+  upgrade:
+    crds: CreateReplace
+  # https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml
+  values:
+    kubeEtcd:
+      service:
+        selector:
+          # Hacky workaround so we don't have to hard-code the Talos node address
+          k8s-app: kube-controller-manager
+    prometheus:
+      prometheusSpec:
+        retention: 24h
+        resources:
+          requests:
+            cpu: 200m
+            memory: 200Mi
+        # Pick up all monitors, regardless of labelling.
+        ruleSelectorNilUsesHelmValues: false
+        serviceMonitorSelectorNilUsesHelmValues: false
+        podMonitorSelectorNilUsesHelmValues: false
+        probeSelectorNilUsesHelmValues: false
+        scrapeConfigSelectorNilUsesHelmValues: false
+    alertmanager:
+      enabled: true
+      podDisruptionBudget:
+        enabled: false
+        minAvailable: 1
+      alertmanagerSpec:
+        configSecret: alertmanager-config
+        secrets:
+          - alertmanager-credentials
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi

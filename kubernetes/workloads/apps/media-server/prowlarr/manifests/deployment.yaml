@@ -1,0 +1,154 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prowlarr
+  namespace: media-server
+  labels:
+    app.kubernetes.io/name: prowlarr
+spec:
+  revisionHistoryLimit: 3
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: prowlarr
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: prowlarr
+    spec:
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: true
+      securityContext:
+        runAsUser: 109696
+        runAsGroup: 109030
+        fsGroup: 109030
+        seLinuxOptions:
+          level: "s0:c123,c456"
+      containers:
+        - name: prowlarr
+          image: ghcr.io/home-operations/prowlarr:2.3.2.5245@sha256:e2459e199564ab852c6e677e951cef36c172a8e71a0e1c90665631b5a0c57438
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: PROWLARR__APP__THEME
+              value: dark
+            - name: PROWLARR__AUTH__METHOD
+              value: External
+            - name: PROWLARR__AUTH__REQUIRED
+              value: DisabledForLocalAddresses
+            - name: PROWLARR__LOG__DBENABLED
+              value: "False"
+            - name: PROWLARR__LOG__LEVEL
+              value: info
+            - name: PROWLARR__AUTH__APIKEY
+              valueFrom: { secretKeyRef: { name: prowlarr-secrets, key: apiKey } }
+            - name: PROWLARR__POSTGRES__HOST
+              valueFrom: { secretKeyRef: { name: media-server-pguser-prowlarr, key: host } }
+            - name: PROWLARR__POSTGRES__PORT
+              valueFrom: { secretKeyRef: { name: media-server-pguser-prowlarr, key: port } }
+            - name: PROWLARR__POSTGRES__USER
+              valueFrom: { secretKeyRef: { name: media-server-pguser-prowlarr, key: user } }
+            - name: PROWLARR__POSTGRES__PASSWORD
+              valueFrom: { secretKeyRef: { name: media-server-pguser-prowlarr, key: password } }
+            - name: PROWLARR__POSTGRES__MAINDB
+              valueFrom: { secretKeyRef: { name: media-server-pguser-prowlarr, key: dbname } }
+          ports:
+            - name: prowlarr-http
+              containerPort: &port 9696
+              protocol: TCP
+          volumeMounts:
+            - name: prowlarr-config
+              mountPath: /config
+            - name: media
+              mountPath: /media
+            - name: tmp
+              mountPath: /tmp
+          resources:
+            requests:
+              cpu: 250m
+              memory: 250Mi
+            limits:
+              memory: 4Gi
+          livenessProbe:
+            tcpSocket:
+              port: *port
+            initialDelaySeconds: 0
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: /ping
+              port: *port
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 5
+          startupProbe:
+            tcpSocket:
+              port: *port
+            initialDelaySeconds: 0
+            failureThreshold: 30
+            timeoutSeconds: 1
+            periodSeconds: 10
+          securityContext:
+            runAsNonRoot: true
+            privileged: false
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ['ALL']
+        - name: exporter
+          image: ghcr.io/onedr0p/exportarr:v2.3.0
+          imagePullPolicy: IfNotPresent
+          args:
+            - prowlarr
+          env:
+            - name: PORT
+              value: "9707"
+            - name: URL
+              value: "http://localhost:9696"
+            - name: APIKEY
+              valueFrom:
+                secretKeyRef:
+                  name: prowlarr-secrets
+                  key: apiKey
+          ports:
+            - name: monitoring
+              containerPort: 9707
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: monitoring
+            failureThreshold: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: monitoring
+            failureThreshold: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          securityContext:
+            runAsNonRoot: true
+            privileged: false
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ['ALL']
+      volumes:
+        - name: prowlarr-config
+          emptyDir:
+            sizeLimit: 128Mi
+        - name: media
+          persistentVolumeClaim:
+            claimName: media
+        - name: tmp
+          emptyDir: {}

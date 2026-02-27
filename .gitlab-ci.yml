@@ -1,6 +1,4 @@
 ---
-# Allow pipelines only for Merge Requests, and on push/merge to main.
-# Do not allow duplicate pipelines.
 workflow:
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH           # Run on main branch commits
@@ -12,70 +10,16 @@ workflow:
 
 default:
   tags:
-    - openstack
+    - homelab
   interruptible: true
 
 stages:
   - validate
   - build
-  - trigger
   - renovate
 
-cache:
-  key: "$CI_COMMIT_REF_NAME"
-  paths:
-    - .packer/
-
 include:
-  - local: '/.gitlab/ci/clusters.yml'
   - local: '/.gitlab/ci/docs.yml'
+  - local: '/.gitlab/ci/kubernetes.yml'
   - local: '/.gitlab/ci/metal.yml'
   - local: '/.gitlab/ci/renovate.yml'
-  - local: '/.gitlab/ci/templates.yml'
-
-# We define the deployments here.
-.deployment_matrix: &deployments
-  - DEPLOYMENT: ['admin', 'main', 'ops']
-
-# Spawn a parallel matrix of Child Pipelines using the 'deployment_matrix'.
-# Deploys to production.
-infra:prod:
-  stage: trigger
-  trigger:
-    strategy: depend
-    include:
-      - local: .gitlab/ci/infra.yml
-        inputs:
-          deployment: ${DEPLOYMENT}
-          environment: prod
-  rules:
-    - if: $CI_PIPELINE_SOURCE == 'schedule'
-      when: never
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE != "web"
-      changes:
-        - infra/deployments/${DEPLOYMENT}/**/*
-        - infra/modules/**/*
-        - .gitlab/ci/infra.yml
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "web"
-  parallel:
-    matrix: *deployments
-
-# Spawn a parallel matrix of Child Pipelines using the 'deployment_matrix'.
-# Deploys ephemeral dev environments for Merge Requests.
-infra:dev:
-  stage: trigger
-  trigger:
-    strategy: depend
-    include:
-      - local: .gitlab/ci/infra.yml
-        inputs:
-          deployment: ${DEPLOYMENT}
-          environment: dev-${CI_MERGE_REQUEST_IID}
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      changes:
-        - infra/deployments/${DEPLOYMENT}/**/*
-        - infra/modules/**/*
-        - .gitlab/ci/infra.yml
-  parallel:
-    matrix: *deployments

@@ -1,6 +1,0 @@
----
-- name: "Restart the 'octavia_worker' container"
-  community.docker.docker_container:
-    name: octavia_worker
-    restart: true
-  listen: restart_octavia_worker

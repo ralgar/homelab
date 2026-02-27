@@ -1,0 +1,13 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: omnicosm-tls
+spec:
+  secretName: omnicosm-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+  - "*.staging.omnicosm.net"
+  - staging.omnicosm.net

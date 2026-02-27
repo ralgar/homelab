@@ -1,0 +1,11 @@
+---
+# Allow Talos API access for the talos-backup cronjob.
+# NOTE: This only enables API access, it doesn't deploy the actual backup job.
+machine:
+  features:
+    kubernetesTalosAPIAccess:
+      enabled: true
+      allowedRoles:
+        - os:etcd:backup
+      allowedKubernetesNamespaces:
+        - kube-system

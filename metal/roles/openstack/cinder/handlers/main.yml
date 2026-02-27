@@ -1,4 +1,0 @@
----
-- name: Include tasks
-  ansible.builtin.include_tasks: restart-containers.yml
-  listen: restart_containers

@@ -1,0 +1,35 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: alertmanager-config
+stringData:
+  alertmanager.yaml: |-
+    # https://prometheus.io/docs/alerting/latest/configuration
+    route:
+      group_by: ['alertname', 'cluster', 'service']
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 3h
+      receiver: pushover
+      routes:
+        - matchers:
+          - alertname = InfoInhibitor
+          receiver: 'null'
+        - matchers:
+          - alertname = Watchdog
+          repeat_interval: 5m  # Ping frequently
+          receiver: 'healthcheck'
+    receivers:
+      - name: 'null'
+      - name: 'pushover'
+        pushover_configs:
+          - user_key_file: /etc/alertmanager/secrets/alertmanager-credentials/pushover_user_key
+            token_file: /etc/alertmanager/secrets/alertmanager-credentials/pushover_token
+            priority: '-1'
+            retry: 5m
+            expire: 1h
+      - name: 'healthcheck'
+        webhook_configs:
+          - url_file: /etc/alertmanager/secrets/alertmanager-credentials/healthcheck_url
+            send_resolved: false  # Don't send when resolved, just ping when firing

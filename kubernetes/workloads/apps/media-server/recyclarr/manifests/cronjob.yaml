@@ -1,0 +1,66 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: recyclarr
+spec:
+  schedule: "0 0 * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    metadata:
+      name: recyclarr
+    spec:
+      backoffLimit: 0
+      successfulJobsHistoryLimit: 1
+      failedJobsHistoryLimit: 1
+      template:
+        spec:
+          restartPolicy: Never
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+            fsGroupChangePolicy: OnRootMismatch
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: recyclarr
+              image: ghcr.io/recyclarr/recyclarr:8.3.2@sha256:55afe316d3e4e4e3b9120cef7c79436b1b5311f6a18d4ef4b7653e720499c90a
+              imagePullPolicy: IfNotPresent
+              args: ["sync"]
+              env:
+                - name: RECYCLARR_DATA_DIR
+                  value: /tmp
+                - name: RADARR_API_KEY
+                  valueFrom: { secretKeyRef: { name: radarr-secrets, key: apiKey } }
+                - name: SONARR_API_KEY
+                  valueFrom: { secretKeyRef: { name: sonarr-secrets, key: apiKey } }
+              volumeMounts:
+                - name: config
+                  mountPath: /config
+                - name: configmap
+                  mountPath: /config/recyclarr.yml
+                  subPath: recyclarr.yml
+                - name: tmp
+                  mountPath: /tmp
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  memory: 256Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: ["ALL"]
+          volumes:
+            - name: config
+              persistentVolumeClaim:
+                claimName: recyclarr
+            - name: configmap
+              configMap:
+                name: recyclarr-config
+            - name: tmp
+              emptyDir: {}

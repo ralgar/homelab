@@ -1,0 +1,389 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: ceph-cluster
+spec:
+  interval: 5m
+  chart:
+    spec:
+      version: "1.18.7"
+      chart: rook-ceph-cluster
+      sourceRef:
+        kind: HelmRepository
+        name: rook-release
+      interval: 60m
+  install:
+    crds: Create
+  upgrade:
+    crds: CreateReplace
+  # https://github.com/rook/rook/blob/master/deploy/charts/rook-ceph-cluster/values.yaml
+  values:
+    operatorNamespace: rook-ceph
+    clusterName: ceph
+    kubeVersion:
+    configOverride: |
+      [global]
+      osd_pool_default_size = 2
+      osd_pool_default_min_size = 1
+      auth_allow_insecure_global_id_reclaim = false
+    toolbox:
+      enabled: true
+      tolerations: []
+      affinity: {}
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "64Mi"
+      priorityClassName:
+    monitoring:
+      enabled: true
+      metricsDisabled: false
+      createPrometheusRules: true
+      rulesNamespaceOverride:
+      prometheusRule:
+        labels:
+          release: kube-prometheus-stack
+        annotations: {}
+    pspEnable: false
+    cephClusterSpec:
+      cephVersion:
+        image: quay.io/ceph/ceph:v19.2.3
+        allowUnsupported: false
+      dataDirHostPath: /var/lib/rook
+      skipUpgradeChecks: false
+      continueUpgradeAfterChecksEvenIfNotHealthy: false
+      waitTimeoutForHealthyOSDInMinutes: 10
+      mon:
+        count: 1
+        allowMultiplePerNode: false
+      mgr:
+        count: 1
+        allowMultiplePerNode: false
+        modules:
+          - name: pg_autoscaler
+            enabled: true
+          - name: dashboard
+            enabled: false
+          - name: nfs
+            enabled: false
+      dashboard:
+        enabled: false
+        ssl: true
+      network:
+        connections:
+          encryption:
+            enabled: false
+          compression:
+            enabled: false
+          requireMsgr2: false
+        provider: host
+      crashCollector:
+        disable: true
+      logCollector:
+        enabled: true
+        periodicity: daily # one of: hourly, daily, weekly, monthly
+        maxLogSize: 500M # SUFFIX may be 'M' or 'G'. Must be at least 1M.
+      cleanupPolicy:
+        confirmation: ""
+        sanitizeDisks:
+          method: quick
+          dataSource: zero
+          iteration: 1
+        allowUninstallWithVolumes: false
+      removeOSDsIfOutAndSafeToRemove: false
+      priorityClassNames:
+        mon: system-node-critical
+        osd: system-node-critical
+        mgr: system-cluster-critical
+      storage: # cluster level storage configuration and selection
+        useAllNodes: false
+        useAllDevices: false
+        nodes:
+          - name: "talos-aio"  # Must match the node's hostname
+            devices:
+              # Device paths map to the SCSI controller's drive bays.
+              # We specify all 8 bays and can hotswap drives as needed.
+              - name: "/dev/disk/by-path/pci-0000:08:00.0-scsi-0:2:0:0"
+              - name: "/dev/disk/by-path/pci-0000:08:00.0-scsi-0:2:1:0"
+              - name: "/dev/disk/by-path/pci-0000:08:00.0-scsi-0:2:2:0"
+              - name: "/dev/disk/by-path/pci-0000:08:00.0-scsi-0:2:3:0"
+              - name: "/dev/disk/by-path/pci-0000:08:00.0-scsi-0:2:4:0"
+              - name: "/dev/disk/by-path/pci-0000:08:00.0-scsi-0:2:5:0"
+              - name: "/dev/disk/by-path/pci-0000:08:00.0-scsi-0:2:6:0"
+              - name: "/dev/disk/by-path/pci-0000:08:00.0-scsi-0:2:7:0"
+      disruptionManagement:
+        managePodBudgets: true
+        osdMaintenanceTimeout: 30
+        pgHealthCheckTimeout: 0
+      healthCheck:
+        daemonHealth:
+          mon:
+            disabled: false
+            interval: 45s
+          osd:
+            disabled: false
+            interval: 60s
+          status:
+            disabled: false
+            interval: 60s
+        livenessProbe:
+          mon:
+            disabled: false
+          mgr:
+            disabled: false
+          osd:
+            disabled: false
+      resources:
+        mon:
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+        mgr:
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+        osd:
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+
+    # -- A list of CephBlockPool configurations to deploy
+    # @default -- See [below](#ceph-block-pools)
+    cephBlockPools:
+      - name: ceph-blockpool
+        # see https://github.com/rook/rook/blob/master/Documentation/CRDs/Block-Storage/ceph-block-pool-crd.md#spec for available configuration
+        spec:
+          failureDomain: osd
+          replicated:
+            size: 2
+          # Enables collecting RBD per-image IO statistics by enabling dynamic OSD performance counters. Defaults to false.
+          # For reference: https://docs.ceph.com/docs/latest/mgr/prometheus/#rbd-io-statistics
+          # enableRBDStats: true
+        storageClass:
+          enabled: true
+          name: general
+          annotations: {}
+          labels: {}
+          isDefault: true
+          reclaimPolicy: Delete
+          allowVolumeExpansion: true
+          volumeBindingMode: "Immediate"
+          mountOptions: []
+          # see https://kubernetes.io/docs/concepts/storage/storage-classes/#allowed-topologies
+          allowedTopologies: []
+          #        - matchLabelExpressions:
+          #            - key: rook-ceph-role
+          #              values:
+          #                - storage-node
+          # see https://github.com/rook/rook/blob/master/Documentation/Storage-Configuration/Block-Storage-RBD/block-storage.md#provision-storage for available configuration
+          parameters:
+            # (optional) mapOptions is a comma-separated list of map options.
+            # For krbd options refer
+            # https://docs.ceph.com/docs/latest/man/8/rbd/#kernel-rbd-krbd-options
+            # For nbd options refer
+            # https://docs.ceph.com/docs/latest/man/8/rbd-nbd/#options
+            # mapOptions: lock_on_read,queue_depth=1024
+
+            # (optional) unmapOptions is a comma-separated list of unmap options.
+            # For krbd options refer
+            # https://docs.ceph.com/docs/latest/man/8/rbd/#kernel-rbd-krbd-options
+            # For nbd options refer
+            # https://docs.ceph.com/docs/latest/man/8/rbd-nbd/#options
+            # unmapOptions: force
+
+            # RBD image format. Defaults to "2".
+            imageFormat: "2"
+
+            # RBD image features, equivalent to OR'd bitfield value: 63
+            # Available for imageFormat: "2". Older releases of CSI RBD
+            # support only the `layering` feature. The Linux kernel (KRBD) supports the
+            # full feature complement as of 5.4
+            imageFeatures: layering
+
+            # These secrets contain Ceph admin credentials.
+            csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
+            csi.storage.k8s.io/provisioner-secret-namespace: "{{ .Release.Namespace }}"
+            csi.storage.k8s.io/controller-expand-secret-name: rook-csi-rbd-provisioner
+            csi.storage.k8s.io/controller-expand-secret-namespace: "{{ .Release.Namespace }}"
+            csi.storage.k8s.io/controller-publish-secret-name: rook-csi-rbd-provisioner
+            csi.storage.k8s.io/controller-publish-secret-namespace: "{{ .Release.Namespace }}"
+            csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
+            csi.storage.k8s.io/node-stage-secret-namespace: "{{ .Release.Namespace }}"
+            # Specify the filesystem type of the volume. If not specified, csi-provisioner
+            # will set default as `ext4`. Note that `xfs` is not recommended due to potential deadlock
+            # in hyperconverged settings where the volume is mounted on the same node as the osds.
+            csi.storage.k8s.io/fstype: ext4
+
+    # -- A list of CephFileSystem configurations to deploy
+    # @default -- See [below](#ceph-file-systems)
+    cephFileSystems:
+      - name: ceph-filesystem
+        # see https://github.com/rook/rook/blob/master/Documentation/CRDs/Shared-Filesystem/ceph-filesystem-crd.md#filesystem-settings for available configuration
+        spec:
+          metadataPool:
+            failureDomain: osd
+            replicated:
+              size: 2
+          dataPools:
+            - failureDomain: osd
+              replicated:
+                size: 2
+              # Optional and highly recommended, 'data0' by default, see https://github.com/rook/rook/blob/master/Documentation/CRDs/Shared-Filesystem/ceph-filesystem-crd.md#pools
+              name: data0
+          metadataServer:
+            activeCount: 1
+            activeStandby: false
+            resources:
+              limits:
+                memory: "4Gi"
+              requests:
+                cpu: "100m"
+                memory: "250Mi"
+            priorityClassName: system-cluster-critical
+        storageClass:
+          enabled: true
+          isDefault: false
+          name: general-shared
+          # (Optional) specify a data pool to use, must be the name of one of the data pools above, 'data0' by default
+          pool: data0
+          reclaimPolicy: Delete
+          allowVolumeExpansion: true
+          volumeBindingMode: "Immediate"
+          annotations: {}
+          labels: {}
+          mountOptions: []
+          # see https://github.com/rook/rook/blob/master/Documentation/Storage-Configuration/Shared-Filesystem-CephFS/filesystem-storage.md#provision-storage for available configuration
+          parameters:
+            # The secrets contain Ceph admin credentials.
+            csi.storage.k8s.io/provisioner-secret-name: rook-csi-cephfs-provisioner
+            csi.storage.k8s.io/provisioner-secret-namespace: "{{ .Release.Namespace }}"
+            csi.storage.k8s.io/controller-expand-secret-name: rook-csi-cephfs-provisioner
+            csi.storage.k8s.io/controller-expand-secret-namespace: "{{ .Release.Namespace }}"
+            csi.storage.k8s.io/controller-publish-secret-name: rook-csi-cephfs-provisioner
+            csi.storage.k8s.io/controller-publish-secret-namespace: "{{ .Release.Namespace }}"
+            csi.storage.k8s.io/node-stage-secret-name: rook-csi-cephfs-node
+            csi.storage.k8s.io/node-stage-secret-namespace: "{{ .Release.Namespace }}"
+            # Specify the filesystem type of the volume. If not specified, csi-provisioner
+            # will set default as `ext4`. Note that `xfs` is not recommended due to potential deadlock
+            # in hyperconverged settings where the volume is mounted on the same node as the osds.
+            csi.storage.k8s.io/fstype: ext4
+
+    # -- Settings for the filesystem snapshot class
+    # @default -- See [CephFS Snapshots](../Storage-Configuration/Ceph-CSI/ceph-csi-snapshot.md#cephfs-snapshots)
+    cephFileSystemVolumeSnapshotClass:
+      enabled: true
+      name: general-shared
+      isDefault: false
+      deletionPolicy: Delete
+      annotations: {}
+      labels: {}
+      # see https://rook.io/docs/rook/v1.10/Storage-Configuration/Ceph-CSI/ceph-csi-snapshot/#cephfs-snapshots for available configuration
+      parameters: {}
+
+    # -- Settings for the block pool snapshot class
+    # @default -- See [RBD Snapshots](../Storage-Configuration/Ceph-CSI/ceph-csi-snapshot.md#rbd-snapshots)
+    cephBlockPoolsVolumeSnapshotClass:
+      enabled: true
+      name: general
+      isDefault: true
+      deletionPolicy: Delete
+      annotations: {}
+      labels: {}
+      # see https://rook.io/docs/rook/v1.10/Storage-Configuration/Ceph-CSI/ceph-csi-snapshot/#rbd-snapshots for available configuration
+      parameters: {}
+
+    # -- A list of CephObjectStore configurations to deploy
+    # @default -- See [below](#ceph-object-stores)
+    cephObjectStores:
+      - name: ceph-objectstore
+        # see https://github.com/rook/rook/blob/master/Documentation/CRDs/Object-Storage/ceph-object-store-crd.md#object-store-settings for available configuration
+        spec:
+          metadataPool:
+            failureDomain: osd
+            replicated:
+              size: 2
+          dataPool:
+            failureDomain: osd
+            erasureCoded:
+              dataChunks: 2
+              codingChunks: 1
+            parameters:
+              bulk: "true"
+          preservePoolsOnDelete: true
+          gateway:
+            port: 80
+            resources:
+              limits:
+                memory: "2Gi"
+              requests:
+                cpu: "1000m"
+                memory: "1Gi"
+            # securePort: 443
+            # sslCertificateRef:
+            instances: 1
+            priorityClassName: system-cluster-critical
+            # opsLogSidecar:
+            #   resources:
+            #     limits:
+            #       memory: "100Mi"
+            #     requests:
+            #       cpu: "100m"
+            #       memory: "40Mi"
+        storageClass:
+          enabled: true
+          name: general-bucket
+          reclaimPolicy: Delete
+          volumeBindingMode: "Immediate"
+          annotations: {}
+          labels: {}
+          # see https://github.com/rook/rook/blob/master/Documentation/Storage-Configuration/Object-Storage-RGW/ceph-object-bucket-claim.md#storageclass for available configuration
+          parameters:
+            # note: objectStoreNamespace and objectStoreName are configured by the chart
+            region: us-east-1
+        ingress:
+          # Enable an ingress for the ceph-objectstore
+          enabled: false
+          # The ingress port by default will be the object store's "securePort" (if set), or the gateway "port".
+          # To override those defaults, set this ingress port to the desired port.
+          # port: 80
+          # annotations: {}
+          # host:
+          #   name: objectstore.example.com
+          #   path: /
+          #   pathType: Prefix
+          # tls:
+          # - hosts:
+          #     - objectstore.example.com
+          #   secretName: ceph-objectstore-tls
+          # ingressClassName: nginx
+        route:
+          # Enable an ingress for the ceph-objectstore
+          enabled: false
+          # The ingress port by default will be the object store's "securePort" (if set), or the gateway "port".
+          # To override those defaults, set this ingress port to the desired port.
+          # port: 80
+          # annotations: {}
+          # host:
+          #   name: objectstore.example.com
+          #   path: /
+          #   pathType: PathPrefix
+          # parentRefs:
+          #   - name: internal
+          #     namespace: kube-system
+          #     sectionName: https
+---
+# Sets size and failureDomain for builtin .mgr pool, since Rook Ceph
+#  doesn't provide any way to configure this in the Helm chart.
+apiVersion: ceph.rook.io/v1
+kind: CephBlockPool
+metadata:
+  name: builtin-mgr
+  namespace: rook-ceph # namespace:cluster
+spec:
+  name: .mgr
+  enableCrushUpdates: true  # Required to update failureDomain
+  failureDomain: osd
+  replicated:
+    size: 2
+    requireSafeReplicaSize: false

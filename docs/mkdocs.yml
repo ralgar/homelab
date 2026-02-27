@@ -1,7 +1,7 @@
 site_name: Homelab Docs
 copyright: >
   <div align="center">
-  Copyright &copy; 2024 Ryan Algar
+  Copyright &copy; 2022-2026 Ryan Algar
   </div>
 repo_url: https://gitlab.com/ralgar/homelab
 site_url: https://ralgar.gitlab.io/homelab/
@@ -50,21 +50,8 @@ nav:
   - features.md
   - Getting Started:
     - getting-started/prerequisites.md
-    - getting-started/deploy-openstack.md
-    - getting-started/cicd-configuration.md
-    - getting-started/windows-images.md
+    - getting-started/configuration.md
+    - getting-started/deploy-kubernetes.md
     - getting-started/renovate-bot.md
-  - Managing Deployments:
-    - deployments/introduction.md
-    - deployments/admin.md
-    - deployments/main.md
-    - deployments/main-k8s.md
-  - Managing OpenStack:
-    - Ceph:
-      - Benchmarking: managing-openstack/ceph/benchmarking.md
-      - Dashboard Access: managing-openstack/ceph/dashboard-access.md
-    - Cinder:
-      - Import/Export Volumes: managing-openstack/cinder/import-export-volumes.md
-      - Troubleshooting: managing-openstack/cinder/troubleshooting.md
   - Reference:
     - reference/license.md

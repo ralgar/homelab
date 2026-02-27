@@ -1,3 +1,0 @@
----
-kolla_networks: "{{ network }}"
-ceph_osds: "{{ ceph_default_osds if ci_pipeline else storage.ceph_osds }}"

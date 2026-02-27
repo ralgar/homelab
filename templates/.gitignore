@@ -1,5 +1,0 @@
-# Ignore all ISO files
-*.iso
-
-# Ignore all image output directories
-output-*/

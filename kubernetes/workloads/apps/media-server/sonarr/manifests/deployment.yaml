@@ -1,0 +1,154 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sonarr
+  namespace: media-server
+  labels:
+    app.kubernetes.io/name: sonarr
+spec:
+  revisionHistoryLimit: 3
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sonarr
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: sonarr
+    spec:
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: true
+      securityContext:
+        runAsUser: 108989
+        runAsGroup: 109030
+        fsGroup: 109030
+        seLinuxOptions:
+          level: "s0:c123,c456"
+      containers:
+        - name: sonarr
+          image: ghcr.io/home-operations/sonarr:4.0.16.2946@sha256:22651c750eedb091f6d76ade95dbecae0eeafe2b55432c3b8d8b042e8745f344
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: SONARR__APP__THEME
+              value: dark
+            - name: SONARR__AUTH__METHOD
+              value: External
+            - name: SONARR__AUTH__REQUIRED
+              value: DisabledForLocalAddresses
+            - name: SONARR__LOG__DBENABLED
+              value: "False"
+            - name: SONARR__LOG__LEVEL
+              value: info
+            - name: SONARR__AUTH__APIKEY
+              valueFrom: { secretKeyRef: { name: sonarr-secrets, key: apiKey } }
+            - name: SONARR__POSTGRES__HOST
+              valueFrom: { secretKeyRef: { name: media-server-pguser-sonarr, key: host } }
+            - name: SONARR__POSTGRES__PORT
+              valueFrom: { secretKeyRef: { name: media-server-pguser-sonarr, key: port } }
+            - name: SONARR__POSTGRES__USER
+              valueFrom: { secretKeyRef: { name: media-server-pguser-sonarr, key: user } }
+            - name: SONARR__POSTGRES__PASSWORD
+              valueFrom: { secretKeyRef: { name: media-server-pguser-sonarr, key: password } }
+            - name: SONARR__POSTGRES__MAINDB
+              valueFrom: { secretKeyRef: { name: media-server-pguser-sonarr, key: dbname } }
+          ports:
+            - name: sonarr-http
+              containerPort: &port 8989
+              protocol: TCP
+          volumeMounts:
+            - name: sonarr-config
+              mountPath: /config
+            - name: media
+              mountPath: /media
+            - name: tmp
+              mountPath: /tmp
+          resources:
+            requests:
+              cpu: 250m
+              memory: 250Mi
+            limits:
+              memory: 4Gi
+          livenessProbe:
+            tcpSocket:
+              port: *port
+            initialDelaySeconds: 0
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: /ping
+              port: *port
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 5
+          startupProbe:
+            tcpSocket:
+              port: *port
+            initialDelaySeconds: 0
+            failureThreshold: 30
+            timeoutSeconds: 1
+            periodSeconds: 10
+          securityContext:
+            runAsNonRoot: true
+            privileged: false
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ['ALL']
+        - name: exporter
+          image: ghcr.io/onedr0p/exportarr:v2.3.0
+          imagePullPolicy: IfNotPresent
+          args:
+            - sonarr
+          env:
+            - name: PORT
+              value: "9707"
+            - name: URL
+              value: "http://localhost:8989"
+            - name: APIKEY
+              valueFrom:
+                secretKeyRef:
+                  name: sonarr-secrets
+                  key: apiKey
+          ports:
+            - name: monitoring
+              containerPort: 9707
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: monitoring
+            failureThreshold: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: monitoring
+            failureThreshold: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          securityContext:
+            runAsNonRoot: true
+            privileged: false
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ['ALL']
+      volumes:
+        - name: sonarr-config
+          emptyDir:
+            sizeLimit: 128Mi
+        - name: media
+          persistentVolumeClaim:
+            claimName: media
+        - name: tmp
+          emptyDir: {}

@@ -1,0 +1,50 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: common
+spec:
+  targetNamespace: media-server
+  interval: 1h
+  prune: true
+  wait: true
+  components:
+    - ../../../../../components/postgres
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  path: ./kubernetes/workloads/apps/media-server/common/manifests
+  postBuild:
+    substitute:
+      APP: media-server
+      BACKUPS__S3_BUCKET: cluster-backups-4265
+      BACKUPS__S3_ENDPOINT: s3.us-west-004.backblazeb2.com
+  patches:
+    - patch: |-
+        - op: replace
+          path: /spec/users
+          value:
+            - name: prowlarr
+              databases:
+                - prowlarr
+              options: "SUPERUSER"
+              password:
+                type: AlphaNumeric
+            - name: radarr
+              databases:
+                - radarr
+              password:
+                type: AlphaNumeric
+            - name: seerr
+              databases:
+                - seerr
+              password:
+                type: AlphaNumeric
+            - name: sonarr
+              databases:
+                - sonarr
+              password:
+                type: AlphaNumeric
+      target:
+        kind: PostgresCluster

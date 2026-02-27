@@ -1,0 +1,40 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sabnzbd
+  namespace: media-server
+  labels:
+    app.kubernetes.io/name: sabnzbd
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: sabnzbd
+  ports:
+    - name: sabnzbd-http
+      port: 8080
+      protocol: TCP
+      targetPort: sabnzbd-http
+    - name: monitoring
+      port: 9707
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: sabnzbd
+  namespace: media-server
+  labels:
+    app.kubernetes.io/name: sabnzbd
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: sabnzbd.${DOMAIN}
+spec:
+  parentRefs:
+    - name: private
+      namespace: networking
+      sectionName: https
+  hostnames:
+    - sabnzbd.${DOMAIN}
+  rules:
+    - backendRefs:
+        - name: sabnzbd
+          port: 8080

@@ -1,6 +1,0 @@
----
-- name: Perform Kolla deployment
-  ansible.builtin.shell: |
-    source {{ kolla_venv }}/bin/activate
-    kolla-ansible deploy
-  notify: post_deploy

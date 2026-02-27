@@ -1,0 +1,27 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/recyclarr/recyclarr/refs/tags/v8.0.0/schemas/config-schema.json
+radarr:
+  remux-web-1080p:
+    base_url: http://radarr.media-server.svc.cluster.local:7878
+    api_key: !env_var RADARR_API_KEY
+    delete_old_custom_formats: true
+    quality_definition:
+      type: movie
+    quality_profiles:
+      # https://trash-guides.info/Radarr/radarr-setup-quality-profiles/#remux-web-1080p
+      - trash_id: 9ca12ea80aa55ef916e3751f4b874151  # Remux + WEB 1080p
+        reset_unmatched_scores:
+          enabled: true
+
+sonarr:
+  web-1080p:
+    base_url: http://sonarr.media-server.svc.cluster.local:8989
+    api_key: !env_var SONARR_API_KEY
+    delete_old_custom_formats: true
+    quality_definition:
+      type: series
+    quality_profiles:
+      # https://trash-guides.info/Sonarr/sonarr-setup-quality-profiles/#web-1080p
+      - trash_id: 72dae194fc92bf828f32cde7744e51a1  # WEB-1080p
+        reset_unmatched_scores:
+          enabled: true

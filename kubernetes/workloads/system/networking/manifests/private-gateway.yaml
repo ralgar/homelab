@@ -1,0 +1,26 @@
+---
+# Owns the load-balancer IP and terminates TLS
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: private
+spec:
+  gatewayClassName: cilium
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: https
+      protocol: HTTPS
+      port: 443
+      allowedRoutes:
+        namespaces:
+          from: All
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: omnicosm-tls
+            namespace: networking

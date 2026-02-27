@@ -2,59 +2,41 @@
 
 ---
 
-## OpenStack Cloud Platform
+## Kubernetes Cluster
 
-### Automated Deployment
+### System
 
-- [x] Builds a self-installing Rocky Linux ISO
-- [x] Provides Ansible roles for deploying a single-node OpenStack cloud
-- [x] Provides a GitLab Runner for infrastructure CI/CD jobs
+- [x] Talos Linux — immutable, API-driven OS with automated etcd backups
+- [x] GitOps-driven continuous deployment via Flux
 
-### OpenStack Services
+### Networking
 
-- [x] Nova (Compute)
-- [x] Neutron (Networking)
-- [x] Octavia (Load Balancing)
-- [x] Designate (DNS)
-- [x] Ceph Storage Cluster
-    - [x] Cinder Volumes (Block Storage)
-    - [x] Cinder Backups (Block Storage)
-    - [x] Glance (Image Storage)
-    - [x] Manila (Shared Filesystems)
-    - [x] RADOS Gateway (Object Storage)
-- [x] Heat (Stack Orchestration)
-- [x] Magnum (Container Orchestration)
+- [x] Cilium CNI with Envoy-powered Gateway API (HTTPRoute)
+- [x] Automated TLS certificate management via cert-manager with Let's Encrypt
 
-### Administrative Features
+### Storage
 
-- [x] Automated building of cloud-ready Windows Server images
-    - [x] Windows Server 2019 Datacenter (Core)
-    - [x] Windows Server 2019 Datacenter (Desktop)
+- [x] Block, object, and shared filesystem storage powered by Rook Ceph
+- [x] VolSync for automated, incremental volume backup and restore
 
----
+### Security & Secrets
 
-## Homelab Infrastructure
+- [x] HashiCorp Vault for secrets management with automated generation
+- [x] External Secrets Operator syncing from Vault and GitLab CI/CD Variables
 
-These are the actual workloads that we'll be deploying on our cloud.
+### Databases
 
-### FCOS All-in-One Server (in production)
+- [x] Crunchy Postgres Operator (PGO) for cloud-native PostgreSQL deployment
+- [x] Reusable Postgres component with seamless, automatic backup and restore
 
-A single Fedora CoreOS server. Simple and reliable, and little-to-no maintenance.
+### Observability
 
-- [x] Complete media server platform, with requests and automated acquisitions.
-- [x] Home automation platform, easily integrated with the media platform.
-- [x] Fully automated deployment through GitLab CI and Terraform.
-- [x] CI-driven staging environment, so you can test changes before merging.
-- [x] Leverages Podman containers, and SELinux, for isolation.
-- [x] Automatic OS and application container updates.
-- [x] Automatic, incremental backups.
+- [x] Prometheus metrics scraped from critical components
+- [x] Grafana with dashboards for visualization of metrics
+- [x] Loki for cluster-wide log aggregation
+- [ ] Exportarr sidecars for rich *arr application metrics
 
-### Kubernetes Cluster (in development/testing)
+### Applications
 
-- [ ] Automated cluster provisioning through GitLab CI and Terraform.
-- [x] Automated Continuous Deployment of applications through
-      [Flux](https://fluxcd.io/flux).
-- [x] Monitoring system based on Prometheus and Grafana.
-- [x] Highly available control plane (optional).
-- [x] Automatic snapshots and backups.
-- [ ] Planned: Automatic horizontal scaling.
+- [x] Complete media server platform with requests and automated acquisition
+- [x] Home automation platform powered by MQTT protocol

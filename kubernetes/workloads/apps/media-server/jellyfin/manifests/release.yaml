@@ -1,0 +1,66 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: jellyfin
+spec:
+  interval: 5m
+  chart:
+    spec:
+      version: 2.7.0
+      chart: jellyfin
+      sourceRef:
+        kind: HelmRepository
+        name: jellyfin
+      interval: 60m
+  install:
+    crds: Create
+  upgrade:
+    crds: CreateReplace
+  values:
+    jellyfin:
+      enableDLNA: false
+    persistence:
+      media:
+        enabled: true
+        existingClaim: media
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+
+    podSecurityContext:
+      runAsUser: 108096
+      runAsGroup: 109030
+      fsGroup: 109030
+      seLinuxOptions:
+        level: "s0:c123,c456"
+    securityContext:
+      runAsNonRoot: true
+      privileged: false
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      capabilities:
+        drop: ['ALL']
+
+    resources:
+      requests:
+        cpu: 250m
+        memory: 250Mi
+      limits:
+        memory: 8Gi
+
+    httpRoute:
+      enabled: true
+      annotations: {}
+      parentRefs:
+        - name: shared-gateway
+          namespace: networking
+          sectionName: https
+      hostnames:
+        - stream.${DOMAIN}
+      rules:
+        - matches:
+            - path:
+                type: PathPrefix
+                value: /

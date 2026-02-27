@@ -1,0 +1,14 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: flux-system
+resources:
+  - ../../../workloads/system/cert-manager/sync.yaml
+  - ../../../workloads/system/cilium/sync.yaml
+  - ../../../workloads/system/external-secrets/sync.yaml
+  - ../../../workloads/system/external-snapshotter/sync.yaml
+  - ../../../workloads/system/metrics-server/sync.yaml
+  - ../../../workloads/system/monitoring/sync.yaml
+  - ../../../workloads/system/networking/sync.yaml
+  - ../../../workloads/system/rook-ceph/sync.yaml
+  - ../../../workloads/system/talos-backup/sync.yaml

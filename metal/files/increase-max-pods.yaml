@@ -1,0 +1,5 @@
+---
+machine:
+  kubelet:
+    extraArgs:
+      max-pods: "250"  # Increase from default 110 (a bit light for single-node)

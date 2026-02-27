@@ -1,0 +1,56 @@
+---
+apiVersion: postgres-operator.crunchydata.com/v1beta1
+kind: PostgresCluster
+metadata:
+  name: ${APP}
+spec:
+  postgresVersion: ${POSTGRES__VERSION:=14}
+  instances:
+    - name: postgres
+      dataVolumeClaimSpec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: ${POSTGRES__VOLUME_CAPACITY:=5Gi}
+  users: []
+  # patroni:
+  #   dynamicConfiguration:
+  #     postgresql:
+  #       pg_hba:
+  #         - "hostnossl all all all md5"  # Disable TLS
+  dataSource:
+    pgbackrest:
+      configuration:
+        - secret:
+            name: ${APP}-pgbackrest-credentials
+      global:
+        repo1-path: /pgbackrest/${APP}
+        repo1-cipher-type: aes-256-cbc
+        repo1-s3-uri-style: path
+      repo:
+        name: repo1
+        s3:
+          bucket: ${BACKUPS__S3_BUCKET}
+          endpoint: ${BACKUPS__S3_ENDPOINT}
+          region: ${BACKUPS__S3_REGION:=us-east-1}
+  backups:
+    pgbackrest:
+      configuration:
+        - secret:
+            name: ${APP}-pgbackrest-credentials
+      global:
+        repo1-path: /pgbackrest/${APP}
+        repo1-cipher-type: aes-256-cbc
+        repo1-s3-uri-style: path
+        repo1-retention-full: "3"  # Keep 3 full backups
+        repo1-retention-full-type: count
+      repos:
+        - name: repo1
+          s3:
+            bucket: ${BACKUPS__S3_BUCKET}
+            endpoint: ${BACKUPS__S3_ENDPOINT}
+            region: ${BACKUPS__S3_REGION:=us-east-1}
+          schedules:
+            full: "0 12 * * 0"            # Sunday at 12 PM UTC (4:00/5:00 AM PST/PDT)
+            incremental: "0 12 * * 1-6"   # Mon-Sat at 12 PM UTC (4:00/5:00 AM PST/PDT)

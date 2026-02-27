@@ -1,0 +1,36 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: home-assistant
+spec:
+  targetNamespace: smart-home
+  interval: 1h
+  prune: true
+  wait: true
+  components:
+    - ../../../../../components/postgres
+    - ../../../../../components/volsync
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  path: ./kubernetes/workloads/apps/smart-home/home-assistant/manifests
+  postBuild:
+    substitute:
+      APP: home-assistant
+      DOMAIN: staging.omnicosm.net
+      BACKUPS__S3_BUCKET: cluster-backups-4265
+      BACKUPS__S3_ENDPOINT: s3.us-west-004.backblazeb2.com
+  patches:
+    - patch: |-
+        - op: replace
+          path: /spec/users
+          value:
+            - name: hass
+              databases:
+                - hass
+              password:
+                type: AlphaNumeric
+      target:
+        kind: PostgresCluster

@@ -1,0 +1,26 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/cilium.io/ciliumloadbalancerippool_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: private
+spec:
+  serviceSelector:
+    matchLabels:
+      io.cilium.gateway/owning-gateway: private
+  blocks:
+    - cidr: 10.0.30.2/32
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/cilium.io/ciliuml2announcementpolicy_v2alpha1.json
+apiVersion: cilium.io/v2alpha1
+kind: CiliumL2AnnouncementPolicy
+metadata:
+  name: private
+spec:
+  serviceSelector:
+    matchLabels:
+      io.cilium.gateway/owning-gateway: private
+  externalIPs: true
+  loadBalancerIPs: true
+  interfaces:
+    - eno2.30

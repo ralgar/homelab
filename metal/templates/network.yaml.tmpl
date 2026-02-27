@@ -1,0 +1,16 @@
+---
+machine:
+  network:
+    nameservers:
+      - ${gateway}
+    interfaces:
+      - interface: eno1
+        addresses:
+          - ${cidr_address}
+        routes:
+          - network: 0.0.0.0/0
+            gateway: ${gateway}
+      - interface: eno2
+        vlans:
+          - vlanId: 30
+          - vlanId: 40

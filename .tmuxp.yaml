@@ -1,0 +1,11 @@
+---
+session_name: Homelab
+environment:
+  KUBECONFIG: "${PWD}/output/kubeconfig"
+  TALOSCONFIG: "${PWD}/output/talosconfig"
+windows:
+  - window_name: vim
+  - window_name: build
+  - window_name: other
+  - window_name: k9s
+    shell_command_before: [k9s]

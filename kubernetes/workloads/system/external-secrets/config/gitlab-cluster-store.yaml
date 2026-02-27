@@ -1,0 +1,17 @@
+---
+apiVersion: external-secrets.io/v1
+kind: ClusterSecretStore
+metadata:
+  name: gitlab
+spec:
+  provider:
+    gitlab:
+      # url: https://gitlab.mydomain.com/
+      auth:
+        SecretRef:
+          accessToken:
+            namespace: flux-system
+            name: cluster-secret-vars
+            key: GITLAB_TOKEN_EXTERNAL_SECRETS
+      projectID: "38523911"
+      environment: "prod"

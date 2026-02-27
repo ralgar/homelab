@@ -1,4 +1,0 @@
----
-- name: Checking 'cinder-premium' volume group exists
-  ansible.builtin.command: vgs cinder-premium
-  changed_when: false

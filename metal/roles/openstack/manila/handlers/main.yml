@@ -1,7 +1,0 @@
----
-- name: Create default share type
-  ansible.builtin.shell: |
-    source /etc/kolla/admin-openrc.sh
-    source {{ manila_kolla_venv }}/bin/activate
-    openstack share type create default_share_type False
-  listen: create_default_share_type

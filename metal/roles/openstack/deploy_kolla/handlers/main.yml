@@ -1,4 +1,0 @@
----
-- name: Include post-deploy tasks
-  ansible.builtin.include_tasks: post-deploy.yml
-  listen: post_deploy

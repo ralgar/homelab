@@ -1,0 +1,23 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: jellyfin
+spec:
+  targetNamespace: media-server
+  interval: 1h
+  prune: true
+  wait: true
+  components:
+    - ../../../../../components/volsync
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  path: ./kubernetes/workloads/apps/media-server/jellyfin/manifests
+  postBuild:
+    substitute:
+      APP: jellyfin
+      BACKUPS__S3_BUCKET: cluster-backups-4265
+      BACKUPS__S3_ENDPOINT: s3.us-west-004.backblazeb2.com
+      DOMAIN: staging.omnicosm.net

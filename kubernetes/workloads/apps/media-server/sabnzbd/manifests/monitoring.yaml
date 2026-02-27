@@ -1,0 +1,17 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: sabnzbd-exporter
+  namespace: media-server
+  labels:
+    app.kubernetes.io/name: sabnzbd
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sabnzbd
+  endpoints:
+    - port: monitoring
+      interval: 4m
+      scrapeTimeout: 90s
+      path: /metrics

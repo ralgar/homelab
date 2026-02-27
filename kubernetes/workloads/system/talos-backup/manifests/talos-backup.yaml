@@ -1,0 +1,85 @@
+---
+apiVersion: talos.dev/v1alpha1
+kind: ServiceAccount
+metadata:
+  name: talos-backup-secrets
+spec:
+  roles:
+    - os:etcd:backup
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: talos-backup
+spec:
+  schedule: '0 12 * * *'
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: talos-backup
+              image: ghcr.io/siderolabs/talos-backup:v0.1.0-beta.3-5-g07d09ec
+              workingDir: /tmp
+              imagePullPolicy: IfNotPresent
+              env:
+                - name: AWS_REGION
+                  value: us-east-1
+                - name: CUSTOM_S3_ENDPOINT
+                  value: https://${BACKUPS__S3_ENDPOINT}
+                - name: BUCKET
+                  value: ${BACKUPS__S3_BUCKET}
+                - name: S3_PREFIX  # Path in bucket
+                  value: etcd
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: talos-backup-credentials
+                      key: S3_ACCESS_KEY
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: talos-backup-credentials
+                      key: S3_SECRET_KEY
+                - name: AGE_X25519_PUBLIC_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: talos-backup-credentials
+                      key: AGE_PUBLIC_KEY
+                - name: ENABLE_COMPRESSION
+                  value: 'true'  # Compress using zstd
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  memory: 256Mi
+              securityContext:
+                runAsUser: 1000
+                runAsGroup: 1000
+                allowPrivilegeEscalation: false
+                runAsNonRoot: true
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop:
+                    - ALL
+                seccompProfile:
+                  type: RuntimeDefault
+              command:
+                - /talos-backup
+              volumeMounts:
+                - mountPath: /tmp
+                  name: tmp
+                - mountPath: /.talos
+                  name: talos
+                - mountPath: /var/run/secrets/talos.dev
+                  name: talos-secrets
+          restartPolicy: OnFailure
+          volumes:
+            - emptyDir: {}
+              name: tmp
+            - emptyDir: {}
+              name: talos
+            - name: talos-secrets
+              secret:
+                secretName: talos-backup-secrets

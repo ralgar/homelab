@@ -1,0 +1,14 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: media-server
+resources:
+  - namespace.yaml
+  - common/sync.yaml
+  - jellyfin/sync.yaml
+  - prowlarr/sync.yaml
+  - radarr/sync.yaml
+  - recyclarr/sync.yaml
+  - sabnzbd/sync.yaml
+  - seerr/sync.yaml
+  - sonarr/sync.yaml

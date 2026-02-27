@@ -1,0 +1,13 @@
+---
+cluster:
+  network:
+    cni:
+      name: none    # Disabled since we use Cilium
+  proxy:
+    disabled: true  # Disabled since we use Cilium
+  extraManifests:
+    - https://github.com/kubernetes-sigs/gateway-api/releases/latest/download/experimental-install.yaml
+  inlineManifests:
+    - name: cilium
+      contents: |
+        ${indent(8, CILIUM_MANIFEST)}

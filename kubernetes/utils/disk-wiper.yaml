@@ -1,0 +1,95 @@
+# WARNING: HERE BE DRAGONS!
+# Applying this file will WIPE all Ceph OSD metadata from specified nodes/disks!
+# This is intended to be used in conjunction with `talosctl reset` to start anew.
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: disk-wiper
+  labels:
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/warn: privileged
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: disk-wiper-config
+  namespace: disk-wiper
+data:
+  wipe.sh: |
+    #!/bin/sh
+    set -euo pipefail
+
+    # Device paths map to the SCSI controller's drive bays.
+    DISKS_BY_PATH=(
+        "pci-0000:08:00.0-scsi-0:2:0:0"
+        "pci-0000:08:00.0-scsi-0:2:1:0"
+        "pci-0000:08:00.0-scsi-0:2:2:0"
+        "pci-0000:08:00.0-scsi-0:2:3:0"
+        "pci-0000:08:00.0-scsi-0:2:4:0"
+        "pci-0000:08:00.0-scsi-0:2:5:0"
+        "pci-0000:08:00.0-scsi-0:2:6:0"
+        "pci-0000:08:00.0-scsi-0:2:7:0"
+    )
+
+    for disk in "${DISKS_BY_PATH[@]}" ; do
+        diskPath="/dev/disk/by-path/$disk"
+        if [ -b "$diskPath" ] ; then
+            echo "[INFO] Wiping $disk..."
+            ceph-volume lvm zap --destroy "$diskPath"
+            echo "[INFO] Wiped $disk successfully."
+        else
+            echo "[WARNING] $disk not found, skipping."
+        fi
+    done
+
+    echo "All disks wiped successfully"
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: disk-wiper
+  namespace: disk-wiper
+  annotations:
+    ignore-check.kube-linter.io/host-network: "Required for disk wiping"
+    ignore-check.kube-linter.io/host-pid: "Required for disk wiping"
+    ignore-check.kube-linter.io/privileged-container: "Required for disk wiping"
+    ignore-check.kube-linter.io/privilege-escalation-container: "Required for disk wiping"
+    ignore-check.kube-linter.io/sensitive-host-mounts: "Required for disk wiping"
+    ignore-check.kube-linter.io/run-as-non-root: "Required for disk wiping"
+    ignore-check.kube-linter.io/no-read-only-root-fs: "Required for disk wiping"
+spec:
+  ttlSecondsAfterFinished: 300
+  template:
+    spec:
+      restartPolicy: Never
+      hostNetwork: true
+      hostPID: true
+      nodeSelector:
+        kubernetes.io/hostname: talos-aio  # Change to your node name
+      containers:
+      - name: disk-wiper
+        image: quay.io/ceph/ceph:v19
+        command: ["/bin/bash", "/scripts/wipe.sh"]
+        securityContext:
+          privileged: true
+        volumeMounts:
+          - name: dev
+            mountPath: /dev
+          - name: scripts
+            mountPath: /scripts
+        resources:
+          requests:
+            cpu: 100m
+            memory: 64Mi
+          limits:
+            memory: 128Mi
+      volumes:
+        - name: dev
+          hostPath:
+            path: /dev
+        - name: scripts
+          configMap:
+            name: disk-wiper-config
+            defaultMode: 0755

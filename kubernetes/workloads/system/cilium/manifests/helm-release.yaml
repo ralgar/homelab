@@ -1,0 +1,51 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: cilium
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: cilium
+  # https://github.com/cilium/cilium/blob/main/install/kubernetes/cilium/values.yaml
+  values:
+    operator:
+      replicas: 1
+    l2announcements:
+      enabled: true
+    externalIPs:
+      enabled: true
+    gatewayAPI:
+      enabled: true
+    devices: eno+
+
+    # Talos-specific config
+    ipam:
+      mode: kubernetes
+    kubeProxyReplacement: true
+    kubeProxyReplacementHealthzBindAddr: 0.0.0.0:10256
+    cgroup:
+      autoMount:
+        enabled: false
+      hostRoot: /sys/fs/cgroup
+    k8sServiceHost: localhost
+    k8sServicePort: 7445
+    securityContext:
+      capabilities:
+        ciliumAgent:
+          - CHOWN
+          - KILL
+          - NET_ADMIN
+          - NET_RAW
+          - IPC_LOCK
+          - SYS_ADMIN
+          - SYS_RESOURCE
+          - DAC_OVERRIDE
+          - FOWNER
+          - SETGID
+          - SETUID
+        cleanCiliumState:
+          - NET_ADMIN
+          - SYS_ADMIN
+          - SYS_RESOURCE

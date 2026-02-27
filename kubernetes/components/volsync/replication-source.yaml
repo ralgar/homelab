@@ -1,0 +1,27 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/volsync.backube/replicationsource_v1alpha1.json
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationSource
+metadata:
+  name: ${APP}
+spec:
+  sourcePVC: ${APP}
+  trigger:
+    # Run every day at 12 PM UTC (4:00/5:00 AM PST/PDT)
+    schedule: "0 12 * * *"
+  restic:
+    accessModes:
+      - ${VOLSYNC__SNAP_ACCESS_MODE:=ReadWriteOnce}  # Use ReadOnlyMany for CephFS
+    repository: ${APP}-volsync-secret
+    retain:
+      hourly: 24
+      daily: 7
+      weekly: 4
+      monthly: 6
+    copyMethod: Snapshot
+    storageClassName: general
+    volumeSnapshotClassName: general
+    moverSecurityContext:
+      runAsUser: ${VOLSYNC__PUID:=1000}
+      runAsGroup: ${VOLSYNC__PGID:=1000}
+      fsGroup: ${VOLSYNC__PGID:=1000}
