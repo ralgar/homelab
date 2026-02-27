@@ -2,13 +2,13 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: external-snapshotter
+  name: snapshot-controller
 spec:
   targetNamespace: kube-system
   interval: 1h
   sourceRef:
     kind: GitRepository
     name: flux-system
-  path: ./kubernetes/workloads/system/external-snapshotter/manifests
+  path: ./kubernetes/workloads/system/snapshot-controller/manifests
   prune: true
   wait: true
