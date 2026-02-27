@@ -33,6 +33,13 @@ gitops-destroy:
 		-target "$(TF_GITOPS_MODULE).helm_release.flux_sync"
 	sleep 60
 
+.PHONY: diff
+diff:
+	flux diff kustomization flux-system \
+		--recursive \
+		--path ./kubernetes/clusters/metal \
+		--local-sources GitRepository/flux-system/flux-system=./
+
 .PHONY: docs
 docs: venv
 	source venv/bin/activate && mkdocs serve --config-file docs/mkdocs.yml
