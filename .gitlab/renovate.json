@@ -2,11 +2,13 @@
   "extends": ["config:recommended"],
   "prConcurrentLimit": 5,
   "prHourlyLimit": 5,
+  "rebaseWhen": "behind-base-branch",
+  "separateMajorMinor": true,
   "flux": {
-    "fileMatch": ["clusters/.+\\.ya?ml$"]
+    "fileMatch": ["kubernetes/.+\\.ya?ml$"]
   },
   "kubernetes": {
-    "fileMatch": ["clusters/.+\\.ya?ml$"]
+    "fileMatch": ["kubernetes/.+\\.ya?ml$"]
   },
   "packageRules": [
     {
