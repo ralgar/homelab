@@ -10,6 +10,9 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  dependsOn:
+    - name: cert-manager-config
+    - name: external-secrets-config
   path: ./kubernetes/workloads/system/networking/manifests
   prune: true
   wait: true

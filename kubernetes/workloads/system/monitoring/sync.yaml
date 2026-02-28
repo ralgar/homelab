@@ -12,6 +12,8 @@ spec:
   path: ./kubernetes/workloads/system/monitoring/controllers
   prune: true
   wait: true
+  dependsOn:
+    - name: external-secrets-config
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization

@@ -47,9 +47,6 @@ spec:
         annotations: {}
     pspEnable: false
     cephClusterSpec:
-      cephVersion:
-        image: quay.io/ceph/ceph:v19.2.3
-        allowUnsupported: false
       dataDirHostPath: /var/lib/rook
       skipUpgradeChecks: false
       continueUpgradeAfterChecksEvenIfNotHealthy: false

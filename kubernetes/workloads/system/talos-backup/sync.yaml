@@ -14,6 +14,8 @@ spec:
     name: flux-system
     namespace: flux-system
   path: ./kubernetes/workloads/system/talos-backup/manifests
+  dependsOn:
+    - name: external-secrets-config
   postBuild:
     substitute:
       BACKUPS__S3_BUCKET: cluster-backups-4265
