@@ -12,3 +12,5 @@ spec:
   path: ./kubernetes/workloads/system/snapshot-controller/manifests
   prune: true
   wait: true
+  dependsOn:
+    - name: monitoring-controllers

@@ -12,3 +12,5 @@ spec:
   path: ./kubernetes/workloads/system/metrics-server/manifests
   prune: true
   wait: true
+  dependsOn:
+    - name: monitoring-controllers
