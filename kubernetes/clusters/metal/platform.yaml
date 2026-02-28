@@ -3,7 +3,6 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: platform
-  namespace: flux-system
 spec:
   interval: 1h
   sourceRef:
@@ -11,6 +10,7 @@ spec:
     name: flux-system
   path: ./kubernetes/clusters/metal/platform
   prune: true
-  wait: true
+  wait: false
   dependsOn:
-    - name: system
+    - name: external-secrets
+    - name: rook-ceph-config
