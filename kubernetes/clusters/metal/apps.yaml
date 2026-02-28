@@ -3,6 +3,7 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: apps
+  namespace: flux-system
 spec:
   interval: 1h
   sourceRef:
@@ -12,10 +13,4 @@ spec:
   prune: true
   wait: false
   dependsOn:
-    - name: cert-manager-config
-    - name: crunchy-pgo
-    - name: external-secrets-config
-    - name: monitoring-controllers
-    - name: rook-ceph-config
-    - name: vault-config
-    - name: volsync
+    - name: platform
