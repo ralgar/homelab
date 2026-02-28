@@ -27,5 +27,5 @@ spec:
   prune: true
   wait: true
   dependsOn:
-    - name: external-snapshotter
     - name: rook-ceph-controller
+    - name: snapshot-controller
