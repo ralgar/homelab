@@ -5,6 +5,8 @@ metadata:
   name: apps
   namespace: flux-system
 spec:
+  dependsOn:
+    - name: platform
   interval: 1h
   sourceRef:
     kind: GitRepository
@@ -12,5 +14,3 @@ spec:
   path: ./kubernetes/clusters/metal/apps
   prune: true
   wait: false
-  dependsOn:
-    - name: platform

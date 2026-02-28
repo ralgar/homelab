@@ -5,12 +5,14 @@ metadata:
   name: platform
   namespace: flux-system
 spec:
+  dependsOn:
+    - name: system
   interval: 1h
+  retryInterval: 1m
+  timeout: 5m
   sourceRef:
     kind: GitRepository
     name: flux-system
   path: ./kubernetes/clusters/metal/platform
   prune: true
   wait: true
-  dependsOn:
-    - name: system
