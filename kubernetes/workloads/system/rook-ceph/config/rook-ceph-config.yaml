@@ -29,6 +29,13 @@ spec:
       auth_allow_insecure_global_id_reclaim = false
     toolbox:
       enabled: true
+      tolerations: []
+      affinity: {}
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "64Mi"
+      priorityClassName:
     monitoring:
       enabled: true
       metricsDisabled: false
@@ -38,8 +45,58 @@ spec:
         labels:
           release: kube-prometheus-stack
         annotations: {}
+    pspEnable: false
     cephClusterSpec:
-      storage: # Cluster-level storage configuration and selection
+      cephVersion:
+        image: quay.io/ceph/ceph:v19.2.3
+        allowUnsupported: false
+      dataDirHostPath: /var/lib/rook
+      skipUpgradeChecks: false
+      continueUpgradeAfterChecksEvenIfNotHealthy: false
+      waitTimeoutForHealthyOSDInMinutes: 10
+      mon:
+        count: 1
+        allowMultiplePerNode: false
+      mgr:
+        count: 1
+        allowMultiplePerNode: false
+        modules:
+          - name: pg_autoscaler
+            enabled: true
+          - name: dashboard
+            enabled: false
+          - name: nfs
+            enabled: false
+      dashboard:
+        enabled: false
+        ssl: true
+      network:
+        connections:
+          encryption:
+            enabled: false
+          compression:
+            enabled: false
+          requireMsgr2: false
+        provider: host
+      crashCollector:
+        disable: true
+      logCollector:
+        enabled: true
+        periodicity: daily # one of: hourly, daily, weekly, monthly
+        maxLogSize: 500M # SUFFIX may be 'M' or 'G'. Must be at least 1M.
+      cleanupPolicy:
+        confirmation: ""
+        sanitizeDisks:
+          method: quick
+          dataSource: zero
+          iteration: 1
+        allowUninstallWithVolumes: false
+      removeOSDsIfOutAndSafeToRemove: false
+      priorityClassNames:
+        mon: system-node-critical
+        osd: system-node-critical
+        mgr: system-cluster-critical
+      storage: # cluster level storage configuration and selection
         useAllNodes: false
         useAllDevices: false
         nodes:
@@ -55,25 +112,28 @@ spec:
               - name: "/dev/disk/by-path/pci-0000:08:00.0-scsi-0:2:5:0"
               - name: "/dev/disk/by-path/pci-0000:08:00.0-scsi-0:2:6:0"
               - name: "/dev/disk/by-path/pci-0000:08:00.0-scsi-0:2:7:0"
-      mon:
-        count: 1
-        allowMultiplePerNode: false
-      mgr:
-        count: 1
-        allowMultiplePerNode: false
-        modules:
-          - name: pg_autoscaler
-            enabled: true
-      dashboard:
-        enabled: true
-        urlPrefix: /
-        ssl: false  # We have SSL on the gateway
-        prometheusEndpoint: http://prometheus-operated.monitoring.svc.cluster.local:9090
-      network:
-        connections:
-          requireMsgr2: true
-      crashCollector:
-        disable: false
+      disruptionManagement:
+        managePodBudgets: true
+        osdMaintenanceTimeout: 30
+        pgHealthCheckTimeout: 0
+      healthCheck:
+        daemonHealth:
+          mon:
+            disabled: false
+            interval: 45s
+          osd:
+            disabled: false
+            interval: 60s
+          status:
+            disabled: false
+            interval: 60s
+        livenessProbe:
+          mon:
+            disabled: false
+          mgr:
+            disabled: false
+          osd:
+            disabled: false
       resources:
         mon:
           requests:
@@ -87,16 +147,6 @@ spec:
           requests:
             cpu: "500m"
             memory: "1Gi"
-
-    route:
-      dashboard:
-        host:
-          name: ceph.omnicosm.net
-          path: /
-          pathType: PathPrefix
-        parentRefs:
-          - name: internal
-            namespace: networking
 
     # -- A list of CephBlockPool configurations to deploy
     # @default -- See [below](#ceph-block-pools)
