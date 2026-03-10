@@ -21,6 +21,9 @@ spec:
     jellyfin:
       enableDLNA: false
     persistence:
+      config:
+        enabled: true
+        existingClaim: ${APP}
       media:
         enabled: true
         existingClaim: media
@@ -54,7 +57,7 @@ spec:
       enabled: true
       annotations: {}
       parentRefs:
-        - name: shared-gateway
+        - name: public
           namespace: networking
           sectionName: https
       hostnames:
