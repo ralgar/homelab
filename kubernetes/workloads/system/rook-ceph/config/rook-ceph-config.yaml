@@ -99,16 +99,16 @@ spec:
         nodes:
           - name: "talos-aio"  # Must match the node's hostname
             devices:
-              # Device paths map to the SCSI controller's drive bays.
+              # Device paths map to the SAS controller's drive bays.
               # We specify all 8 bays and can hotswap drives as needed.
-              - name: "/dev/disk/by-path/pci-0000:08:00.0-scsi-0:2:0:0"
-              - name: "/dev/disk/by-path/pci-0000:08:00.0-scsi-0:2:1:0"
-              - name: "/dev/disk/by-path/pci-0000:08:00.0-scsi-0:2:2:0"
-              - name: "/dev/disk/by-path/pci-0000:08:00.0-scsi-0:2:3:0"
-              - name: "/dev/disk/by-path/pci-0000:08:00.0-scsi-0:2:4:0"
-              - name: "/dev/disk/by-path/pci-0000:08:00.0-scsi-0:2:5:0"
-              - name: "/dev/disk/by-path/pci-0000:08:00.0-scsi-0:2:6:0"
-              - name: "/dev/disk/by-path/pci-0000:08:00.0-scsi-0:2:7:0"
+              - name: "/dev/disk/by-path/pci-0000:08:00.0-sas-phy1-lun-0"
+              - name: "/dev/disk/by-path/pci-0000:08:00.0-sas-phy2-lun-0"
+              - name: "/dev/disk/by-path/pci-0000:08:00.0-sas-phy3-lun-0"
+              - name: "/dev/disk/by-path/pci-0000:08:00.0-sas-phy4-lun-0"
+              - name: "/dev/disk/by-path/pci-0000:08:00.0-sas-phy5-lun-0"
+              - name: "/dev/disk/by-path/pci-0000:08:00.0-sas-phy6-lun-0"
+              - name: "/dev/disk/by-path/pci-0000:08:00.0-sas-phy7-lun-0"
+              - name: "/dev/disk/by-path/pci-0000:08:00.0-sas-phy8-lun-0"
       disruptionManagement:
         managePodBudgets: true
         osdMaintenanceTimeout: 30
