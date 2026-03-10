@@ -1,0 +1,69 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: media-filesystem-init
+data:
+  fs-init.sh: |
+    #!/bin/bash
+    set -xe
+
+    mkdir -p /media/library/movies
+    mkdir -p /media/library/series
+    mkdir -p /media/usenet/completed/movies
+    mkdir -p /media/usenet/completed/prowlarr
+    mkdir -p /media/usenet/completed/series
+    mkdir -p /media/usenet/incomplete
+    chmod -R g+w,o-rwx /media/*
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: media-filesystem-init
+  annotations:
+    ignore-check.kube-linter.io/latest-tag: "Tag pinning not needed for busybox"
+spec:
+  ttlSecondsAfterFinished: 86400
+  template:
+    spec:
+      restartPolicy: OnFailure
+      securityContext:
+        runAsUser: 109030
+        runAsGroup: 109030
+        fsGroup: 109030
+        seLinuxOptions:
+          level: "s0:c123,c456"
+      containers:
+        - name: media-filesystem-init
+          image: cgr.dev/chainguard/busybox:latest
+          command: ["/bin/sh", "/scripts/fs-init.sh"]
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+            - name: media
+              mountPath: /media
+          resources:
+            requests:
+              cpu: 125m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+          securityContext:
+            runAsNonRoot: true
+            privileged: false
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ['ALL']
+            seccompProfile:
+              type: RuntimeDefault
+      volumes:
+        - name: scripts
+          configMap:
+            name: media-filesystem-init
+            defaultMode: 0700
+        - name: media
+          persistentVolumeClaim:
+            claimName: media

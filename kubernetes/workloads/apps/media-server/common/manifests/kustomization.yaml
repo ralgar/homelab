@@ -3,6 +3,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - media-pvc.yaml
+  - media-job.yaml
 configMapGenerator:
   - name: media-grafana-dashboard
     files:
