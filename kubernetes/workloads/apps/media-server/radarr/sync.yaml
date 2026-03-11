@@ -15,4 +15,4 @@ spec:
   path: ./kubernetes/workloads/apps/media-server/radarr/manifests
   postBuild:
     substitute:
-      DOMAIN: staging.omnicosm.net
+      DOMAIN: omnicosm.net

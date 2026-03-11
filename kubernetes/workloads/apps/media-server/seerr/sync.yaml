@@ -20,4 +20,4 @@ spec:
       APP: seerr
       BACKUPS__S3_BUCKET: cluster-backups-4265
       BACKUPS__S3_ENDPOINT: s3.us-west-004.backblazeb2.com
-      DOMAIN: staging.omnicosm.net
+      DOMAIN: omnicosm.net

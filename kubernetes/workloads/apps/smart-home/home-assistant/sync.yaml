@@ -19,7 +19,7 @@ spec:
   postBuild:
     substitute:
       APP: home-assistant
-      DOMAIN: staging.omnicosm.net
+      DOMAIN: omnicosm.net
       BACKUPS__S3_BUCKET: cluster-backups-4265
       BACKUPS__S3_ENDPOINT: s3.us-west-004.backblazeb2.com
   patches:

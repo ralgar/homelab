@@ -15,4 +15,4 @@ spec:
   wait: true
   postBuild:
     substitute:
-      DOMAIN: staging.omnicosm.net
+      DOMAIN: omnicosm.net

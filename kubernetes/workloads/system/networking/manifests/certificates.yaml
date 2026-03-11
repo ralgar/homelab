@@ -9,5 +9,5 @@ spec:
     name: letsencrypt-prod
     kind: ClusterIssuer
   dnsNames:
-  - "*.staging.omnicosm.net"
-  - staging.omnicosm.net
+  - "*.omnicosm.net"
+  - omnicosm.net
