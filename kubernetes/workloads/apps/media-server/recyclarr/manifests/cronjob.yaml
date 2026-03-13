@@ -6,13 +6,13 @@ metadata:
 spec:
   schedule: "0 0 * * *"
   concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
   jobTemplate:
     metadata:
       name: recyclarr
     spec:
       backoffLimit: 0
-      successfulJobsHistoryLimit: 1
-      failedJobsHistoryLimit: 1
       template:
         spec:
           restartPolicy: Never
