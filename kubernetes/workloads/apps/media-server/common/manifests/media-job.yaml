@@ -3,9 +3,10 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: media-filesystem-init
+  namespace: media-server
 data:
   fs-init.sh: |
-    #!/bin/bash
+    #!/bin/sh
     set -xe
 
     mkdir -p /media/library/movies
@@ -14,13 +15,20 @@ data:
     mkdir -p /media/usenet/completed/prowlarr
     mkdir -p /media/usenet/completed/series
     mkdir -p /media/usenet/incomplete
-    chmod -R g+w,o-rwx /media/*
+
+    chmod g+w,o-rwx /media/library/movies
+    chmod g+w,o-rwx /media/library/series
+    chmod g+w,o-rwx /media/usenet/completed/movies
+    chmod g+w,o-rwx /media/usenet/completed/prowlarr
+    chmod g+w,o-rwx /media/usenet/completed/series
+    chmod g+w,o-rwx /media/usenet/incomplete
 
 ---
 apiVersion: batch/v1
 kind: Job
 metadata:
   name: media-filesystem-init
+  namespace: media-server
   annotations:
     ignore-check.kube-linter.io/latest-tag: "Tag pinning not needed for busybox"
 spec:
