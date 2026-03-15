@@ -40,6 +40,9 @@ spec:
       enabled: true
       metricsDisabled: false
       createPrometheusRules: true
+      prometheusRuleOverrides:
+        CephPGImbalance:
+          disabled: true  # Causing noise due to my oddly-sized disks
       rulesNamespaceOverride:
       prometheusRule:
         labels:
