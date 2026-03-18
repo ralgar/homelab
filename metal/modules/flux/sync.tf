@@ -31,7 +31,7 @@ resource "time_sleep" "delay_destroy" {
 resource "helm_release" "flux_sync" {
   repository       = "https://fluxcd-community.github.io/helm-charts"
   chart            = "flux2-sync"
-  version          = "1.14.3"
+  version          = "1.14.4"
   name             = "flux-system"
   namespace        = "flux-system"
   create_namespace = true
