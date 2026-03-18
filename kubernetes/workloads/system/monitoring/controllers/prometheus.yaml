@@ -28,15 +28,24 @@ spec:
     crds: CreateReplace
   # https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml
   values:
+    cleanPrometheusOperatorObjectNames: true
     kubeProxy:
       enabled: false  # Replaced by Cilium
     kubeEtcd:
       service:
         selector:
-          # Hacky workaround so we don't have to hard-code the Talos node address
-          k8s-app: kube-controller-manager
+          component: kube-apiserver  # etcd runs on control plane nodes
     prometheus:
+      route:
+        main:
+          enabled: true
+          hostnames:
+            - prometheus.omnicosm.net
+          parentRefs:
+            - name: private
+              namespace: networking
       prometheusSpec:
+        externalUrl: https://prometheus.omnicosm.net
         retention: 24h
         resources:
           requests:
@@ -53,6 +62,14 @@ spec:
       podDisruptionBudget:
         enabled: false
         minAvailable: 1
+      route:
+        main:
+          enabled: true
+          hostnames:
+            - alertmanager.omnicosm.net
+          parentRefs:
+            - name: private
+              namespace: networking
       alertmanagerSpec:
         configSecret: alertmanager-config
         secrets:
