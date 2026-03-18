@@ -61,3 +61,11 @@ spec:
           requests:
             cpu: 100m
             memory: 200Mi
+    grafana:
+      enabled: false
+      forceDeployDashboards: true
+      operator:
+        dashboardsConfigMapRefEnabled: true
+        folder: monitoring
+        matchLabels:
+          dashboards: grafana

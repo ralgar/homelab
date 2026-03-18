@@ -7,4 +7,5 @@ resources:
   - alertmanager-secrets.yaml
   - alertmanager-config.yaml
   - prometheus.yaml
+  - grafana-operator.yaml
   - loki.yaml
