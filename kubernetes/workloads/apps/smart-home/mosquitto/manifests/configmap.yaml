@@ -13,7 +13,7 @@ data:
 
     # Store temporary state to bolster reliable delivery.
     persistence true
-    persistence_location /data/
+    persistence_location /mosquitto/data/
 
     # Password from K8s secret.
     password_file /secrets/mosquitto.passwd

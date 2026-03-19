@@ -38,7 +38,7 @@ spec:
             - name: mosquitto-config
               mountPath: /mosquitto/config
             - name: mosquitto-data
-              mountPath: /data
+              mountPath: /mosquitto/data
             - name: mosquitto-secrets
               mountPath: /secrets
           resources:
@@ -80,8 +80,8 @@ spec:
           configMap:
             name: mosquitto-config
         - name: mosquitto-data
-          emptyDir:
-            sizeLimit: 8Mi
+          persistentVolumeClaim:
+            claimName: mosquitto-data
         - name: mosquitto-secrets
           secret:
             secretName: mosquitto-secrets

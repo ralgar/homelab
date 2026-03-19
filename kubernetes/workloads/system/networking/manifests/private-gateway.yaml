@@ -6,6 +6,9 @@ metadata:
   name: private
 spec:
   gatewayClassName: cilium
+  infrastructure:
+    annotations:
+      lbipam.cilium.io/ips: 10.0.30.2
   listeners:
     - name: http
       protocol: HTTP

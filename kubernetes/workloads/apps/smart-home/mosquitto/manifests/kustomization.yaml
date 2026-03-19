@@ -5,4 +5,5 @@ resources:
   - configmap.yaml
   - secrets.yaml
   - ingress.yaml
+  - storage.yaml
   - deployment.yaml
