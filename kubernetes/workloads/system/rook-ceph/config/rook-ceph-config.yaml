@@ -26,7 +26,6 @@ spec:
       [global]
       osd_pool_default_size = 2
       osd_pool_default_min_size = 1
-      auth_allow_insecure_global_id_reclaim = false
     toolbox:
       enabled: true
       tolerations: []
