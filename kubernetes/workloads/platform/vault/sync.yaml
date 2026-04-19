@@ -27,5 +27,12 @@ spec:
   path: ./kubernetes/workloads/platform/vault/config
   prune: true
   wait: true
+  components:
+    - ../../../../../components/volsync
+  postBuild:
+    substitute:
+      APP: vault
+      BACKUPS__S3_BUCKET: cluster-backups-4265
+      BACKUPS__S3_ENDPOINT: s3.us-west-004.backblazeb2.com
   dependsOn:
     - name: vault-controller

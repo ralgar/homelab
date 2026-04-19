@@ -19,22 +19,10 @@ spec:
   volumes:
     - name: vault-file
       persistentVolumeClaim:
-        claimName: vault-file
+        claimName: vault
   volumeMounts:
     - name: vault-file
       mountPath: /vault/file
-  volumeClaimTemplates:
-    - metadata:
-        name: vault-file
-      spec:
-        # https://kubernetes.io/docs/concepts/storage/persistent-volumes/#class-1
-        # storageClassName: ""
-        accessModes:
-          - ReadWriteOnce
-        volumeMode: Filesystem
-        resources:
-          requests:
-            storage: 1Gi
 
   # Describe where you would like to store the Vault unseal keys and root token.
   unsealConfig:
