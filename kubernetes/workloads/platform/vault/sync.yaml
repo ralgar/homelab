@@ -28,7 +28,7 @@ spec:
   prune: true
   wait: true
   components:
-    - ../../../../../components/volsync
+    - ../../../../components/volsync
   postBuild:
     substitute:
       APP: vault
