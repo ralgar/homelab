@@ -25,3 +25,10 @@ sonarr:
       - trash_id: 72dae194fc92bf828f32cde7744e51a1  # WEB-1080p
         reset_unmatched_scores:
           enabled: true
+    custom_formats:
+      - # No Audio Description
+        trash_ids:
+          - 44ccbcbc74506f208973e1463b11705f  # With Audio Description
+        assign_scores_to:
+          - trash_id: 72dae194fc92bf828f32cde7744e51a1  # WEB-1080p
+            score: -10000
