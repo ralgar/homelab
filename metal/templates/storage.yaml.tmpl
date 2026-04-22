@@ -1,14 +1,52 @@
 machine:
   install:
     disk: ${install_disk}
-  systemDiskEncryption:
-    ephemeral:
-      provider: luks2
-      keys:
-        - nodeID: {}
-          slot: 0
-    state:
-      provider: luks2
-      keys:
-        - nodeID: {}
-          slot: 0
+---
+apiVersion: v1alpha1
+kind: VolumeConfig
+name: STATE
+encryption:
+  provider: luks2
+  keys:
+    - nodeID: {}
+      slot: 0
+---
+apiVersion: v1alpha1
+kind: VolumeConfig
+name: EPHEMERAL
+provisioning:
+  maxSize: 460GiB
+  grow: false
+encryption:
+  provider: luks2
+  keys:
+    - slot: 0
+      nodeID: {}
+---
+apiVersion: v1alpha1
+kind: UserVolumeConfig
+name: rook
+provisioning:
+  diskSelector:
+    match: system_disk
+  minSize: 10GiB
+  maxSize: 10GiB
+encryption:
+  provider: luks2
+  keys:
+    - slot: 0
+      nodeID: {}
+---
+apiVersion: v1alpha1
+kind: RawVolumeConfig
+name: ceph-storage
+provisioning:
+  diskSelector:
+    match: system_disk
+  minSize: 100GiB
+  grow: true
+encryption:
+  provider: luks2
+  keys:
+    - slot: 0
+      nodeID: {}
