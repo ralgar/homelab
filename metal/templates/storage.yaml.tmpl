@@ -39,14 +39,9 @@ encryption:
 ---
 apiVersion: v1alpha1
 kind: RawVolumeConfig
-name: ceph-storage
+name: nvme-osd
 provisioning:
   diskSelector:
     match: system_disk
   minSize: 100GiB
   grow: true
-encryption:
-  provider: luks2
-  keys:
-    - slot: 0
-      nodeID: {}
