@@ -6,6 +6,7 @@ metadata:
   labels:
     app.kubernetes.io/name: hass
   annotations:
+    reloader.stakater.com/auto: "true"
     ignore-check.kube-linter.io/no-read-only-root-fs: "Unsupported for this app."
 spec:
   revisionHistoryLimit: 3

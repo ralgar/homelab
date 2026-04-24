@@ -31,6 +31,8 @@ metadata:
   namespace: media-server
   labels:
     app.kubernetes.io/name: sabnzbd
+  annotations:
+    reloader.stakater.com/auto: "true"
 spec:
   revisionHistoryLimit: 3
   replicas: 1

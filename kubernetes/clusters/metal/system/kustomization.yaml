@@ -9,6 +9,7 @@ resources:
   - ../../../workloads/system/metrics-server/sync.yaml
   - ../../../workloads/system/monitoring/sync.yaml
   - ../../../workloads/system/networking/sync.yaml
+  - ../../../workloads/system/reloader/sync.yaml
   - ../../../workloads/system/rook-ceph/sync.yaml
   - ../../../workloads/system/snapshot-controller/sync.yaml
   - ../../../workloads/system/talos-backup/sync.yaml
