@@ -83,7 +83,7 @@ spec:
       resources:
         requests:
           storage: 10Gi
-      storageClassName: general
+      storageClassName: general-block
   disableDefaultSecurityContext: All
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/servicemonitor_v1.json

@@ -19,8 +19,8 @@ spec:
       weekly: 4
       monthly: 6
     copyMethod: Snapshot
-    storageClassName: general
-    volumeSnapshotClassName: general
+    storageClassName: general-block
+    volumeSnapshotClassName: general-block
     moverSecurityContext:
       runAsUser: ${VOLSYNC__PUID:=1000}
       runAsGroup: ${VOLSYNC__PGID:=1000}

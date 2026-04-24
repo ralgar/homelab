@@ -16,7 +16,7 @@ spec:
     cacheAccessModes:
       - ${VOLSYNC__CACHE_ACCESS_MODE:=ReadWriteOnce}
     cacheCapacity: ${VOLSYNC__CAPACITY:=5Gi}
-    cacheStorageClassName: ${VOLSYNC__CACHE_STORAGE_CLASS:=general}
+    cacheStorageClassName: ${VOLSYNC__CACHE_STORAGE_CLASS:=general-block}
     capacity: ${VOLSYNC__CAPACITY:=5Gi}
     cleanupCachePVC: true
     cleanupTempPVC: true
@@ -26,5 +26,5 @@ spec:
       runAsUser: ${VOLSYNC__PUID:=1000}
       runAsGroup: ${VOLSYNC__PGID:=1000}
       fsGroup: ${VOLSYNC__PGID:=1000}
-    storageClassName: ${VOLSYNC__STORAGE_CLASS:=general}
-    volumeSnapshotClassName: ${VOLSYNC__SNAPSHOT_CLASS:=general}
+    storageClassName: ${VOLSYNC__STORAGE_CLASS:=general-block}
+    volumeSnapshotClassName: ${VOLSYNC__SNAPSHOT_CLASS:=general-block}

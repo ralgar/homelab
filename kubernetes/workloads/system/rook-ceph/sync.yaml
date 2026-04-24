@@ -18,7 +18,7 @@ kind: Kustomization
 metadata:
   name: rook-ceph-config
 spec:
-  targetNamespace: rook-ceph
+  #targetNamespace:  # Do NOT target namespace as clusters each need their own
   interval: 1h
   sourceRef:
     kind: GitRepository
