@@ -25,6 +25,7 @@ spec:
         - secret:
             name: ${APP}-pgbackrest-credentials
       global:
+        process-max: "8"
         repo1-path: /pgbackrest/${APP}
         repo1-cipher-type: aes-256-cbc
         repo1-s3-uri-style: path
