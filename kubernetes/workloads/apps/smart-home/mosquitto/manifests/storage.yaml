@@ -4,7 +4,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: mosquitto-data
 spec:
-  storageClassName: general-block
+  storageClassName: premium-block
   accessModes:
     - ReadWriteOnce
   resources:

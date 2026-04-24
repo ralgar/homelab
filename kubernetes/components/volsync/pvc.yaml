@@ -4,7 +4,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: ${APP}
 spec:
-  storageClassName: ${VOLSYNC__STORAGE_CLASS:=general-block}
+  storageClassName: ${VOLSYNC__STORAGE_CLASS:=premium-block}
   accessModes:
     - ${VOLSYNC__ACCESS_MODE:=ReadWriteOnce}
   dataSourceRef:

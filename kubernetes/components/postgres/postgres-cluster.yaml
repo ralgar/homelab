@@ -8,6 +8,7 @@ spec:
   instances:
     - name: postgres
       dataVolumeClaimSpec:
+        storageClassName: ${POSTGRES__STORAGE_CLASS:=premium-block}
         accessModes:
           - ReadWriteOnce
         resources:
