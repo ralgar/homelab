@@ -27,6 +27,8 @@ spec:
         runAsUser: 105055
         runAsGroup: 105055
         fsGroup: 105055
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: seerr
           image: ghcr.io/seerr-team/seerr:v3.2.0@sha256:c4cbd5121236ac2f70a843a0b920b68a27976be57917555f1c45b08a1e6b2aad

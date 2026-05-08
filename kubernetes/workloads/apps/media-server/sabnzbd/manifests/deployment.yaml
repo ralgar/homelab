@@ -54,6 +54,8 @@ spec:
         runAsUser: 106789
         runAsGroup: 109030
         fsGroup: 109030
+        seccompProfile:
+          type: RuntimeDefault
         seLinuxOptions:
           level: "s0:c123,c456"
       containers:

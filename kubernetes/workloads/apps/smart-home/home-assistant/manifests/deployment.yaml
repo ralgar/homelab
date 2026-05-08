@@ -27,6 +27,8 @@ spec:
         runAsUser: 108123
         runAsGroup: 108123
         fsGroup: 108123
+        seccompProfile:
+          type: RuntimeDefault
       initContainers:
         - name: init
           image: docker.io/blockstack/envsubst:latest@sha256:d64d7430289a2440d86b68047207d0454a4b67be6afa6600c4df4978d48aecfb

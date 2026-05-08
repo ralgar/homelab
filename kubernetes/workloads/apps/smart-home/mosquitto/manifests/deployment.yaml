@@ -27,6 +27,8 @@ spec:
         runAsUser: 101883
         runAsGroup: 101883
         fsGroup: 101883
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: mosquitto
           image: docker.io/eclipse-mosquitto:2.0.22
