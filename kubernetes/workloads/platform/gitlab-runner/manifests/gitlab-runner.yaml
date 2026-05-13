@@ -20,7 +20,7 @@ spec:
   interval: 5m
   chart:
     spec:
-      version: "0.88.1"
+      version: "0.88.2"
       chart: gitlab-runner
       sourceRef:
         kind: HelmRepository
