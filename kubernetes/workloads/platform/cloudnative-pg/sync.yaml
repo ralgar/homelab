@@ -12,5 +12,3 @@ spec:
   path: ./kubernetes/workloads/platform/cloudnative-pg/manifests
   prune: true
   wait: true
-  dependsOn:
-    - name: monitoring-controllers
