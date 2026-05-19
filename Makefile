@@ -1,37 +1,4 @@
-TF_ROOT  := ./infra/deployments/main-k8s
-
 CURRENT_REF := $(shell git symbolic-ref HEAD)
-
-TF_GITOPS_MODULE := module.cluster1_gitops
-
-.PHONY: plan
-plan:
-	cd $(TF_ROOT) && terraform plan -var="gitops_ref_name=$(CURRENT_REF)"
-
-.PHONY: init
-init:
-	cd $(TF_ROOT) && terraform init
-
-.PHONY: apply
-apply:
-	cd $(TF_ROOT) && terraform apply -auto-approve -var="gitops_ref_name=$(CURRENT_REF)"
-
-.PHONY: destroy
-destroy: gitops-destroy
-	cd $(TF_ROOT) && terraform state rm '$(TF_GITOPS_MODULE)' || true
-	cd $(TF_ROOT) && terraform destroy -auto-approve
-
-.PHONY: gitops-redeploy
-gitops-redeploy: gitops-destroy
-	cd $(TF_ROOT) && terraform apply -auto-approve \
-		-target "$(TF_GITOPS_MODULE).helm_release.flux_sync" \
-		-var="gitops_ref_name=$(CURRENT_REF)"
-
-.PHONY: gitops-destroy
-gitops-destroy:
-	cd $(TF_ROOT) && terraform destroy -auto-approve \
-		-target "$(TF_GITOPS_MODULE).helm_release.flux_sync"
-	sleep 60
 
 .PHONY: diff
 diff:
@@ -39,6 +6,10 @@ diff:
 		--recursive \
 		--path ./kubernetes/clusters/metal \
 		--local-sources GitRepository/flux-system/flux-system=./
+
+.PHONY: switch-branch
+switch-branch:
+	kubectl patch gitrepository flux-system -n flux-system --type=merge -p '{"spec":{"ref":{"name":"$(CURRENT_REF)"}}}'
 
 .PHONY: docs
 docs: venv
