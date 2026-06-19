@@ -15,7 +15,7 @@ spec:
   interval: 5m
   chart:
     spec:
-      version: "3.13.0"
+      version: "3.13.1"
       chart: metrics-server
       sourceRef:
         kind: HelmRepository
