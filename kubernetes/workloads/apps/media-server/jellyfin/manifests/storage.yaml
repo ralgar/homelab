@@ -9,4 +9,4 @@ spec:
   storageClassName: premium-block
   resources:
     requests:
-      storage: 10Gi
+      storage: 50Gi
