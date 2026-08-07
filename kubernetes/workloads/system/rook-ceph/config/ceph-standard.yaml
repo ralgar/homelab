@@ -192,19 +192,16 @@ spec:
             region: us-east-1
         route:
           # Enable an ingress for the ceph-objectstore
-          enabled: false
-          # The ingress port by default will be the object store's "securePort" (if set), or the gateway "port".
-          # To override those defaults, set this ingress port to the desired port.
-          # port: 80
+          enabled: true
           # annotations: {}
-          # host:
-          #   name: objectstore.example.com
-          #   path: /
-          #   pathType: PathPrefix
-          # parentRefs:
-          #   - name: internal
-          #     namespace: kube-system
-          #     sectionName: https
+          host:
+            name: s3.omnicosm.net
+            path: /
+            pathType: PathPrefix
+          parentRefs:
+            - name: private
+              namespace: networking
+              sectionName: https
 ---
 # Overrides size and failureDomain for builtin .mgr pool, since Rook Ceph
 #  doesn't provide any way to configure this in the Helm chart directly.
