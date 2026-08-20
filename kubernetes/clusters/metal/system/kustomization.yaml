@@ -6,6 +6,7 @@ resources:
   - ../../../workloads/system/cert-manager/sync.yaml
   - ../../../workloads/system/cilium/sync.yaml
   - ../../../workloads/system/external-secrets/sync.yaml
+  - ../../../workloads/system/kubernetes-mcp-server/sync.yaml
   - ../../../workloads/system/metrics-server/sync.yaml
   - ../../../workloads/system/monitoring/sync.yaml
   - ../../../workloads/system/networking/sync.yaml

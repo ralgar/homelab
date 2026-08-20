@@ -1,0 +1,37 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kubernetes-mcp-server
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: kubernetes-mcp-server
+  # https://github.com/containers/kubernetes-mcp-server/blob/main/charts/kubernetes-mcp-server/values.yaml
+  values:
+    extraArgs:
+      - --read-only
+    rbac:
+      extraClusterRoleBindings:
+        - name: use-view-role
+          roleRef:
+            name: view
+            external: true
+    ingress:
+      enabled: false
+    httpRoute:
+      enabled: true
+      parentRefs:
+        - group: gateway.networking.k8s.io
+          kind: Gateway
+          name: private
+          namespace: networking
+          sectionName: https
+      hostnames:
+        - k8s-mcp.omnicosm.net
+      rules:
+        - matches:
+            - path:
+                type: PathPrefix
+                value: /
