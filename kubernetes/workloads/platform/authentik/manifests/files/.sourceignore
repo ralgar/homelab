@@ -1,0 +1,2 @@
+# Explicitly include images since Flux ignores image files by default
+!EmailLogo.png

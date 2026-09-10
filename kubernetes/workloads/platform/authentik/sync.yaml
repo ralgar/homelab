@@ -1,0 +1,39 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: authentik
+spec:
+  targetNamespace: authentik
+  interval: 1h
+  prune: true
+  wait: true
+  components:
+    - ../../../../components/postgres
+    - ../../../../components/volsync
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  path: ./kubernetes/workloads/platform/authentik/manifests
+  postBuild:
+    substitute:
+      APP: authentik
+      DOMAIN: omnicosm.net
+      BACKUPS__S3_BUCKET: cluster-backups-4265
+      BACKUPS__S3_ENDPOINT: s3.us-west-004.backblazeb2.com
+      VOLSYNC__ACCESS_MODE: ReadWriteMany
+      VOLSYNC__STORAGE_CLASS: general-shared
+      VOLSYNC__SNAPSHOT_CLASS: general-shared
+  patches:
+    - patch: |-
+        - op: replace
+          path: /spec/users
+          value:
+            - name: authentik
+              databases:
+                - authentik
+              password:
+                type: AlphaNumeric
+      target:
+        kind: PostgresCluster

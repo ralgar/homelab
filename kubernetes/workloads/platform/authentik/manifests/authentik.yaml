@@ -1,0 +1,119 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: authentik
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: authentik
+spec:
+  interval: 120m
+  url: https://charts.goauthentik.io
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: authentik
+spec:
+  interval: 5m
+  chart:
+    spec:
+      version: "2026.8.0"
+      chart: authentik
+      sourceRef:
+        kind: HelmRepository
+        name: authentik
+      interval: 60m
+  install:
+    crds: Create
+  upgrade:
+    crds: CreateReplace
+  values:
+    authentik:
+      secret_key: file:///authentik-secrets/secret-key
+      error_reporting:
+        enabled: false  # Opt out of telemetry
+      postgresql:
+        host: file:///postgres-creds/host
+        port: file:///postgres-creds/port
+        name: file:///postgres-creds/dbname
+        user: file:///postgres-creds/user
+        password: file:///postgres-creds/password
+      email:
+        host: smtp.resend.com
+        port: 587
+        username: resend
+        password: file:///authentik-secrets/smtp-password
+        use_tls: true   # -- STARTTLS / explicit TLS, usually on port 587.
+        use_ssl: false  # -- Implicit TLS/SSL, usually on port 465 (`use_ssl` is the setting name).
+        timeout: 10
+        from: "Omnicosm <noreply@auth.omnicosm.net>"
+
+    server:
+      route:
+        main:
+          enabled: true
+          hostnames:
+            - auth.${DOMAIN}
+          parentRefs:
+            - name: public
+              namespace: networking
+
+    global:
+      env:
+        - name: AUTHENTIK_POSTGRESQL__SSLMODE
+          value: require
+      volumes:
+        - name: authentik-data
+          persistentVolumeClaim:
+            claimName: authentik
+        - name: authentik-secrets
+          secret:
+            secretName: authentik-secrets
+        - name: custom-branding
+          configMap:
+            name: custom-branding
+        - name: email-templates
+          configMap:
+            name: email-templates
+        - name: postgres-creds
+          secret:
+            secretName: authentik-pguser-authentik
+      volumeMounts:
+        - name: authentik-data
+          mountPath: /data
+        - name: authentik-secrets
+          mountPath: /authentik-secrets
+          readOnly: true
+        - name: custom-branding
+          mountPath: /web/dist/assets/icons/icon_left_brand.png
+          subPath: EmailLogo.png
+          readOnly: true
+        - name: email-templates
+          mountPath: /templates/email
+          readOnly: true
+        - name: postgres-creds
+          mountPath: /postgres-creds
+          readOnly: true
+
+    additionalObjects:
+      - apiVersion: external-secrets.io/v1
+        kind: ExternalSecret
+        metadata:
+          name: authentik-secrets
+        spec:
+          secretStoreRef:
+            kind: ClusterSecretStore
+            name: gitlab
+          target:
+            name: authentik-secrets
+            creationPolicy: Owner
+          data:
+            - secretKey: secret-key
+              remoteRef:
+                key: AUTHENTIK__SECRET_KEY
+            - secretKey: smtp-password
+              remoteRef:
+                key: AUTHENTIK__SMTP_PASSWORD
