@@ -33,7 +33,7 @@ spec:
           level: "s0:c123,c456"
       containers:
         - name: sonarr
-          image: ghcr.io/home-operations/sonarr:4.0.19.2997@sha256:01db3e6a923f6e0f3a217baa94b4660cf2f9b45d4166b2fc8c20c67c5221cb78
+          image: ghcr.io/home-operations/sonarr:4.0.20.3012@sha256:1f19eb5e0f421418c1a956bbe01310a0141423afe28bd9a4b1dcb8629ff2bce2
           imagePullPolicy: IfNotPresent
           env:
             - name: SONARR__APP__THEME
