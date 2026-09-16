@@ -33,7 +33,7 @@ spec:
           level: "s0:c123,c456"
       containers:
         - name: prowlarr
-          image: ghcr.io/home-operations/prowlarr:2.6.1.5509@sha256:ce5d6bdd5be6529f503df77aa9d2bad20239031d7c660406e8fb1c6d621dd020
+          image: ghcr.io/home-operations/prowlarr:2.6.4.5611@sha256:a5b8031268268b9d3a121c49ea7cc89248538e6379a3e29b0d419489bd95e004
           imagePullPolicy: IfNotPresent
           env:
             - name: PROWLARR__APP__THEME
