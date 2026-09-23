@@ -9,6 +9,7 @@ data:
     #!/bin/sh
     set -xe
 
+    mkdir -p /media/library/anime
     mkdir -p /media/library/movies
     mkdir -p /media/library/series
     mkdir -p /media/usenet/completed/movies
@@ -16,6 +17,7 @@ data:
     mkdir -p /media/usenet/completed/series
     mkdir -p /media/usenet/incomplete
 
+    chmod g+w,o-rwx /media/library/anime
     chmod g+w,o-rwx /media/library/movies
     chmod g+w,o-rwx /media/library/series
     chmod g+w,o-rwx /media/usenet/completed/movies
