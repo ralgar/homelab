@@ -47,6 +47,7 @@ spec:
         repo1-s3-uri-style: path
         repo1-retention-full: "3"  # Keep 3 full backups
         repo1-retention-full-type: count
+        repo1-bundle: "y"
       repos:
         - name: repo1
           s3:
