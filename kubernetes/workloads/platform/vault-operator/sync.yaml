@@ -2,15 +2,13 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: infra
-  namespace: flux-system
+  name: vault-operator
 spec:
-  dependsOn:
-    - name: system
+  targetNamespace: vault
   interval: 1h
   sourceRef:
     kind: GitRepository
     name: flux-system
-  path: ./kubernetes/clusters/metal/infra
+  path: ./kubernetes/workloads/platform/vault-operator/manifests
   prune: true
-  wait: false
+  wait: true
