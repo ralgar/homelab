@@ -49,17 +49,18 @@ spec:
         use_tls: true   # -- STARTTLS / explicit TLS, usually on port 587.
         use_ssl: false  # -- Implicit TLS/SSL, usually on port 465 (`use_ssl` is the setting name).
         timeout: 10
-        from: "Omnicosm <noreply@auth.omnicosm.net>"
+        from: "Omnicosm <noreply@omnicosm.net>"
 
     server:
       route:
         main:
           enabled: true
           hostnames:
-            - auth.${DOMAIN}
+            - ${DOMAIN}
           parentRefs:
             - name: public
               namespace: networking
+              sectionName: https
 
     global:
       env:

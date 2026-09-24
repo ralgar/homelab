@@ -10,6 +10,5 @@ configMapGenerator:
   - name: email-templates
     files:
       - files/base.html
-      - files/invitation.html
 generatorOptions:
   disableNameSuffixHash: true
