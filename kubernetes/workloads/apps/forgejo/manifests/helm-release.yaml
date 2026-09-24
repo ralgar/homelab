@@ -1,0 +1,58 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: forgejo
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: forgejo
+  # https://code.forgejo.org/forgejo-helm/forgejo-helm/src/branch/main/values.yaml
+  values:
+    persistence:
+      enabled: true
+      create: false
+      mount: true
+      claimName: forgejo
+    gitea:
+      config:
+        server:
+          DOMAIN: git.omnicosm.net
+          ROOT_URL: https://git.omnicosm.net
+          SSH_DOMAIN: git.omnicosm.net
+        database:
+          DB_TYPE: postgres
+          SSL_MODE: require
+        service:
+          DISABLE_REGISTRATION: true
+          ENABLE_INTERNAL_SIGNIN: false
+          ENABLE_BASIC_AUTHENTICATION: false
+        oauth2_client:
+          ENABLE_AUTO_REGISTRATION: true
+      additionalConfigFromEnvs:
+        - name: FORGEJO__DATABASE__HOST
+          valueFrom: { secretKeyRef: { name: forgejo-pguser-forgejo, key: host } }
+        - name: FORGEJO__DATABASE__PORT
+          valueFrom: { secretKeyRef: { name: forgejo-pguser-forgejo, key: port } }
+        - name: FORGEJO__DATABASE__USER
+          valueFrom: { secretKeyRef: { name: forgejo-pguser-forgejo, key: user } }
+        - name: FORGEJO__DATABASE__PASSWD
+          valueFrom: { secretKeyRef: { name: forgejo-pguser-forgejo, key: password } }
+        - name: FORGEJO__DATABASE__NAME
+          valueFrom: { secretKeyRef: { name: forgejo-pguser-forgejo, key: dbname } }
+
+    httpRoute:
+      enabled: true
+      parentRefs:
+        - name: private
+          namespace: networking
+      hostnames:
+        - git.omnicosm.net
+
+    tcpRoute:
+      enabled: false  # FIXME: Remove manual TCPRoute when Forgejo chart catches up
+      parentRefs:
+        - name: private
+          namespace: networking
+          sectionName: ssh
