@@ -6,10 +6,10 @@
   "rebaseWhen": "behind-base-branch",
   "separateMajorMinor": true,
   "flux": {
-    "fileMatch": ["kubernetes/.+\\.ya?ml$"]
+    "managerFilePatterns": ["/kubernetes/.+\\.ya?ml$/"]
   },
   "kubernetes": {
-    "fileMatch": ["kubernetes/.+\\.ya?ml$"]
+    "managerFilePatterns": ["/kubernetes/.+\\.ya?ml$/"]
   },
   "packageRules": [
     {
@@ -17,7 +17,12 @@
       "automerge": false
     },
     {
-      "matchUpdateTypes": ["patch"],
+      "matchUpdateTypes": ["patch", "digest"],
+      "automerge": true
+    },
+    {
+      "matchPackageNames": ["/jellyfin/"],
+      "matchUpdateTypes": ["minor"],
       "automerge": true
     }
   ]
