@@ -10,8 +10,8 @@ spec:
     name: kubernetes-mcp-server
   # https://github.com/containers/kubernetes-mcp-server/blob/main/charts/kubernetes-mcp-server/values.yaml
   values:
-    extraArgs:
-      - --read-only
+    config:
+      read_only: true
     rbac:
       extraClusterRoleBindings:
         - name: use-view-role
