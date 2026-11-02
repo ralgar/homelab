@@ -45,8 +45,10 @@ spec:
         repo1-path: /pgbackrest/${APP}
         repo1-cipher-type: aes-256-cbc
         repo1-s3-uri-style: path
-        repo1-retention-full: "3"  # Keep 3 full backups
+        repo1-retention-full: "30"  # Keep 30 full backups
         repo1-retention-full-type: count
+        repo1-retention-archive-type: full
+        repo1-retention-archive: "1"  # Only keep WAL until most recent full backup
         repo1-bundle: "y"
       repos:
         - name: repo1
@@ -55,5 +57,4 @@ spec:
             endpoint: ${BACKUPS__S3_ENDPOINT}
             region: ${BACKUPS__S3_REGION:=us-east-1}
           schedules:
-            full: "0 12 * * 0"            # Sunday at 12 PM UTC (4:00/5:00 AM PST/PDT)
-            incremental: "0 12 * * 1-6"   # Mon-Sat at 12 PM UTC (4:00/5:00 AM PST/PDT)
+            full: "0 12 * * *"  # Full backup daily at 12 PM UTC (5:00 AM PDT)
