@@ -25,6 +25,10 @@ sonarr:
       - trash_id: 72dae194fc92bf828f32cde7744e51a1  # WEB-1080p
         reset_unmatched_scores:
           enabled: true
+      - trash_id: 20e0fc959f1f1704bed501f23bdae76f  # [Anime] Remux-1080p
+        min_format_score: 2000   # Reject anything that isn't Dual Audio or Dub Only
+        reset_unmatched_scores:
+          enabled: true
     custom_formats:
       - # No Audio Description
         trash_ids:
@@ -32,3 +36,15 @@ sonarr:
         assign_scores_to:
           - trash_id: 72dae194fc92bf828f32cde7744e51a1  # WEB-1080p
             score: -10000
+      - # [Anime] Dual Audio: Preferred
+        trash_ids:
+          - 418f50b10f1907201b6cfdf881f467b7  # [Anime] Dual Audio
+        assign_scores_to:
+          - trash_id: 20e0fc959f1f1704bed501f23bdae76f  # [Anime] Remux-1080p
+            score: 3500
+      - # [Anime] Dub Only: Acceptable
+        trash_ids:
+          - 9c14d194486c4014d422adc64092d794  # [Anime] Dub Only
+        assign_scores_to:
+          - trash_id: 20e0fc959f1f1704bed501f23bdae76f  # [Anime] Remux-1080p
+            score: 2000
