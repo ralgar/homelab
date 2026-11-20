@@ -20,7 +20,7 @@ spec:
   interval: 5m
   chart:
     spec:
-      version: "2026.8.5"
+      version: "2026.8.6"
       chart: authentik
       sourceRef:
         kind: HelmRepository
